@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz An Toàn Lao Động - Nâng Cao</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #quiz-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Progress Bar */
+        .quiz-progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Question Container */
+        .question-container {
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        /* Image Single/Multi Choice */
+        .image-answers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-answer-option {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .image-answer-option:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .image-answer-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .image-answer-option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .image-answer-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .image-answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .image-answer-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-answer-text {
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .image-answer-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .image-answer-option.selected .image-answer-checkbox {
+            background: #667eea;
+            color: white;
+        }
+
+        .image-answer-option.correct .image-answer-checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .image-answer-option.incorrect .image-answer-checkbox {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        /* Drag and Drop */
+        .drag-drop-container {
+            margin-top: 20px;
+        }
+
+        .drag-source {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .drag-source-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .draggable-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+
+        .draggable-item {
+            cursor: move;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .draggable-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .draggable-item.dragging {
+            opacity: 0.5;
+        }
+
+        .draggable-item.placed {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .draggable-item-img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .draggable-item-label {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            background: #667eea;
+            color: white;
+        }
+
+        .drop-zones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .drop-zone {
+            min-height: 300px;
+            padding: 20px;
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .drop-zone-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .drop-zone.safe .drop-zone-header {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .drop-zone.danger .drop-zone-header {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .drop-zone-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .dropped-item {
+            position: relative;
+        }
+
+        .remove-item {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        /* Hotspot Image - Multi Select */
+        .hotspot-container {
+            margin-top: 20px;
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .hotspot-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hotspot-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hotspot-point {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(102, 126, 234, 0);
+            }
+        }
+
+        .hotspot-point:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .hotspot-point.selected {
+            background: #667eea;
+            color: white;
+            animation: none;
+        }
+
+        .hotspot-point.correct {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            animation: none;
+        }
+
+        .hotspot-point.incorrect {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            animation: none;
+        }
+
+        .hotspot-point.disabled {
+            cursor: not-allowed;
+        }
+
+        .hotspot-instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .submit-button, .next-button, .retry-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover, .next-button:hover, .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feedback-correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .feedback-icon {
+            font-size: 24px;
+        }
+
+        /* Results */
+        .results-container {
+            text-align: center;
+        }
+
+        .results-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .results-score {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 8;
+        }
+
+        .score-circle-fill {
+            fill: none;
+            stroke-width: 8;
+            transition: stroke-dasharray 1s ease;
+        }
+
+        .score-circle.passed .score-circle-fill {
+            stroke: #28a745;
+        }
+
+        .score-circle.failed .score-circle-fill {
+            stroke: #dc3545;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-percentage {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .score-fraction {
+            font-size: 18px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .results-message {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .message-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+            }
+
+            .question-title {
+                font-size: 20px;
+            }
+
+            .image-answers-container {
+                grid-template-columns: 1fr;
+            }
+
+            .drop-zones {
+                grid-template-columns: 1fr;
+            }
+
+            .draggable-items {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-percentage {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container"></div>
+
+    <script>
+        // ===================================================================
+        // QUIZ ENGINE - ĐỌC JSON FORMAT CỦA BẠN
+        // ===================================================================
+        class QuizEngine {
+            constructor(gameData) {
+                this.gameData = gameData;
+                this.questions = gameData.EachQuiz || [];
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.answers = [];
+                this.container = null;
+                this.currentAnswer = null;
+            }
+
+            init(containerId) {
+                this.container = document.getElementById(containerId);
+                if (!this.container) {
+                    console.error('Quiz container not found:', containerId);
+                    return;
+                }
+                this.render();
+            }
+
+            render() {
+                if (this.currentQuestionIndex < this.questions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.renderResults();
+                }
+            }
+
+            renderQuestion() {
+                const question = this.questions[this.currentQuestionIndex];
+                const totalQuestions = this.questions.length;
+                const questionNumber = this.currentQuestionIndex + 1;
+
+                let questionHtml = '';
+                switch (question.qtype) {
+                    case 'image_mcq':
+                        questionHtml = this.renderImageMCQ(question);
+                        break;
+                    case 'image_multi':
+                        questionHtml = this.renderImageMulti(question);
+                        break;
+                    case 'drag_drop':
+                        questionHtml = this.renderDragDrop(question);
+                        break;
+                    case 'multi_hotspot':
+                        questionHtml = this.renderMultiHotspot(question);
+                        break;
+                }
+
+                const html = `
+                    <div class="quiz-container">
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(questionNumber / totalQuestions) * 100}%"></div>
+                            </div>
+                            <div class="progress-text">Câu ${questionNumber} / ${totalQuestions}</div>
+                        </div>
+
+                        <div class="question-container">
+                            <span class="question-type-badge">${this.getTypeLabel(question.qtype)}</span>
+                            <h2 class="question-title">${question.qtxt}</h2>
+                            ${questionHtml}
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+                this.attachEventListeners(question);
+            }
+
+            getTypeLabel(type) {
+                const labels = {
+                    'image_mcq': 'Chọn 1 hình ảnh',
+                    'image_multi': 'Chọn nhiều hình ảnh',
+                    'drag_drop': 'Kéo thả',
+                    'multi_hotspot': 'Click nhiều điểm'
+                };
+                return labels[type] || type;
+            }
+
+            renderImageMCQ(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">○</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderImageMulti(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">☐</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-multi">Xác nhận</button>
+                `;
+            }
+
+            renderDragDrop(question) {
+                return `
+                    <div class="drag-drop-container">
+                        <div class="drag-source">
+                            <div class="drag-source-title">Kéo các hình ảnh vào cột phù hợp:</div>
+                            <div class="draggable-items" id="draggable-items">
+                                ${question.drag_items.map((item, index) => `
+                                    <div class="draggable-item" draggable="true" data-index="${index}" data-id="${item.id}">
+                                        <img src="${item.image}" alt="${item.label}" class="draggable-item-img">
+                                        <div class="draggable-item-label">${item.label}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="drop-zones">
+                            <div class="drop-zone safe" data-zone="safe">
+                                <div class="drop-zone-header">✓ An Toàn</div>
+                                <div class="drop-zone-items"></div>
+                            </div>
+                            <div class="drop-zone danger" data-zone="danger">
+                                <div class="drop-zone-header">⚠ Nguy Cơ</div>
+                                <div class="drop-zone-items"></div>
+                            </div>
+                        </div>
+
+                        <button class="submit-button" id="submit-drag" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderMultiHotspot(question) {
+                const correctCount = question.sol_array ? question.sol_array.length : 0;
+                return `
+                    <div class="hotspot-container">
+                        <div class="hotspot-instructions">
+                            📍 Click vào tất cả các điểm nguy hiểm trên hình ảnh (${correctCount} điểm)
+                        </div>
+                        <div style="position: relative; display: inline-block;">
+                            <img src="${question.image_json[0]}" alt="Hotspot Image" class="hotspot-image" id="hotspot-img">
+                            <div class="hotspot-overlay">
+                                ${question.hotspot_array.map((hotspot, index) => `
+                                    <div class="hotspot-point" data-index="${index}" data-id="${hotspot.id}"
+                                         style="left: ${hotspot.x}%; top: ${hotspot.y}%;">
+                                        ${index + 1}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-hotspot">Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            attachEventListeners(question) {
+                switch (question.qtype) {
+                    case 'image_mcq':
+                        this.attachImageMCQListeners(question);
+                        break;
+                    case 'image_multi':
+                        this.attachImageMultiListeners(question);
+                        break;
+                    case 'drag_drop':
+                        this.attachDragDropListeners(question);
+                        break;
+                    case 'multi_hotspot':
+                        this.attachMultiHotspotListeners(question);
+                        break;
+                }
+            }
+
+            attachImageMCQListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        const isCorrect = index === question.sol_array;
+                        this.currentAnswer = { selected: [index], isCorrect };
+                        
+                        options.forEach(opt => opt.classList.add('disabled'));
+                        option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        option.querySelector('.image-answer-checkbox').textContent = isCorrect ? '✓' : '✗';
+                        
+                        if (!isCorrect) {
+                            options[question.sol_array].classList.add('correct');
+                            options[question.sol_array].querySelector('.image-answer-checkbox').textContent = '✓';
+                        }
+                        
+                        this.showFeedback(isCorrect, question);
+                    });
+                });
+            }
+
+            attachImageMultiListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                const submitBtn = this.container.querySelector('#submit-multi');
+                const selected = new Set();
+
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        if (selected.has(index)) {
+                            selected.delete(index);
+                            option.classList.remove('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☐';
+                        } else {
+                            selected.add(index);
+                            option.classList.add('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☑';
+                        }
+
+                        submitBtn.disabled = selected.size === 0;
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctSet = new Set(question.sol_array);
+                    const isCorrect = selected.size === correctSet.size && 
+                                     [...selected].every(i => correctSet.has(i));
+                    
+                    this.currentAnswer = { selected: Array.from(selected), isCorrect };
+                    
+                    options.forEach((opt, idx) => {
+                        opt.classList.add('disabled');
+                        const checkbox = opt.querySelector('.image-answer-checkbox');
+                        if (correctSet.has(idx)) {
+                            opt.classList.add('correct');
+                            checkbox.textContent = '✓';
+                        } else if (selected.has(idx)) {
+                            opt.classList.add('incorrect');
+                            checkbox.textContent = '✗';
+                        }
+                    });
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, question);
+                });
+            }
+
+            attachDragDropListeners(question) {
+                const draggables = this.container.querySelectorAll('.draggable-item');
+                const dropZones = this.container.querySelectorAll('.drop-zone');
+                const submitBtn = this.container.querySelector('#submit-drag');
+                const placements = {};
+
+                draggables.forEach(draggable => {
+                    draggable.addEventListener('dragstart', (e) => {
+                        if (draggable.classList.contains('placed')) return;
+                        draggable.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('id', draggable.dataset.id);
+                        e.dataTransfer.setData('index', draggable.dataset.index);
+                    });
+
+                    draggable.addEventListener('dragend', () => {
+                        draggable.classList.remove('dragging');
+                    });
+                });
+
+                dropZones.forEach(zone => {
+                    zone.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        zone.classList.add('drag-over');
+                    });
+
+                    zone.addEventListener('dragleave', () => {
+                        zone.classList.remove('drag-over');
+                    });
+
+                    zone.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        zone.classList.remove('drag-over');
+                        
+                        const id = e.dataTransfer.getData('id');
+                        const index = e.dataTransfer.getData('index');
+                        const draggable = this.container.querySelector(`.draggable-item[data-id="${id}"]`);
+                        
+                        if (!draggable || draggable.classList.contains('placed')) return;
+
+                        const zoneType = zone.dataset.zone;
+                        const zoneItems = zone.querySelector('.drop-zone-items');
+                        
+                        const clonedItem = draggable.cloneNode(true);
+                        clonedItem.classList.add('dropped-item');
+                        clonedItem.removeAttribute('draggable');
+                        
+                        const removeBtn = document.createElement('button');
+                        removeBtn.className = 'remove-item';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', () => {
+                            clonedItem.remove();
+                            draggable.classList.remove('placed');
+                            delete placements[id];
+                            submitBtn.disabled = Object.keys(placements).length !== question.drag_items.length;
+                        });
+                        
+                        clonedItem.appendChild(removeBtn);
+                        zoneItems.appendChild(clonedItem);
+                        
+                        draggable.classList.add('placed');
+                        placements[id] = zoneType;
+                        
+                        submitBtn.disabled = Object.keys(placements).length !== question.drag_items.length;
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    let correctCount = 0;
+                    question.drag_items.forEach((item) => {
+                        if (placements[item.id] === item.correct_zone) {
+                            correctCount++;
+                        }
+                    });
+                    
+                    const isCorrect = correctCount === question.drag_items.length;
+                    this.currentAnswer = { placements, isCorrect, correctCount };
+                    
+                    submitBtn.disabled = true;
+                    draggables.forEach(d => d.setAttribute('draggable', 'false'));
+                    
+                    this.showFeedback(isCorrect, question, `Bạn xếp đúng ${correctCount}/${question.drag_items.length} hình ảnh`);
+                });
+            }
+
+            attachMultiHotspotListeners(question) {
+                const hotspots = this.container.querySelectorAll('.hotspot-point');
+                const submitBtn = this.container.querySelector('#submit-hotspot');
+                const selected = new Set();
+
+                hotspots.forEach((hotspot) => {
+                    hotspot.addEventListener('click', () => {
+                        if (hotspot.classList.contains('disabled')) return;
+                        
+                        const id = hotspot.dataset.id;
+                        if (selected.has(id)) {
+                            selected.delete(id);
+                            hotspot.classList.remove('selected');
+                        } else {
+                            selected.add(id);
+                            hotspot.classList.add('selected');
+                        }
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctSet = new Set(question.sol_array);
+                    let correctCount = 0;
+                    
+                    hotspots.forEach((hotspot) => {
+                        hotspot.classList.add('disabled');
+                        const id = hotspot.dataset.id;
+                        const isCorrectSpot = correctSet.has(id);
+                        const isSelected = selected.has(id);
+                        
+                        if (isCorrectSpot) {
+                            hotspot.classList.add('correct');
+                            if (isSelected) correctCount++;
+                        } else if (isSelected) {
+                            hotspot.classList.add('incorrect');
+                        }
+                    });
+                    
+                    const isCorrect = correctCount === correctSet.size && selected.size === correctSet.size;
+                    this.currentAnswer = { selected: Array.from(selected), isCorrect, correctCount };
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, question, `Bạn chọn đúng ${correctCount}/${correctSet.size} điểm`);
+                });
+            }
+
+            showFeedback(isCorrect, question, customMessage = '') {
+                if (isCorrect) {
+                    this.score++;
+                }
+
+                this.answers.push({
+                    questionIndex: this.currentQuestionIndex,
+                    qid: question.qid,
+                    answer: this.currentAnswer,
+                    isCorrect: isCorrect
+                });
+
+                const defaultMsg = isCorrect ? 'Chính xác! ✓' : 'Chưa chính xác! ✗';
+                const message = customMessage || defaultMsg;
+                
+                const feedbackHtml = `
+                    <div class="feedback-message ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
+                        <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+                        <span class="feedback-text">${message}</span>
+                    </div>
+                `;
+
+                const questionContainer = this.container.querySelector('.question-container');
+                questionContainer.insertAdjacentHTML('beforeend', feedbackHtml);
+
+                const nextButton = document.createElement('button');
+                nextButton.className = 'next-button';
+                nextButton.textContent = this.currentQuestionIndex < this.questions.length - 1 
+                    ? 'Câu tiếp theo →' 
+                    : 'Hoàn thành';
+                nextButton.addEventListener('click', () => this.nextQuestion());
+                questionContainer.appendChild(nextButton);
+            }
+
+            nextQuestion() {
+                this.currentQuestionIndex++;
+                this.currentAnswer = null;
+                this.render();
+            }
+
+            renderResults() {
+                const totalQuestions = this.questions.length;
+                const percentage = Math.round((this.score / totalQuestions) * 100);
+                const passPercentage = this.gameData.main_pass_threshold_percent || 70;
+                const passed = percentage >= passPercentage;
+
+                const html = `
+                    <div class="quiz-container results-container">
+                        <div class="results-header">
+                            <h2>🎯 Kết quả Quiz</h2>
+                        </div>
+
+                        <div class="results-score">
+                            <div class="score-circle ${passed ? 'passed' : 'failed'}">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="score-circle-bg"></circle>
+                                    <circle cx="50" cy="50" r="45" class="score-circle-fill" 
+                                        style="stroke-dasharray: ${percentage * 2.827}, 282.7"></circle>
+                                </svg>
+                                <div class="score-text">
+                                    <div class="score-percentage">${percentage}%</div>
+                                    <div class="score-fraction">${this.score} / ${totalQuestions}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-message ${passed ? 'message-passed' : 'message-failed'}">
+                            ${passed ? '🎉 Xuất sắc! Bạn đã vượt qua bài kiểm tra!' : '😔 Bạn cần học thêm. Hãy thử lại nhé!'}
+                        </div>
+
+                        <div class="results-actions">
+                            <button class="retry-button" onclick="location.reload()">
+                                🔄 Làm lại
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+            }
+        }
+
+        // ===================================================================
+        // QUIZ DATA - FORMAT JSON CỦA BẠN VỚI 4 LOẠI CÂU HỎI
+        // ===================================================================
+        const quizData = {
+            "main_game_id": "safety_quiz_2025",
+            "main_title": "Quiz An Toàn Lao Động - Nâng Cao",
+            "main_description": "Kiểm tra kiến thức về an toàn lao động với các dạng câu hỏi đa dạng",
+            "main_total_questions": 4,
+            "main_pass_threshold_percent": 75,
+            "EachQuiz": [
+                // Câu 1: Image MCQ - Chọn 1 hình ảnh
+                {
+                    "qn": 1,
+                    "qid": "safety_001",
+                    "qtype": "image_mcq",
+                    "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi làm việc ở công trường?",
+                    "pmax": 10,
+                    "diff": "easy",
+                    "opt_array": [
+                        {
+                            "text": "Mũ bảo hiểm",
+                            "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Mũ thời trang",
+                            "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Nón lá",
+                            "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Không cần đội gì",
+                            "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
+                        }
+                    ],
+                    "sol_array": 0,
+                    "image_json": null,
+                    "expl": "Mũ bảo hiểm là thiết bị bảo hộ bắt buộc tại công trường."
+                },
+
+                // Câu 2: Image Multi - Chọn nhiều hình ảnh
+                {
+                    "qn": 2,
+                    "qid": "safety_002",
+                    "qtype": "image_multi",
+                    "qtxt": "Chọn TẤT CẢ các thiết bị bảo hộ cần thiết khi làm việc với hóa chất:",
+                    "pmax": 15,
+                    "diff": "medium",
+                    "opt_array": [
+                        {
+                            "text": "Găng tay chống hóa chất",
+                            "image": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Kính bảo hộ",
+                            "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Quần áo thời trang",
+                            "image": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Khẩu trang phòng độc",
+                            "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=300&fit=crop"
+                        }
+                    ],
+                    "sol_array": [0, 1, 3],
+                    "image_json": null,
+                    "expl": "Cần đầy đủ găng tay, kính bảo hộ và khẩu trang khi làm việc với hóa chất."
+                },
+
+                // Câu 3: Drag Drop - Kéo thả vào 2 cột
+                {
+                    "qn": 3,
+                    "qid": "safety_003",
+                    "qtype": "drag_drop",
+                    "qtxt": "Kéo thả các hình ảnh vào cột AN TOÀN hoặc NGUY CƠ:",
+                    "pmax": 20,
+                    "diff": "medium",
+                    "opt_array": null,
+                    "drag_items": [
+                        {
+                            "id": "item_1",
+                            "label": "Mặc đồ bảo hộ",
+                            "image": "https://images.unsplash.com/photo-1572107248692-1d32d1f5fc3a?w=200&h=150&fit=crop",
+                            "correct_zone": "safe"
+                        },
+                        {
+                            "id": "item_2",
+                            "label": "Hút thuốc",
+                            "image": "https://images.unsplash.com/photo-1605671919743-c3cd293be5e7?w=200&h=150&fit=crop",
+                            "correct_zone": "danger"
+                        },
+                        {
+                            "id": "item_3",
+                            "label": "Đeo kính bảo hộ",
+                            "image": "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=200&h=150&fit=crop",
+                            "correct_zone": "safe"
+                        },
+                        {
+                            "id": "item_4",
+                            "label": "Chạy trong nhà máy",
+                            "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=200&h=150&fit=crop",
+                            "correct_zone": "danger"
+                        },
+                        {
+                            "id": "item_5",
+                            "label": "Rửa tay đúng cách",
+                            "image": "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=200&h=150&fit=crop",
+                            "correct_zone": "safe"
+                        },
+                        {
+                            "id": "item_6",
+                            "label": "Dùng điện thoại khi vận hành máy",
+                            "image": "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200&h=150&fit=crop",
+                            "correct_zone": "danger"
+                        }
+                    ],
+                    "sol_array": null,
+                    "image_json": null,
+                    "expl": "Phân biệt rõ hành động an toàn và nguy hiểm tại nơi làm việc."
+                },
+
+                // Câu 4: Multi Hotspot - Click nhiều điểm trên ảnh
+                {
+                    "qn": 4,
+                    "qid": "safety_004",
+                    "qtype": "multi_hotspot",
+                    "qtxt": "Click vào TẤT CẢ các điểm NGUY HIỂM trên hình ảnh công trường:",
+                    "pmax": 20,
+                    "diff": "hard",
+                    "opt_array": null,
+                    "hotspot_array": [
+                        { "id": "spot_1", "x": 25, "y": 30 },
+                        { "id": "spot_2", "x": 50, "y": 40 },
+                        { "id": "spot_3", "x": 75, "y": 35 },
+                        { "id": "spot_4", "x": 30, "y": 70 },
+                        { "id": "spot_5", "x": 65, "y": 75 }
+                    ],
+                    "sol_array": ["spot_1", "spot_3", "spot_5"],
+                    "image_json": ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop"],
+                    "expl": "Cần nhận biết được các điểm nguy hiểm để tránh tai nạn lao động."
+                }
+            ]
+        };
+
+        // ===================================================================
+        // KHỞI ĐỘNG QUIZ
+        // ===================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const quiz = new QuizEngine(quizData);
+            quiz.init('quiz-container');
+        });
+    </script>
+</body>
+</html>
