@@ -1,0 +1,2438 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - An Toàn Giao Thông</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #quiz-container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .quiz-main-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .quiz-description {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .quiz-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        /* Progress Bar */
+        .quiz-progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Question Container */
+        .question-container {
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .question-type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .question-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* MCQ & Multi Choice */
+        .text-answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .text-answer-option {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .text-answer-option:hover:not(.disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .text-answer-option.selected {
+            background: #f0f4ff;
+            border-color: #667eea;
+        }
+
+        .text-answer-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .text-answer-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .text-answer-option.disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .text-answer-option.correct .answer-letter {
+            background: #28a745;
+        }
+
+        .text-answer-option.incorrect .answer-letter {
+            background: #dc3545;
+        }
+
+        .answer-text {
+            flex: 1;
+            color: #333;
+        }
+
+        .answer-checkbox {
+            margin-left: 10px;
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        /* Hotspot */
+        .hotspot-container {
+            margin-top: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hotspot-image-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+
+        .hotspot-image {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hotspot-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .hotspot-click-point {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .hotspot-click-point.correct {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .hotspot-click-point.incorrect {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        .hotspot-instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+        }
+
+        /* Order/Sorting */
+        .order-container {
+            margin-top: 20px;
+        }
+
+        .order-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .order-item:hover:not(.disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .order-item.dragging {
+            opacity: 0.5;
+        }
+
+        .order-item.disabled {
+            cursor: not-allowed;
+        }
+
+        .order-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .order-text {
+            flex: 1;
+            color: #333;
+        }
+
+        .drag-handle {
+            font-size: 20px;
+            color: #999;
+            cursor: move;
+        }
+
+        /* Image Pair */
+        .image-pair-container {
+            margin-top: 20px;
+        }
+
+        .pair-instructions {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .pair-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .pair-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pair-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .pair-column.safe .pair-column-header {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .pair-column.danger .pair-column-header {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .pair-item {
+            position: relative;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .pair-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .pair-item.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .pair-item.matched {
+            border-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .pair-item.disabled {
+            cursor: not-allowed;
+        }
+
+        .pair-item-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .pair-item-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .pair-item.selected .pair-item-label {
+            background: #667eea;
+            color: white;
+        }
+
+        .pair-item.matched .pair-item-label {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        /* Drag Drop Pair */
+        .drag-drop-pair-container {
+            margin-top: 20px;
+        }
+
+        .drag-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .drag-column {
+            min-height: 300px;
+        }
+
+        .drag-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .drag-column.source .drag-column-header {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .drag-column.target .drag-column-header {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .drag-items-source, .drag-items-target {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 250px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+        }
+
+        .drag-items-target.drag-over {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .drag-pair-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .drag-pair-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-pair-item.dragging {
+            opacity: 0.5;
+        }
+
+        .drag-pair-item-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .drag-pair-item-text {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .drag-pair-item-label {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Text Image Match */
+        .text-image-match-container {
+            margin-top: 20px;
+        }
+
+        .match-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .match-column-text, .match-column-image {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .match-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .match-text-item {
+            padding: 15px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .match-text-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .match-text-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .match-text-item.matched {
+            border-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .match-image-item {
+            position: relative;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .match-image-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .match-image-item.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .match-image-item.matched {
+            border-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .match-image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .match-item-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .match-text-item.selected .match-item-label,
+        .match-image-item.selected .match-item-label {
+            background: #667eea;
+            color: white;
+        }
+
+        .match-text-item.matched .match-item-label,
+        .match-image-item.matched .match-item-label {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        /* Buttons */
+        .submit-button, .next-button, .retry-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover:not(:disabled), 
+        .next-button:hover, 
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Feedback */
+        .feedback-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feedback-correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .feedback-icon {
+            font-size: 24px;
+        }
+
+        .explanation {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            color: #0c5460;
+            line-height: 1.6;
+        }
+
+        .explanation strong {
+            color: #004085;
+        }
+
+        /* Results */
+        .results-container {
+            text-align: center;
+        }
+
+        .results-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .results-score {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 8;
+        }
+
+        .score-circle-fill {
+            fill: none;
+            stroke-width: 8;
+            transition: stroke-dasharray 1s ease;
+        }
+
+        .score-circle.passed .score-circle-fill {
+            stroke: #28a745;
+        }
+
+        .score-circle.failed .score-circle-fill {
+            stroke: #dc3545;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-percentage {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .score-fraction {
+            font-size: 18px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .results-message {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .message-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Hint Button */
+        .hint-button {
+            background: #ffc107;
+            color: #333;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .hint-button:hover {
+            background: #ffb300;
+            transform: translateY(-2px);
+        }
+
+        .hint-content {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            color: #856404;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Image Single/Multi Choice */
+        .image-answers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-answer-option {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .image-answer-option:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .image-answer-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .image-answer-option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .image-answer-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .image-answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .image-answer-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-answer-text {
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .image-answer-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .image-answer-option.selected .image-answer-checkbox {
+            background: #667eea;
+            color: white;
+        }
+
+        .image-answer-option.correct .image-answer-checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .image-answer-option.incorrect .image-answer-checkbox {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+            }
+
+            .question-title {
+                font-size: 18px;
+            }
+
+            .pair-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-percentage {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container"></div>
+
+    <script>
+        // ===================================================================
+        // QUIZ ENGINE - Đọc đúng format JSON của bạn
+        // ===================================================================
+        class QuizEngine {
+            constructor(gameData) {
+                this.gameData = gameData;
+                this.questions = gameData.EachQuiz || [];
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.totalPoints = 0;
+                this.maxPoints = gameData.main_total_max_points || 0;
+                this.answers = [];
+                this.container = null;
+                this.currentAnswer = null;
+                this.hintsUsed = new Set();
+            }
+
+            init(containerId) {
+                this.container = document.getElementById(containerId);
+                if (!this.container) {
+                    console.error('Quiz container not found:', containerId);
+                    return;
+                }
+                this.render();
+            }
+
+            render() {
+                if (this.currentQuestionIndex < this.questions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.renderResults();
+                }
+            }
+
+            renderQuestion() {
+                const question = this.questions[this.currentQuestionIndex];
+                const totalQuestions = this.questions.length;
+                const questionNumber = this.currentQuestionIndex + 1;
+
+                let questionHtml = '';
+                switch (question.qtype) {
+                    case 'mcq':
+                        questionHtml = this.renderMCQ(question);
+                        break;
+                    case 'multi':
+                        questionHtml = this.renderMultiChoice(question);
+                        break;
+                    case 'image_mcq':
+                        questionHtml = this.renderImageMCQ(question);
+                        break;
+                    case 'image_multi':
+                        questionHtml = this.renderImageMultiChoice(question);
+                        break;
+                    case 'hotspot':
+                        questionHtml = this.renderHotspot(question);
+                        break;
+                    case 'order':
+                        questionHtml = this.renderOrder(question);
+                        break;
+                    case 'image_pair':
+                        questionHtml = this.renderImagePair(question);
+                        break;
+                    case 'drag_drop_pair':
+                        questionHtml = this.renderDragDropPair(question);
+                        break;
+                    case 'text_image_match':
+                        questionHtml = this.renderTextImageMatch(question);
+                        break;
+                }
+
+                const html = `
+                    <div class="quiz-container">
+                        ${questionNumber === 1 ? `
+                            <div class="quiz-header">
+                                <h1 class="quiz-main-title">${this.gameData.main_title}</h1>
+                                <p class="quiz-description">${this.gameData.main_description}</p>
+                                <div class="quiz-meta">
+                                    <span>📚 ${this.gameData.main_grade}</span>
+                                    <span>👥 ${this.gameData.main_age_array[0]}-${this.gameData.main_age_array[this.gameData.main_age_array.length-1]} tuổi</span>
+                                    <span>⏱ ${Math.floor(this.gameData.main_max_time_per_game_ms / 1000 / 60)} phút</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(questionNumber / totalQuestions) * 100}%"></div>
+                            </div>
+                            <div class="progress-text">Câu ${questionNumber} / ${totalQuestions} • ${question.pmax} điểm</div>
+                        </div>
+
+                        <div class="question-container">
+                            <span class="question-type-badge">${this.getTypeLabel(question.qtype)} - ${question.diff}</span>
+                            ${question.hint_allow && !this.hintsUsed.has(question.qid) ? 
+                                `<button class="hint-button" onclick="window.quizEngine.showHint('${question.qid}')">💡 Gợi ý (-${question.hint_penalty_percent}%)</button>` : ''}
+                            <div id="hint-container-${question.qid}"></div>
+                            <h2 class="question-title">${question.qtxt}</h2>
+                            ${questionHtml}
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+                this.attachEventListeners(question);
+            }
+
+            getTypeLabel(type) {
+                const labels = {
+                    'mcq': 'Chọn 1 đáp án',
+                    'multi': 'Chọn nhiều đáp án',
+                    'image_mcq': 'Chọn 1 hình ảnh',
+                    'image_multi': 'Chọn nhiều hình ảnh',
+                    'hotspot': 'Click vào điểm đúng',
+                    'order': 'Sắp xếp thứ tự',
+                    'image_pair': 'Ghép cặp hình ảnh',
+                    'drag_drop_pair': 'Kéo thả ghép cặp',
+                    'text_image_match': 'Ghép text với hình'
+                };
+                return labels[type] || type;
+            }
+
+            showHint(qid) {
+                const question = this.questions.find(q => q.qid === qid);
+                if (!question || this.hintsUsed.has(qid)) return;
+
+                this.hintsUsed.add(qid);
+                const hintContainer = document.getElementById(`hint-container-${qid}`);
+                if (hintContainer) {
+                    hintContainer.innerHTML = `
+                        <div class="hint-content">
+                            💡 <strong>Gợi ý:</strong> ${question.hint_content_text}
+                        </div>
+                    `;
+                }
+            }
+
+            renderMCQ(question) {
+                const imageHtml = question.image_json && question.image_json.length > 0 
+                    ? `<img src="${question.image_json[0]}" alt="Question Image" class="question-image">` 
+                    : '';
+
+                return `
+                    ${imageHtml}
+                    <div class="text-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="text-answer-option" data-index="${index}">
+                                <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                                <span class="answer-text">${answer}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderMultiChoice(question) {
+                const imageHtml = question.image_json && question.image_json.length > 0 
+                    ? `<img src="${question.image_json[0]}" alt="Question Image" class="question-image">` 
+                    : '';
+
+                return `
+                    ${imageHtml}
+                    <div class="text-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="text-answer-option" data-index="${index}">
+                                <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                                <span class="answer-text">${answer}</span>
+                                <span class="answer-checkbox">☐</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-multi">Xác nhận</button>
+                `;
+            }
+
+            renderImageMCQ(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">○</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderImageMultiChoice(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">☐</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-image-multi">Xác nhận</button>
+                `;
+            }
+
+            renderHotspot(question) {
+                return `
+                    <div class="hotspot-container">
+                        <div class="hotspot-instructions">
+                            📍 ${question.qtxt}
+                        </div>
+                        <div class="hotspot-image-wrapper">
+                            <img src="${question.image_json[0]}" alt="Hotspot Image" class="hotspot-image" id="hotspot-img">
+                            <div class="hotspot-overlay" id="hotspot-overlay"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderOrder(question) {
+                const imageHtml = question.image_json && question.image_json.length > 0 
+                    ? `<img src="${question.image_json[0]}" alt="Question Image" class="question-image">` 
+                    : '';
+
+                return `
+                    ${imageHtml}
+                    <div class="order-container">
+                        <div class="order-items" id="order-items">
+                            ${question.opt_array.map((item, index) => `
+                                <div class="order-item" draggable="true" data-index="${index}" data-text="${item}">
+                                    <span class="order-number">${index + 1}</span>
+                                    <span class="order-text">${item}</span>
+                                    <span class="drag-handle">☰</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="submit-button" id="submit-order">Xác nhận thứ tự</button>
+                    </div>
+                `;
+            }
+
+            renderImagePair(question) {
+                const safeImages = question.image_json.slice(0, 3);
+                const dangerImages = question.image_json.slice(3, 6);
+
+                return `
+                    <div class="image-pair-container">
+                        <div class="pair-instructions">
+                            🔄 ${question.qtxt}
+                        </div>
+                        <div class="pair-columns">
+                            <div class="pair-column safe">
+                                <div class="pair-column-header">✓ Hành động An Toàn</div>
+                                ${safeImages.map((img, index) => `
+                                    <div class="pair-item" data-group="safe" data-index="${index}">
+                                        <img src="${img}" alt="Safe ${index + 1}" class="pair-item-img">
+                                        <div class="pair-item-label">${index + 1}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="pair-column danger">
+                                <div class="pair-column-header">⚠ Hành động Nguy Hiểm</div>
+                                ${dangerImages.map((img, index) => `
+                                    <div class="pair-item" data-group="danger" data-index="${index}">
+                                        <img src="${img}" alt="Danger ${index + 1}" class="pair-item-img">
+                                        <div class="pair-item-label">${index + 4}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-pair" disabled>Xác nhận ghép cặp</button>
+                    </div>
+                `;
+            }
+
+            renderDragDropPair(question) {
+                const leftItems = question.left_items || [];
+                const rightItems = question.right_items || [];
+
+                return `
+                    <div class="drag-drop-pair-container">
+                        <div class="pair-instructions">
+                            🔄 ${question.qtxt}
+                        </div>
+                        <div class="drag-columns">
+                            <div class="drag-column source">
+                                <div class="drag-column-header">📦 Kéo từ đây</div>
+                                <div class="drag-items-source" id="drag-source">
+                                    ${leftItems.map((item, index) => `
+                                        <div class="drag-pair-item" draggable="true" data-index="${index}" data-id="${item.id}">
+                                            ${item.image ? `<img src="${item.image}" class="drag-pair-item-img">` : ''}
+                                            <div class="drag-pair-item-text">${item.text}</div>
+                                            <div class="drag-pair-item-label">${item.label || index + 1}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="drag-column target">
+                                <div class="drag-column-header">🎯 Thả vào đây</div>
+                                <div class="drag-items-target" id="drag-target"></div>
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-drag-pair" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderTextImageMatch(question) {
+                const textItems = question.text_items || [];
+                const imageItems = question.image_items || [];
+
+                return `
+                    <div class="text-image-match-container">
+                        <div class="pair-instructions">
+                            🔗 ${question.qtxt}
+                        </div>
+                        <div class="match-columns">
+                            <div class="match-column-text">
+                                <div class="match-column-header">📝 Văn bản</div>
+                                ${textItems.map((item, index) => `
+                                    <div class="match-text-item" data-group="text" data-index="${index}" data-id="${item.id}">
+                                        ${item.text}
+                                        <div class="match-item-label">${item.label || String.fromCharCode(65 + index)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="match-column-image">
+                                <div class="match-column-header">🖼️ Hình ảnh</div>
+                                ${imageItems.map((item, index) => `
+                                    <div class="match-image-item" data-group="image" data-index="${index}" data-id="${item.id}">
+                                        <img src="${item.image}" alt="Image ${index + 1}">
+                                        <div class="match-item-label">${item.label || (index + 1)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-text-image-match" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            attachEventListeners(question) {
+                switch (question.qtype) {
+                    case 'mcq':
+                        this.attachMCQListeners(question);
+                        break;
+                    case 'multi':
+                        this.attachMultiChoiceListeners(question);
+                        break;
+                    case 'image_mcq':
+                        this.attachImageMCQListeners(question);
+                        break;
+                    case 'image_multi':
+                        this.attachImageMultiChoiceListeners(question);
+                        break;
+                    case 'hotspot':
+                        this.attachHotspotListeners(question);
+                        break;
+                    case 'order':
+                        this.attachOrderListeners(question);
+                        break;
+                    case 'image_pair':
+                        this.attachImagePairListeners(question);
+                        break;
+                    case 'drag_drop_pair':
+                        this.attachDragDropPairListeners(question);
+                        break;
+                    case 'text_image_match':
+                        this.attachTextImageMatchListeners(question);
+                        break;
+                }
+            }
+
+            attachMCQListeners(question) {
+                const options = this.container.querySelectorAll('.text-answer-option');
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        const isCorrect = question.opt_array[index] === question.sol_array;
+                        const points = isCorrect ? question.pmax : 0;
+                        
+                        this.currentAnswer = { selected: [index], isCorrect };
+                        
+                        options.forEach(opt => opt.classList.add('disabled'));
+                        option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        
+                        if (!isCorrect) {
+                            const correctIndex = question.opt_array.indexOf(question.sol_array);
+                            if (correctIndex !== -1) {
+                                options[correctIndex].classList.add('correct');
+                            }
+                        }
+                        
+                        this.showFeedback(isCorrect, points, question);
+                    });
+                });
+            }
+
+            attachMultiChoiceListeners(question) {
+                const options = this.container.querySelectorAll('.text-answer-option');
+                const submitBtn = this.container.querySelector('#submit-multi');
+                const selected = new Set();
+
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        const answer = question.opt_array[index];
+                        if (selected.has(answer)) {
+                            selected.delete(answer);
+                            option.classList.remove('selected');
+                            option.querySelector('.answer-checkbox').textContent = '☐';
+                        } else {
+                            selected.add(answer);
+                            option.classList.add('selected');
+                            option.querySelector('.answer-checkbox').textContent = '☑';
+                        }
+
+                        submitBtn.disabled = selected.size === 0;
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctSet = new Set(question.sol_array);
+                    const isCorrect = selected.size === correctSet.size && 
+                                     [...selected].every(i => correctSet.has(i));
+                    const points = isCorrect ? question.pmax : 0;
+                    
+                    this.currentAnswer = { selected: Array.from(selected), isCorrect };
+                    
+                    options.forEach((opt, idx) => {
+                        opt.classList.add('disabled');
+                        const answer = question.opt_array[idx];
+                        if (correctSet.has(answer)) {
+                            opt.classList.add('correct');
+                        } else if (selected.has(answer)) {
+                            opt.classList.add('incorrect');
+                        }
+                    });
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, points, question);
+                });
+            }
+
+            attachImageMCQListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        const isCorrect = index === question.sol_array;
+                        const points = isCorrect ? question.pmax : 0;
+                        
+                        this.currentAnswer = { selected: [index], isCorrect };
+                        
+                        options.forEach(opt => opt.classList.add('disabled'));
+                        option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        option.querySelector('.image-answer-checkbox').textContent = isCorrect ? '✓' : '✗';
+                        
+                        if (!isCorrect) {
+                            options[question.sol_array].classList.add('correct');
+                            options[question.sol_array].querySelector('.image-answer-checkbox').textContent = '✓';
+                        }
+                        
+                        this.showFeedback(isCorrect, points, question);
+                    });
+                });
+            }
+
+            attachImageMultiChoiceListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                const submitBtn = this.container.querySelector('#submit-image-multi');
+                const selected = new Set();
+
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        if (selected.has(index)) {
+                            selected.delete(index);
+                            option.classList.remove('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☐';
+                        } else {
+                            selected.add(index);
+                            option.classList.add('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☑';
+                        }
+
+                        submitBtn.disabled = selected.size === 0;
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctSet = new Set(question.sol_array);
+                    const isCorrect = selected.size === correctSet.size && 
+                                     [...selected].every(i => correctSet.has(i));
+                    const points = isCorrect ? question.pmax : 0;
+                    
+                    this.currentAnswer = { selected: Array.from(selected), isCorrect };
+                    
+                    options.forEach((opt, idx) => {
+                        opt.classList.add('disabled');
+                        if (correctSet.has(idx)) {
+                            opt.classList.add('correct');
+                            opt.querySelector('.image-answer-checkbox').textContent = '✓';
+                        } else if (selected.has(idx)) {
+                            opt.classList.add('incorrect');
+                            opt.querySelector('.image-answer-checkbox').textContent = '✗';
+                        }
+                    });
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, points, question);
+                });
+            }
+
+            attachHotspotListeners(question) {
+                const overlay = this.container.querySelector('#hotspot-overlay');
+                const img = this.container.querySelector('#hotspot-img');
+                let clicked = false;
+
+                overlay.addEventListener('click', (e) => {
+                    if (clicked) return;
+
+                    const rect = img.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const clickY = e.clientY - rect.top;
+
+                    // Tính toán theo tỷ lệ pixel thực tế của ảnh
+                    const scaleX = img.naturalWidth / rect.width;
+                    const scaleY = img.naturalHeight / rect.height;
+                    const actualX = clickX * scaleX;
+                    const actualY = clickY * scaleY;
+
+                    // So sánh với sol_json
+                    const correctX = question.sol_json.x;
+                    const correctY = question.sol_json.y;
+                    const radius = question.sol_json.radius;
+
+                    const distance = Math.sqrt(
+                        Math.pow(actualX - correctX, 2) + 
+                        Math.pow(actualY - correctY, 2)
+                    );
+
+                    const isCorrect = distance <= radius;
+                    const points = isCorrect ? question.pmax : 0;
+
+                    // Hiển thị điểm click
+                    const clickPoint = document.createElement('div');
+                    clickPoint.className = `hotspot-click-point ${isCorrect ? 'correct' : 'incorrect'}`;
+                    clickPoint.style.left = `${(clickX / rect.width) * 100}%`;
+                    clickPoint.style.top = `${(clickY / rect.height) * 100}%`;
+                    clickPoint.textContent = isCorrect ? '✓' : '✗';
+                    overlay.appendChild(clickPoint);
+
+                    // Hiển thị điểm đúng nếu sai
+                    if (!isCorrect) {
+                        const correctPoint = document.createElement('div');
+                        correctPoint.className = 'hotspot-click-point correct';
+                        correctPoint.style.left = `${(correctX / img.naturalWidth) * 100}%`;
+                        correctPoint.style.top = `${(correctY / img.naturalHeight) * 100}%`;
+                        correctPoint.textContent = '✓';
+                        overlay.appendChild(correctPoint);
+                    }
+
+                    clicked = true;
+                    overlay.style.cursor = 'default';
+                    this.currentAnswer = { clickX: actualX, clickY: actualY, isCorrect };
+                    this.showFeedback(isCorrect, points, question);
+                });
+            }
+
+            attachOrderListeners(question) {
+                const items = this.container.querySelectorAll('.order-item');
+                const submitBtn = this.container.querySelector('#submit-order');
+                let draggedElement = null;
+
+                items.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        draggedElement = item;
+                        item.classList.add('dragging');
+                    });
+
+                    item.addEventListener('dragend', () => {
+                        item.classList.remove('dragging');
+                    });
+
+                    item.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        const afterElement = this.getDragAfterElement(this.container.querySelector('#order-items'), e.clientY);
+                        const container = this.container.querySelector('#order-items');
+                        if (afterElement == null) {
+                            container.appendChild(draggedElement);
+                        } else {
+                            container.insertBefore(draggedElement, afterElement);
+                        }
+                        this.updateOrderNumbers();
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const currentOrder = Array.from(this.container.querySelectorAll('.order-item'))
+                        .map(item => item.dataset.text);
+                    
+                    const isCorrect = JSON.stringify(currentOrder) === JSON.stringify(question.sol_array);
+                    const points = isCorrect ? question.pmax : 0;
+                    
+                    this.currentAnswer = { order: currentOrder, isCorrect };
+                    
+                    items.forEach(item => {
+                        item.classList.add('disabled');
+                        item.setAttribute('draggable', 'false');
+                    });
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, points, question);
+                });
+            }
+
+            updateOrderNumbers() {
+                const currentItems = this.container.querySelectorAll('.order-item');
+                currentItems.forEach((item, index) => {
+                    item.querySelector('.order-number').textContent = index + 1;
+                });
+            }
+
+            getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.order-item:not(.dragging)')];
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            attachImagePairListeners(question) {
+                const items = this.container.querySelectorAll('.pair-item');
+                const submitBtn = this.container.querySelector('#submit-pair');
+                let firstSelected = null;
+                const pairs = [];
+
+                items.forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (item.classList.contains('matched') || item.classList.contains('disabled')) return;
+
+                        if (!firstSelected) {
+                            firstSelected = item;
+                            item.classList.add('selected');
+                        } else {
+                            if (firstSelected === item) {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = null;
+                                return;
+                            }
+
+                            // Kiểm tra nếu từ 2 nhóm khác nhau
+                            if (firstSelected.dataset.group !== item.dataset.group) {
+                                const safeIndex = firstSelected.dataset.group === 'safe' 
+                                    ? parseInt(firstSelected.dataset.index) 
+                                    : parseInt(item.dataset.index);
+                                const dangerIndex = firstSelected.dataset.group === 'danger' 
+                                    ? parseInt(firstSelected.dataset.index) 
+                                    : parseInt(item.dataset.index);
+
+                                pairs.push([safeIndex, dangerIndex]);
+                                
+                                firstSelected.classList.add('matched');
+                                firstSelected.classList.remove('selected');
+                                item.classList.add('matched');
+                                
+                                firstSelected = null;
+
+                                submitBtn.disabled = pairs.length !== 3;
+                            } else {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = item;
+                                item.classList.add('selected');
+                            }
+                        }
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    // Kiểm tra theo sol_array của question
+                    let correctCount = 0;
+                    pairs.forEach(pair => {
+                        if (pair[0] === pair[1]) correctCount++;
+                    });
+
+                    const isCorrect = correctCount === 3;
+                    const points = isCorrect ? question.pmax : Math.floor(question.pmax * (correctCount / 3));
+                    
+                    this.currentAnswer = { pairs, isCorrect, correctCount };
+                    
+                    items.forEach(item => item.classList.add('disabled'));
+                    submitBtn.disabled = true;
+                    
+                    this.showFeedback(isCorrect, points, question, `Bạn ghép đúng ${correctCount}/3 cặp`);
+                });
+            }
+
+            attachDragDropPairListeners(question) {
+                const sourceItems = this.container.querySelectorAll('.drag-pair-item');
+                const targetZone = this.container.querySelector('#drag-target');
+                const submitBtn = this.container.querySelector('#submit-drag-pair');
+                let draggedElement = null;
+                const droppedItems = [];
+
+                sourceItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        draggedElement = item;
+                        item.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                    });
+
+                    item.addEventListener('dragend', () => {
+                        item.classList.remove('dragging');
+                    });
+                });
+
+                targetZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    targetZone.classList.add('drag-over');
+                });
+
+                targetZone.addEventListener('dragleave', () => {
+                    targetZone.classList.remove('drag-over');
+                });
+
+                targetZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    targetZone.classList.remove('drag-over');
+
+                    if (draggedElement && !droppedItems.includes(draggedElement.dataset.id)) {
+                        const clone = draggedElement.cloneNode(true);
+                        clone.setAttribute('draggable', 'false');
+                        clone.style.opacity = '0.6';
+                        targetZone.appendChild(clone);
+                        
+                        droppedItems.push(draggedElement.dataset.id);
+                        draggedElement.style.opacity = '0.3';
+                        draggedElement.setAttribute('draggable', 'false');
+
+                        submitBtn.disabled = droppedItems.length !== question.left_items.length;
+                    }
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const targetOrder = Array.from(targetZone.querySelectorAll('.drag-pair-item'))
+                        .map(item => item.dataset.id);
+                    
+                    const correctOrder = question.sol_array || [];
+                    let correctCount = 0;
+                    
+                    targetOrder.forEach((id, index) => {
+                        if (correctOrder[index] === id) correctCount++;
+                    });
+
+                    const isCorrect = correctCount === correctOrder.length;
+                    const points = isCorrect ? question.pmax : Math.floor(question.pmax * (correctCount / correctOrder.length));
+
+                    this.currentAnswer = { order: targetOrder, isCorrect, correctCount };
+                    submitBtn.disabled = true;
+
+                    this.showFeedback(isCorrect, points, question, `Bạn sắp xếp đúng ${correctCount}/${correctOrder.length} vị trí`);
+                });
+            }
+
+            attachTextImageMatchListeners(question) {
+                const textItems = this.container.querySelectorAll('.match-text-item');
+                const imageItems = this.container.querySelectorAll('.match-image-item');
+                const submitBtn = this.container.querySelector('#submit-text-image-match');
+                let firstSelected = null;
+                const pairs = [];
+
+                const allItems = [...textItems, ...imageItems];
+
+                allItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (item.classList.contains('matched') || item.classList.contains('disabled')) return;
+
+                        if (!firstSelected) {
+                            firstSelected = item;
+                            item.classList.add('selected');
+                        } else {
+                            if (firstSelected === item) {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = null;
+                                return;
+                            }
+
+                            // Check if from different groups
+                            if (firstSelected.dataset.group !== item.dataset.group) {
+                                const textId = firstSelected.dataset.group === 'text' 
+                                    ? firstSelected.dataset.id 
+                                    : item.dataset.id;
+                                const imageId = firstSelected.dataset.group === 'image' 
+                                    ? firstSelected.dataset.id 
+                                    : item.dataset.id;
+
+                                pairs.push([textId, imageId]);
+                                
+                                firstSelected.classList.add('matched');
+                                firstSelected.classList.remove('selected');
+                                item.classList.add('matched');
+                                
+                                firstSelected = null;
+
+                                const totalPairs = question.text_items.length;
+                                submitBtn.disabled = pairs.length !== totalPairs;
+                            } else {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = item;
+                                item.classList.add('selected');
+                            }
+                        }
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctPairs = question.sol_array || [];
+                    let correctCount = 0;
+
+                    pairs.forEach(pair => {
+                        const isCorrect = correctPairs.some(cp => 
+                            (cp[0] === pair[0] && cp[1] === pair[1]) ||
+                            (cp[0] === pair[1] && cp[1] === pair[0])
+                        );
+                        if (isCorrect) correctCount++;
+                    });
+
+                    const isCorrect = correctCount === correctPairs.length;
+                    const points = isCorrect ? question.pmax : Math.floor(question.pmax * (correctCount / correctPairs.length));
+
+                    this.currentAnswer = { pairs, isCorrect, correctCount };
+                    allItems.forEach(item => item.classList.add('disabled'));
+                    submitBtn.disabled = true;
+
+                    this.showFeedback(isCorrect, points, question, `Bạn ghép đúng ${correctCount}/${correctPairs.length} cặp`);
+                });
+            }
+
+            showFeedback(isCorrect, points, question, customMessage = '') {
+                if (isCorrect) {
+                    this.score++;
+                }
+
+                // Áp dụng hint penalty
+                if (this.hintsUsed.has(question.qid) && points > 0) {
+                    const penalty = question.hint_penalty_percent || 0;
+                    points = Math.floor(points * (1 - penalty / 100));
+                }
+
+                this.totalPoints += points;
+
+                this.answers.push({
+                    questionIndex: this.currentQuestionIndex,
+                    qid: question.qid,
+                    answer: this.currentAnswer,
+                    isCorrect: isCorrect,
+                    points: points,
+                    maxPoints: question.pmax
+                });
+
+                const message = customMessage || (isCorrect ? 'Chính xác! ✓' : 'Chưa chính xác! ✗');
+                
+                const feedbackHtml = `
+                    <div class="feedback-message ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
+                        <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+                        <span class="feedback-text">${message} (+${points}/${question.pmax} điểm)</span>
+                    </div>
+                    ${question.expl && question.display_correct_answer === 'y' ? `
+                        <div class="explanation">
+                            <strong>💡 Giải thích:</strong> ${question.expl}
+                        </div>
+                    ` : ''}
+                `;
+
+                const questionContainer = this.container.querySelector('.question-container');
+                questionContainer.insertAdjacentHTML('beforeend', feedbackHtml);
+
+                const nextButton = document.createElement('button');
+                nextButton.className = 'next-button';
+                nextButton.textContent = this.currentQuestionIndex < this.questions.length - 1 
+                    ? 'Câu tiếp theo →' 
+                    : 'Xem kết quả 🎯';
+                nextButton.addEventListener('click', () => this.nextQuestion());
+                questionContainer.appendChild(nextButton);
+            }
+
+            nextQuestion() {
+                this.currentQuestionIndex++;
+                this.currentAnswer = null;
+                this.render();
+            }
+
+            renderResults() {
+                const totalQuestions = this.questions.length;
+                const percentage = Math.round((this.score / totalQuestions) * 100);
+                const pointPercentage = Math.round((this.totalPoints / this.maxPoints) * 100);
+                const passed = percentage >= this.gameData.main_pass_threshold_percent;
+
+                const html = `
+                    <div class="quiz-container results-container">
+                        <div class="results-header">
+                            <h2>🎯 ${this.gameData.main_title}</h2>
+                            <p style="color: #666; margin-top: 10px;">Kết quả kiểm tra của bạn</p>
+                        </div>
+
+                        <div class="results-score">
+                            <div class="score-circle ${passed ? 'passed' : 'failed'}">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="score-circle-bg"></circle>
+                                    <circle cx="50" cy="50" r="45" class="score-circle-fill" 
+                                        style="stroke-dasharray: ${percentage * 2.827}, 282.7"></circle>
+                                </svg>
+                                <div class="score-text">
+                                    <div class="score-percentage">${percentage}%</div>
+                                    <div class="score-fraction">${this.score}/${totalQuestions} câu</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-message ${passed ? 'message-passed' : 'message-failed'}">
+                            ${passed ? '🎉 Xuất sắc! Bạn đã vượt qua bài kiểm tra!' : '😔 Bạn cần học thêm. Hãy thử lại nhé!'}
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                            <div style="font-size: 18px; margin-bottom: 10px;">
+                                <strong>Tổng điểm:</strong> ${this.totalPoints} / ${this.maxPoints} (${pointPercentage}%)
+                            </div>
+                            <div style="font-size: 14px; color: #666;">
+                                Điểm chuẩn đạt: ${this.gameData.main_pass_threshold_percent}%
+                            </div>
+                        </div>
+
+                        <div class="results-actions">
+                            <button class="retry-button" onclick="location.reload()">
+                                🔄 Làm lại bài kiểm tra
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+            }
+        }
+
+        // ===================================================================
+        // QUIZ DATA - Đúng format JSON của bạn
+        // ===================================================================
+        const quizData = {
+            "main_game_id": "traffic_safety_primary_2025",
+            "main_title": "An Toàn Giao Thông: Thử Thách Cho Học Sinh Tiểu Học",
+            "main_description": "Bộ câu hỏi kiểm tra kiến thức và kỹ năng an toàn giao thông đường bộ cơ bản cho học sinh tiểu học (8-11 tuổi).",
+            "main_project_id": "proj_hazard_2025",
+            "main_game_version": "1.0.0",
+            "main_author": "Traffic Safety Team",
+            "main_age_array": [8, 9, 10, 11],
+            "main_grade": "Primary",
+            "main_total_questions": 8,
+            "main_total_max_points": 135,
+            "main_max_time_per_game_ms": 200000,
+            "main_language": "vi",
+            "main_theme": "traffic_safety",
+            "main_difficulty_level": "mixed",
+            "main_show_correct_answer_after_each_quiz": true,
+            "main_shuffle_questions_order": false,
+            "main_default_hint_allow": true,
+            "main_default_hint_penalty_percent": 20,
+            "main_feedback_mode": "detailed_explanation",
+            "main_pass_threshold_percent": 70,
+            "main_media_assets_root_url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1760225296/hq720_fylduj.jpg",
+            "main_status": "published",
+            "EachQuiz": [
+                {
+                    "qn": 1,
+                    "qid": "traffic_001",
+                    "fq": true,
+                    "lq": false,
+                    "tmax": 30000,
+                    "pmax": 10,
+                    "diff": "easy",
+                    "qtype": "hotspot",
+                    "qtxt": "Hãy bấm vào vị trí có vạch kẻ dành cho người đi bộ",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "sol_json": {
+                        "x": 400,
+                        "y": 300,
+                        "radius": 80
+                    },
+                    "expl": "Vạch kẻ trắng ngang đường là nơi an toàn để học sinh sang đường.",
+                    "tag_array": ["crosswalk", "pedestrian"],
+                    "lang": "vi",
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463771/68633251_tr3nqn.jpg"],
+                    "image_total_number": 1,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": false,
+                    "opt_fmt": "image_only",
+                    "media_placement": "background",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Tìm dấu hiệu an toàn nhất để qua đường.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 2,
+                    "qid": "traffic_002",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 40000,
+                    "pmax": 15,
+                    "diff": "medium",
+                    "qtype": "multi",
+                    "qtxt": "Trong các lựa chọn sau, đâu là phương tiện giao thông an toàn, hợp pháp cho học sinh tiểu học?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "hide",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        "Xe đạp",
+                        "Xe máy",
+                        "Ô tô đi cùng bố mẹ",
+                        "Xe buýt trường học",
+                        "Xe tải"
+                    ],
+                    "sol_array": [
+                        "Xe đạp",
+                        "Ô tô đi cùng bố mẹ",
+                        "Xe buýt trường học"
+                    ],
+                    "expl": "Học sinh tiểu học chỉ nên đi bộ, đi xe đạp hoặc được đưa đón bằng xe buýt/ô tô cùng người lớn.",
+                    "tag_array": ["vehicle", "safe"],
+                    "lang": "vi",
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463465/important_road_safety_rules_to_teach_your_children_illustration.jpg_vk7gty.webp"],
+                    "image_total_number": 1,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Luật giao thông quy định độ tuổi và giấy phép lái xe cho từng loại phương tiện.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 3,
+                    "qid": "traffic_003",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 20000,
+                    "pmax": 10,
+                    "diff": "easy",
+                    "qtype": "mcq",
+                    "qtxt": "Đèn tín hiệu giao thông màu đỏ nghĩa là gì?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "hide",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        "Dừng lại",
+                        "Đi chậm",
+                        "Được đi tiếp",
+                        "Rẽ phải"
+                    ],
+                    "sol_array": "Dừng lại",
+                    "expl": "Đèn đỏ nghĩa là mọi phương tiện và người đi bộ phải dừng lại.",
+                    "tag_array": ["traffic_light"],
+                    "lang": "vi",
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463334/Teach-Road-Safety-to-Kids-1_kibxvw.png"],
+                    "image_total_number": 1,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": false,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Đây là kiến thức cơ bản nhất về luật giao thông.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 4,
+                    "qid": "traffic_004",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 50000,
+                    "pmax": 20,
+                    "diff": "hard",
+                    "qtype": "order",
+                    "qtxt": "Sắp xếp đúng thứ tự các bước khi qua đường tại ngã tư có đèn tín hiệu",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "hide",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        "Nhìn trái – nhìn phải",
+                        "Chờ đèn xanh cho người đi bộ",
+                        "Đi nhanh qua vạch kẻ",
+                        "Không dừng giữa đường"
+                    ],
+                    "sol_array": [
+                        "Chờ đèn xanh cho người đi bộ",
+                        "Nhìn trái – nhìn phải",
+                        "Đi nhanh qua vạch kẻ",
+                        "Không dừng giữa đường"
+                    ],
+                    "expl": "Trẻ em cần tuân thủ đủ 4 bước: chờ tín hiệu, quan sát an toàn, và đi qua dứt khoát.",
+                    "tag_array": ["order", "crossing"],
+                    "lang": "vi",
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1759660871/88745398_road-safety_qjetaw.jpg"],
+                    "image_total_number": 1,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": false,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Điều đầu tiên luôn là phải tuân theo tín hiệu, sau đó mới đến quan sát.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 5,
+                    "qid": "traffic_005",
+                    "fq": false,
+                    "lq": true,
+                    "tmax": 60000,
+                    "pmax": 25,
+                    "diff": "hard",
+                    "qtype": "image_pair",
+                    "qtxt": "Ghép cặp hành động an toàn và nguy hiểm tương ứng",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "hide",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "sol_array": [
+                        [0, 0],
+                        [1, 1],
+                        [2, 2]
+                    ],
+                    "expl": "Luôn ghép hành động đúng với hành động sai tương ứng.",
+                    "tag_array": ["image_pair", "safe_vs_danger"],
+                    "lang": "vi",
+                    "image_json": [
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662280/89039832_children_tw6zrn.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759661153/87498090_a-car-bumping-the-traffic-cones_pk60x0.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662493/88589066_children_1_j24kzx.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662282/89505552_children_snzywa.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662851/36960374_children_xterrv.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662490/87614454_children_rkfqo3.jpg"
+                    ],
+                    "image_total_number": 6,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "image_only",
+                    "media_placement": "side_by_side",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Ghép hình ảnh 1 với 4, 2 với 5, 3 với 6.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 6,
+                    "qid": "traffic_006",
+                    "fq": false,
+                    "lq": true,
+                    "tmax": 30000,
+                    "pmax": 15,
+                    "diff": "medium",
+                    "qtype": "image_mcq",
+                    "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi đi xe đạp trên đường?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {
+                            "text": "Mũ bảo hiểm xe đạp",
+                            "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Mũ thời trang",
+                            "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Nón lá",
+                            "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Không cần đội gì",
+                            "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
+                        }
+                    ],
+                    "sol_array": 0,
+                    "expl": "Mũ bảo hiểm xe đạp là thiết bị bảo hộ quan trọng giúp bảo vệ đầu khi té ngã.",
+                    "tag_array": ["helmet", "bicycle", "safety"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": false,
+                    "opt_fmt": "image_text",
+                    "media_placement": "inline",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Tìm thiết bị được thiết kế chuyên dụng cho xe đạp.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 7,
+                    "qid": "traffic_007",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 45000,
+                    "pmax": 20,
+                    "diff": "hard",
+                    "qtype": "drag_drop_pair",
+                    "qtxt": "Kéo các biển báo vào đúng thứ tự xuất hiện khi đến gần ngã tư",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "left_items": [
+                        {
+                            "id": "sign1",
+                            "text": "Biển báo ngã tư phía trước",
+                            "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=200&h=150&fit=crop",
+                            "label": "1"
+                        },
+                        {
+                            "id": "sign2",
+                            "text": "Biển giảm tốc độ",
+                            "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=200&h=150&fit=crop",
+                            "label": "2"
+                        },
+                        {
+                            "id": "sign3",
+                            "text": "Biển dừng lại",
+                            "image": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=200&h=150&fit=crop",
+                            "label": "3"
+                        },
+                        {
+                            "id": "sign4",
+                            "text": "Biển ưu tiên đường chính",
+                            "image": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=200&h=150&fit=crop",
+                            "label": "4"
+                        }
+                    ],
+                    "right_items": [],
+                    "sol_array": ["sign1", "sign2", "sign3", "sign4"],
+                    "expl": "Thứ tự đúng: Báo ngã tư trước → Giảm tốc độ → Dừng lại → Đường ưu tiên.",
+                    "tag_array": ["drag_drop", "traffic_signs", "order"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "mixed",
+                    "media_placement": "inline",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Suy nghĩ về trình tự các biển báo khi tiến gần đến ngã tư.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 8,
+                    "qid": "traffic_008",
+                    "fq": false,
+                    "lq": true,
+                    "tmax": 50000,
+                    "pmax": 20,
+                    "diff": "medium",
+                    "qtype": "text_image_match",
+                    "qtxt": "Ghép mô tả với biển báo giao thông tương ứng",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "text_items": [
+                        {
+                            "id": "text_a",
+                            "text": "Cấm xe máy",
+                            "label": "A"
+                        },
+                        {
+                            "id": "text_b",
+                            "text": "Vạch sang đường",
+                            "label": "B"
+                        },
+                        {
+                            "id": "text_c",
+                            "text": "Đèn giao thông",
+                            "label": "C"
+                        },
+                        {
+                            "id": "text_d",
+                            "text": "Giới hạn tốc độ",
+                            "label": "D"
+                        }
+                    ],
+                    "image_items": [
+                        {
+                            "id": "img_1",
+                            "image": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?w=300&h=200&fit=crop",
+                            "label": "1"
+                        },
+                        {
+                            "id": "img_2",
+                            "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop",
+                            "label": "2"
+                        },
+                        {
+                            "id": "img_3",
+                            "image": "https://images.unsplash.com/photo-1561362912-687f8853a866?w=300&h=200&fit=crop",
+                            "label": "3"
+                        },
+                        {
+                            "id": "img_4",
+                            "image": "https://images.unsplash.com/photo-1542831371-d531d36971e6?w=300&h=200&fit=crop",
+                            "label": "4"
+                        }
+                    ],
+                    "sol_array": [
+                        ["text_a", "img_1"],
+                        ["text_b", "img_2"],
+                        ["text_c", "img_3"],
+                        ["text_d", "img_4"]
+                    ],
+                    "expl": "Mỗi mô tả tương ứng với một biển báo cụ thể theo quy định giao thông.",
+                    "tag_array": ["text_image_match", "traffic_signs"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 4,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "mixed",
+                    "media_placement": "side_by_side",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Quan sát kỹ hình dạng và màu sắc của từng biển báo.",
+                    "hint_content_media": null
+                }
+            ]
+        };
+
+        // ===================================================================
+        // KHỞI ĐỘNG QUIZ
+        // ===================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            window.quizEngine = new QuizEngine(quizData);
+            window.quizEngine.init('quiz-container');
+        });
+    </script>
+</body>
+</html>
