@@ -641,6 +641,99 @@
             animation: fadeIn 0.3s ease;
         }
 
+        /* Image Single/Multi Choice */
+        .image-answers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .image-answer-option {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .image-answer-option:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .image-answer-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .image-answer-option.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .image-answer-option.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .image-answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .image-answer-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-answer-text {
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .image-answer-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .image-answer-option.selected .image-answer-checkbox {
+            background: #667eea;
+            color: white;
+        }
+
+        .image-answer-option.correct .image-answer-checkbox {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .image-answer-option.incorrect .image-answer-checkbox {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .quiz-container {
@@ -717,6 +810,12 @@
                     case 'multi':
                         questionHtml = this.renderMultiChoice(question);
                         break;
+                    case 'image_mcq':
+                        questionHtml = this.renderImageMCQ(question);
+                        break;
+                    case 'image_multi':
+                        questionHtml = this.renderImageMultiChoice(question);
+                        break;
                     case 'hotspot':
                         questionHtml = this.renderHotspot(question);
                         break;
@@ -768,6 +867,8 @@
                 const labels = {
                     'mcq': 'Chọn 1 đáp án',
                     'multi': 'Chọn nhiều đáp án',
+                    'image_mcq': 'Chọn 1 hình ảnh',
+                    'image_multi': 'Chọn nhiều hình ảnh',
                     'hotspot': 'Click vào điểm đúng',
                     'order': 'Sắp xếp thứ tự',
                     'image_pair': 'Ghép cặp hình ảnh'
@@ -825,6 +926,35 @@
                         `).join('')}
                     </div>
                     <button class="submit-button" id="submit-multi">Xác nhận</button>
+                `;
+            }
+
+            renderImageMCQ(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">○</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderImageMultiChoice(question) {
+                return `
+                    <div class="image-answers-container">
+                        ${question.opt_array.map((answer, index) => `
+                            <div class="image-answer-option" data-index="${index}">
+                                <img src="${answer.image}" alt="${answer.text}" class="image-answer-img">
+                                <div class="image-answer-text">${answer.text}</div>
+                                <div class="image-answer-checkbox">☐</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-image-multi">Xác nhận</button>
                 `;
             }
 
@@ -906,6 +1036,12 @@
                     case 'multi':
                         this.attachMultiChoiceListeners(question);
                         break;
+                    case 'image_mcq':
+                        this.attachImageMCQListeners(question);
+                        break;
+                    case 'image_multi':
+                        this.attachImageMultiChoiceListeners(question);
+                        break;
                     case 'hotspot':
                         this.attachHotspotListeners(question);
                         break;
@@ -983,6 +1119,78 @@
                             opt.classList.add('correct');
                         } else if (selected.has(answer)) {
                             opt.classList.add('incorrect');
+                        }
+                    });
+                    
+                    submitBtn.disabled = true;
+                    this.showFeedback(isCorrect, points, question);
+                });
+            }
+
+            attachImageMCQListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        const isCorrect = index === question.sol_array;
+                        const points = isCorrect ? question.pmax : 0;
+                        
+                        this.currentAnswer = { selected: [index], isCorrect };
+                        
+                        options.forEach(opt => opt.classList.add('disabled'));
+                        option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        option.querySelector('.image-answer-checkbox').textContent = isCorrect ? '✓' : '✗';
+                        
+                        if (!isCorrect) {
+                            options[question.sol_array].classList.add('correct');
+                            options[question.sol_array].querySelector('.image-answer-checkbox').textContent = '✓';
+                        }
+                        
+                        this.showFeedback(isCorrect, points, question);
+                    });
+                });
+            }
+
+            attachImageMultiChoiceListeners(question) {
+                const options = this.container.querySelectorAll('.image-answer-option');
+                const submitBtn = this.container.querySelector('#submit-image-multi');
+                const selected = new Set();
+
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        if (option.classList.contains('disabled')) return;
+                        
+                        if (selected.has(index)) {
+                            selected.delete(index);
+                            option.classList.remove('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☐';
+                        } else {
+                            selected.add(index);
+                            option.classList.add('selected');
+                            option.querySelector('.image-answer-checkbox').textContent = '☑';
+                        }
+
+                        submitBtn.disabled = selected.size === 0;
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctSet = new Set(question.sol_array);
+                    const isCorrect = selected.size === correctSet.size && 
+                                     [...selected].every(i => correctSet.has(i));
+                    const points = isCorrect ? question.pmax : 0;
+                    
+                    this.currentAnswer = { selected: Array.from(selected), isCorrect };
+                    
+                    options.forEach((opt, idx) => {
+                        opt.classList.add('disabled');
+                        if (correctSet.has(idx)) {
+                            opt.classList.add('correct');
+                            opt.querySelector('.image-answer-checkbox').textContent = '✓';
+                        } else if (selected.has(idx)) {
+                            opt.classList.add('incorrect');
+                            opt.querySelector('.image-answer-checkbox').textContent = '✗';
                         }
                     });
                     
@@ -1298,8 +1506,8 @@
             "main_author": "Traffic Safety Team",
             "main_age_array": [8, 9, 10, 11],
             "main_grade": "Primary",
-            "main_total_questions": 5,
-            "main_total_max_points": 80,
+            "main_total_questions": 6,
+            "main_total_max_points": 95,
             "main_max_time_per_game_ms": 200000,
             "main_language": "vi",
             "main_theme": "traffic_safety",
@@ -1561,6 +1769,65 @@
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
                     "hint_content_text": "Ghép hình ảnh 1 với 4, 2 với 5, 3 với 6.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 6,
+                    "qid": "traffic_006",
+                    "fq": false,
+                    "lq": true,
+                    "tmax": 30000,
+                    "pmax": 15,
+                    "diff": "medium",
+                    "qtype": "image_mcq",
+                    "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi đi xe đạp trên đường?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {
+                            "text": "Mũ bảo hiểm xe đạp",
+                            "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Mũ thời trang",
+                            "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Nón lá",
+                            "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop"
+                        },
+                        {
+                            "text": "Không cần đội gì",
+                            "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
+                        }
+                    ],
+                    "sol_array": 0,
+                    "expl": "Mũ bảo hiểm xe đạp là thiết bị bảo hộ quan trọng giúp bảo vệ đầu khi té ngã.",
+                    "tag_array": ["helmet", "bicycle", "safety"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": false,
+                    "opt_fmt": "image_text",
+                    "media_placement": "inline",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Tìm thiết bị được thiết kế chuyên dụng cho xe đạp.",
                     "hint_content_media": null
                 }
             ]
