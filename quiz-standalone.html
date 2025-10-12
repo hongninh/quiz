@@ -453,6 +453,218 @@
             color: white;
         }
 
+        /* Drag Drop Pair */
+        .drag-drop-pair-container {
+            margin-top: 20px;
+        }
+
+        .drag-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .drag-column {
+            min-height: 300px;
+        }
+
+        .drag-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .drag-column.source .drag-column-header {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .drag-column.target .drag-column-header {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .drag-items-source, .drag-items-target {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-height: 250px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #ccc;
+        }
+
+        .drag-items-target.drag-over {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .drag-pair-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+
+        .drag-pair-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .drag-pair-item.dragging {
+            opacity: 0.5;
+        }
+
+        .drag-pair-item-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .drag-pair-item-text {
+            flex: 1;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .drag-pair-item-label {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* Text Image Match */
+        .text-image-match-container {
+            margin-top: 20px;
+        }
+
+        .match-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .match-column-text, .match-column-image {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .match-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #e7f3ff;
+            color: #004085;
+        }
+
+        .match-text-item {
+            padding: 15px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .match-text-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .match-text-item.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .match-text-item.matched {
+            border-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .match-image-item {
+            position: relative;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .match-image-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .match-image-item.selected {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        .match-image-item.matched {
+            border-color: #28a745;
+            opacity: 0.6;
+        }
+
+        .match-image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .match-item-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .match-text-item.selected .match-item-label,
+        .match-image-item.selected .match-item-label {
+            background: #667eea;
+            color: white;
+        }
+
+        .match-text-item.matched .match-item-label,
+        .match-image-item.matched .match-item-label {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
         /* Buttons */
         .submit-button, .next-button, .retry-button {
             width: 100%;
@@ -825,6 +1037,12 @@
                     case 'image_pair':
                         questionHtml = this.renderImagePair(question);
                         break;
+                    case 'drag_drop_pair':
+                        questionHtml = this.renderDragDropPair(question);
+                        break;
+                    case 'text_image_match':
+                        questionHtml = this.renderTextImageMatch(question);
+                        break;
                 }
 
                 const html = `
@@ -871,7 +1089,9 @@
                     'image_multi': 'Chọn nhiều hình ảnh',
                     'hotspot': 'Click vào điểm đúng',
                     'order': 'Sắp xếp thứ tự',
-                    'image_pair': 'Ghép cặp hình ảnh'
+                    'image_pair': 'Ghép cặp hình ảnh',
+                    'drag_drop_pair': 'Kéo thả ghép cặp',
+                    'text_image_match': 'Ghép text với hình'
                 };
                 return labels[type] || type;
             }
@@ -1028,6 +1248,72 @@
                 `;
             }
 
+            renderDragDropPair(question) {
+                const leftItems = question.left_items || [];
+                const rightItems = question.right_items || [];
+
+                return `
+                    <div class="drag-drop-pair-container">
+                        <div class="pair-instructions">
+                            🔄 ${question.qtxt}
+                        </div>
+                        <div class="drag-columns">
+                            <div class="drag-column source">
+                                <div class="drag-column-header">📦 Kéo từ đây</div>
+                                <div class="drag-items-source" id="drag-source">
+                                    ${leftItems.map((item, index) => `
+                                        <div class="drag-pair-item" draggable="true" data-index="${index}" data-id="${item.id}">
+                                            ${item.image ? `<img src="${item.image}" class="drag-pair-item-img">` : ''}
+                                            <div class="drag-pair-item-text">${item.text}</div>
+                                            <div class="drag-pair-item-label">${item.label || index + 1}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="drag-column target">
+                                <div class="drag-column-header">🎯 Thả vào đây</div>
+                                <div class="drag-items-target" id="drag-target"></div>
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-drag-pair" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderTextImageMatch(question) {
+                const textItems = question.text_items || [];
+                const imageItems = question.image_items || [];
+
+                return `
+                    <div class="text-image-match-container">
+                        <div class="pair-instructions">
+                            🔗 ${question.qtxt}
+                        </div>
+                        <div class="match-columns">
+                            <div class="match-column-text">
+                                <div class="match-column-header">📝 Văn bản</div>
+                                ${textItems.map((item, index) => `
+                                    <div class="match-text-item" data-group="text" data-index="${index}" data-id="${item.id}">
+                                        ${item.text}
+                                        <div class="match-item-label">${item.label || String.fromCharCode(65 + index)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="match-column-image">
+                                <div class="match-column-header">🖼️ Hình ảnh</div>
+                                ${imageItems.map((item, index) => `
+                                    <div class="match-image-item" data-group="image" data-index="${index}" data-id="${item.id}">
+                                        <img src="${item.image}" alt="Image ${index + 1}">
+                                        <div class="match-item-label">${item.label || (index + 1)}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-text-image-match" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
             attachEventListeners(question) {
                 switch (question.qtype) {
                     case 'mcq':
@@ -1050,6 +1336,12 @@
                         break;
                     case 'image_pair':
                         this.attachImagePairListeners(question);
+                        break;
+                    case 'drag_drop_pair':
+                        this.attachDragDropPairListeners(question);
+                        break;
+                    case 'text_image_match':
+                        this.attachTextImageMatchListeners(question);
                         break;
                 }
             }
@@ -1388,6 +1680,147 @@
                 });
             }
 
+            attachDragDropPairListeners(question) {
+                const sourceItems = this.container.querySelectorAll('.drag-pair-item');
+                const targetZone = this.container.querySelector('#drag-target');
+                const submitBtn = this.container.querySelector('#submit-drag-pair');
+                let draggedElement = null;
+                const droppedItems = [];
+
+                sourceItems.forEach(item => {
+                    item.addEventListener('dragstart', (e) => {
+                        draggedElement = item;
+                        item.classList.add('dragging');
+                        e.dataTransfer.effectAllowed = 'move';
+                    });
+
+                    item.addEventListener('dragend', () => {
+                        item.classList.remove('dragging');
+                    });
+                });
+
+                targetZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    targetZone.classList.add('drag-over');
+                });
+
+                targetZone.addEventListener('dragleave', () => {
+                    targetZone.classList.remove('drag-over');
+                });
+
+                targetZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    targetZone.classList.remove('drag-over');
+
+                    if (draggedElement && !droppedItems.includes(draggedElement.dataset.id)) {
+                        const clone = draggedElement.cloneNode(true);
+                        clone.setAttribute('draggable', 'false');
+                        clone.style.opacity = '0.6';
+                        targetZone.appendChild(clone);
+                        
+                        droppedItems.push(draggedElement.dataset.id);
+                        draggedElement.style.opacity = '0.3';
+                        draggedElement.setAttribute('draggable', 'false');
+
+                        submitBtn.disabled = droppedItems.length !== question.left_items.length;
+                    }
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const targetOrder = Array.from(targetZone.querySelectorAll('.drag-pair-item'))
+                        .map(item => item.dataset.id);
+                    
+                    const correctOrder = question.sol_array || [];
+                    let correctCount = 0;
+                    
+                    targetOrder.forEach((id, index) => {
+                        if (correctOrder[index] === id) correctCount++;
+                    });
+
+                    const isCorrect = correctCount === correctOrder.length;
+                    const points = isCorrect ? question.pmax : Math.floor(question.pmax * (correctCount / correctOrder.length));
+
+                    this.currentAnswer = { order: targetOrder, isCorrect, correctCount };
+                    submitBtn.disabled = true;
+
+                    this.showFeedback(isCorrect, points, question, `Bạn sắp xếp đúng ${correctCount}/${correctOrder.length} vị trí`);
+                });
+            }
+
+            attachTextImageMatchListeners(question) {
+                const textItems = this.container.querySelectorAll('.match-text-item');
+                const imageItems = this.container.querySelectorAll('.match-image-item');
+                const submitBtn = this.container.querySelector('#submit-text-image-match');
+                let firstSelected = null;
+                const pairs = [];
+
+                const allItems = [...textItems, ...imageItems];
+
+                allItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        if (item.classList.contains('matched') || item.classList.contains('disabled')) return;
+
+                        if (!firstSelected) {
+                            firstSelected = item;
+                            item.classList.add('selected');
+                        } else {
+                            if (firstSelected === item) {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = null;
+                                return;
+                            }
+
+                            // Check if from different groups
+                            if (firstSelected.dataset.group !== item.dataset.group) {
+                                const textId = firstSelected.dataset.group === 'text' 
+                                    ? firstSelected.dataset.id 
+                                    : item.dataset.id;
+                                const imageId = firstSelected.dataset.group === 'image' 
+                                    ? firstSelected.dataset.id 
+                                    : item.dataset.id;
+
+                                pairs.push([textId, imageId]);
+                                
+                                firstSelected.classList.add('matched');
+                                firstSelected.classList.remove('selected');
+                                item.classList.add('matched');
+                                
+                                firstSelected = null;
+
+                                const totalPairs = question.text_items.length;
+                                submitBtn.disabled = pairs.length !== totalPairs;
+                            } else {
+                                firstSelected.classList.remove('selected');
+                                firstSelected = item;
+                                item.classList.add('selected');
+                            }
+                        }
+                    });
+                });
+
+                submitBtn.addEventListener('click', () => {
+                    const correctPairs = question.sol_array || [];
+                    let correctCount = 0;
+
+                    pairs.forEach(pair => {
+                        const isCorrect = correctPairs.some(cp => 
+                            (cp[0] === pair[0] && cp[1] === pair[1]) ||
+                            (cp[0] === pair[1] && cp[1] === pair[0])
+                        );
+                        if (isCorrect) correctCount++;
+                    });
+
+                    const isCorrect = correctCount === correctPairs.length;
+                    const points = isCorrect ? question.pmax : Math.floor(question.pmax * (correctCount / correctPairs.length));
+
+                    this.currentAnswer = { pairs, isCorrect, correctCount };
+                    allItems.forEach(item => item.classList.add('disabled'));
+                    submitBtn.disabled = true;
+
+                    this.showFeedback(isCorrect, points, question, `Bạn ghép đúng ${correctCount}/${correctPairs.length} cặp`);
+                });
+            }
+
             showFeedback(isCorrect, points, question, customMessage = '') {
                 if (isCorrect) {
                     this.score++;
@@ -1506,8 +1939,8 @@
             "main_author": "Traffic Safety Team",
             "main_age_array": [8, 9, 10, 11],
             "main_grade": "Primary",
-            "main_total_questions": 6,
-            "main_total_max_points": 95,
+            "main_total_questions": 8,
+            "main_total_max_points": 135,
             "main_max_time_per_game_ms": 200000,
             "main_language": "vi",
             "main_theme": "traffic_safety",
@@ -1828,6 +2261,166 @@
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
                     "hint_content_text": "Tìm thiết bị được thiết kế chuyên dụng cho xe đạp.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 7,
+                    "qid": "traffic_007",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 45000,
+                    "pmax": 20,
+                    "diff": "hard",
+                    "qtype": "drag_drop_pair",
+                    "qtxt": "Kéo các biển báo vào đúng thứ tự xuất hiện khi đến gần ngã tư",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "left_items": [
+                        {
+                            "id": "sign1",
+                            "text": "Biển báo ngã tư phía trước",
+                            "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=200&h=150&fit=crop",
+                            "label": "1"
+                        },
+                        {
+                            "id": "sign2",
+                            "text": "Biển giảm tốc độ",
+                            "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=200&h=150&fit=crop",
+                            "label": "2"
+                        },
+                        {
+                            "id": "sign3",
+                            "text": "Biển dừng lại",
+                            "image": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=200&h=150&fit=crop",
+                            "label": "3"
+                        },
+                        {
+                            "id": "sign4",
+                            "text": "Biển ưu tiên đường chính",
+                            "image": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=200&h=150&fit=crop",
+                            "label": "4"
+                        }
+                    ],
+                    "right_items": [],
+                    "sol_array": ["sign1", "sign2", "sign3", "sign4"],
+                    "expl": "Thứ tự đúng: Báo ngã tư trước → Giảm tốc độ → Dừng lại → Đường ưu tiên.",
+                    "tag_array": ["drag_drop", "traffic_signs", "order"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "mixed",
+                    "media_placement": "inline",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Suy nghĩ về trình tự các biển báo khi tiến gần đến ngã tư.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 8,
+                    "qid": "traffic_008",
+                    "fq": false,
+                    "lq": true,
+                    "tmax": 50000,
+                    "pmax": 20,
+                    "diff": "medium",
+                    "qtype": "text_image_match",
+                    "qtxt": "Ghép mô tả với biển báo giao thông tương ứng",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": null,
+                    "text_items": [
+                        {
+                            "id": "text_a",
+                            "text": "Cấm xe máy",
+                            "label": "A"
+                        },
+                        {
+                            "id": "text_b",
+                            "text": "Vạch sang đường",
+                            "label": "B"
+                        },
+                        {
+                            "id": "text_c",
+                            "text": "Đèn giao thông",
+                            "label": "C"
+                        },
+                        {
+                            "id": "text_d",
+                            "text": "Giới hạn tốc độ",
+                            "label": "D"
+                        }
+                    ],
+                    "image_items": [
+                        {
+                            "id": "img_1",
+                            "image": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?w=300&h=200&fit=crop",
+                            "label": "1"
+                        },
+                        {
+                            "id": "img_2",
+                            "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop",
+                            "label": "2"
+                        },
+                        {
+                            "id": "img_3",
+                            "image": "https://images.unsplash.com/photo-1561362912-687f8853a866?w=300&h=200&fit=crop",
+                            "label": "3"
+                        },
+                        {
+                            "id": "img_4",
+                            "image": "https://images.unsplash.com/photo-1542831371-d531d36971e6?w=300&h=200&fit=crop",
+                            "label": "4"
+                        }
+                    ],
+                    "sol_array": [
+                        ["text_a", "img_1"],
+                        ["text_b", "img_2"],
+                        ["text_c", "img_3"],
+                        ["text_d", "img_4"]
+                    ],
+                    "expl": "Mỗi mô tả tương ứng với một biển báo cụ thể theo quy định giao thông.",
+                    "tag_array": ["text_image_match", "traffic_signs"],
+                    "lang": "vi",
+                    "image_json": null,
+                    "image_total_number": 4,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "mixed",
+                    "media_placement": "side_by_side",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": true,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Quan sát kỹ hình dạng và màu sắc của từng biển báo.",
                     "hint_content_media": null
                 }
             ]
