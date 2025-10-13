@@ -1764,6 +1764,46 @@
             ]
         };
 
+        // Helper functions để download và copy kết quả
+        window.downloadResults = function() {
+            if (!window.quizFinalOutput) {
+                alert('Chưa có kết quả!');
+                return;
+            }
+            const dataStr = JSON.stringify(window.quizFinalOutput, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `quiz_result_${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+            alert('✅ Đã tải file JSON!');
+        };
+
+        window.copyResults = function() {
+            if (!window.quizFinalOutput) {
+                alert('Chưa có kết quả!');
+                return;
+            }
+            const dataStr = JSON.stringify(window.quizFinalOutput, null, 2);
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert('✅ Đã copy kết quả JSON vào clipboard!');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                // Fallback: hiển thị textarea
+                const textarea = document.createElement('textarea');
+                textarea.value = dataStr;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Đã copy kết quả!');
+            });
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const quiz = new QuizEngine(quizData);
             quiz.init('quiz-container');
