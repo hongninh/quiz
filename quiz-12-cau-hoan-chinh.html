@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Hoàn Chỉnh - 12 Câu Hỏi</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #quiz-container { width: 100%; max-width: 900px; }
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .quiz-main-title { font-size: 28px; color: #333; margin-bottom: 10px; }
+        .quiz-description { font-size: 14px; color: #666; line-height: 1.6; }
+        .quiz-progress { margin-bottom: 30px; }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+        .progress-text { text-align: center; color: #666; font-size: 14px; font-weight: 600; }
+        .question-title { font-size: 22px; color: #333; margin-bottom: 20px; line-height: 1.5; }
+        .question-type-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .question-image {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .text-answers-container { display: flex; flex-direction: column; gap: 15px; }
+        .text-answer-option {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+        .text-answer-option:hover:not(.disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+        .text-answer-option.selected { background: #f0f4ff; border-color: #667eea; }
+        .text-answer-option.correct { background: #d4edda; border-color: #28a745; }
+        .text-answer-option.incorrect { background: #f8d7da; border-color: #dc3545; }
+        .text-answer-option.disabled { cursor: not-allowed; }
+        .answer-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .text-answer-option.correct .answer-letter { background: #28a745; }
+        .text-answer-option.incorrect .answer-letter { background: #dc3545; }
+        .answer-text { flex: 1; color: #333; }
+        .answer-checkbox { margin-left: 10px; font-size: 20px; color: #667eea; }
+        
+        .image-answers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .image-answer-option {
+            position: relative;
+            cursor: pointer;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .image-answer-option:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .image-answer-option.selected { border-color: #667eea; background: #f0f4ff; }
+        .image-answer-option.correct { border-color: #28a745; background: #d4edda; }
+        .image-answer-option.incorrect { border-color: #dc3545; background: #f8d7da; }
+        .image-answer-option.disabled { cursor: not-allowed; opacity: 0.7; }
+        .image-answer-img { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .image-answer-text { padding: 15px; text-align: center; font-weight: 500; color: #333; font-size: 15px; }
+        .image-answer-checkbox {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #667eea;
+            transition: all 0.3s ease;
+        }
+        .image-answer-option.selected .image-answer-checkbox { background: #667eea; color: white; }
+        .image-answer-option.correct .image-answer-checkbox { background: #28a745; border-color: #28a745; color: white; }
+        .image-answer-option.incorrect .image-answer-checkbox { background: #dc3545; border-color: #dc3545; color: white; }
+        
+        .hotspot-container { margin-top: 20px; position: relative; display: flex; flex-direction: column; align-items: center; }
+        .hotspot-image-wrapper { position: relative; display: inline-block; max-width: 100%; }
+        .hotspot-image { width: 100%; max-width: 800px; height: auto; display: block; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .hotspot-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+        .hotspot-click-point {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 20px;
+        }
+        .hotspot-click-point.correct { background: #28a745; border-color: #28a745; color: white; }
+        .hotspot-click-point.incorrect { background: #dc3545; border-color: #dc3545; color: white; }
+        .hotspot-instructions {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+        }
+        
+        .hotspot-point {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+        }
+        .hotspot-point:hover { transform: translate(-50%, -50%) scale(1.2); }
+        .hotspot-point.selected { background: #667eea; color: white; animation: none; }
+        .hotspot-point.correct { background: #28a745; border-color: #28a745; color: white; animation: none; }
+        .hotspot-point.incorrect { background: #dc3545; border-color: #dc3545; color: white; animation: none; }
+        .hotspot-point.disabled { cursor: not-allowed; }
+        
+        .order-container { margin-top: 20px; }
+        .order-items { display: flex; flex-direction: column; gap: 15px; }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: move;
+            transition: all 0.3s ease;
+        }
+        .order-item:hover:not(.disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        .order-item.dragging { opacity: 0.5; }
+        .order-item.disabled { cursor: not-allowed; }
+        .order-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .order-text { flex: 1; color: #333; }
+        .drag-handle { font-size: 20px; color: #999; cursor: move; }
+        
+        .image-pair-container { margin-top: 20px; }
+        .pair-instructions {
+            background: #d1ecf1;
+            color: #0c5460;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .pair-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .pair-column { display: flex; flex-direction: column; gap: 15px; }
+        .pair-column-header {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .pair-column.safe .pair-column-header { background: #d4edda; color: #155724; }
+        .pair-column.danger .pair-column-header { background: #f8d7da; color: #721c24; }
+        .pair-item {
+            position: relative;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .pair-item:hover:not(.disabled) {
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .pair-item.selected { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3); }
+        .pair-item.matched { border-color: #28a745; opacity: 0.6; }
+        .pair-item.disabled { cursor: not-allowed; }
+        .pair-item-img { width: 100%; height: 150px; object-fit: cover; }
+        .pair-item-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .pair-item.selected .pair-item-label { background: #667eea; color: white; }
+        .pair-item.matched .pair-item-label { background: #28a745; border-color: #28a745; color: white; }
+        
+        .drag-drop-container { margin-top: 20px; }
+        .drag-source {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .drag-source-title { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .draggable-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+        }
+        .draggable-item {
+            cursor: move;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        .draggable-item:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
+        .draggable-item.dragging { opacity: 0.5; }
+        .draggable-item.placed { opacity: 0.3; cursor: not-allowed; }
+        .draggable-item-img { width: 100%; height: 80px; object-fit: cover; }
+        .draggable-item-label {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            background: #667eea;
+            color: white;
+        }
+        .drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .drop-zone {
+            min-height: 300px;
+            padding: 20px;
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.drag-over { border-color: #667eea; background: #f0f4ff; }
+        .drop-zone-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .drop-zone.safe .drop-zone-header { background: #d4edda; color: #155724; }
+        .drop-zone.danger .drop-zone-header { background: #f8d7da; color: #721c24; }
+        .drop-zone-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .dropped-item { position: relative; }
+        .remove-item {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .submit-button, .next-button, .retry-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .submit-button:hover:not(:disabled), .next-button:hover, .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .submit-button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        
+        .feedback-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .feedback-correct { background: #d4edda; color: #155724; }
+        .feedback-incorrect { background: #f8d7da; color: #721c24; }
+        .feedback-icon { font-size: 24px; }
+        .explanation {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 8px;
+            color: #0c5460;
+            line-height: 1.6;
+        }
+        
+        .results-container { text-align: center; }
+        .results-header h2 { font-size: 32px; color: #333; margin-bottom: 30px; }
+        .results-score { display: flex; justify-content: center; margin-bottom: 30px; }
+        .score-circle { position: relative; width: 200px; height: 200px; }
+        .score-circle svg { transform: rotate(-90deg); }
+        .score-circle-bg { fill: none; stroke: #e0e0e0; stroke-width: 8; }
+        .score-circle-fill { fill: none; stroke-width: 8; transition: stroke-dasharray 1s ease; }
+        .score-circle.passed .score-circle-fill { stroke: #28a745; }
+        .score-circle.failed .score-circle-fill { stroke: #dc3545; }
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .score-percentage { font-size: 48px; font-weight: bold; color: #333; }
+        .score-fraction { font-size: 18px; color: #666; margin-top: 5px; }
+        .results-message { font-size: 20px; font-weight: 600; padding: 20px; border-radius: 10px; margin-bottom: 30px; }
+        .message-passed { background: #d4edda; color: #155724; }
+        .message-failed { background: #f8d7da; color: #721c24; }
+        
+        @media (max-width: 768px) {
+            .quiz-container { padding: 20px; }
+            .question-title { font-size: 18px; }
+            .image-answers-container { grid-template-columns: 1fr; }
+            .drop-zones, .pair-columns { grid-template-columns: 1fr; }
+            .draggable-items { grid-template-columns: repeat(3, 1fr); }
+            .score-circle { width: 150px; height: 150px; }
+            .score-percentage { font-size: 36px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container"></div>
+    <script>
+        class QuizEngine {
+            constructor(gameData) {
+                this.gameData = gameData;
+                this.questions = gameData.EachQuiz || [];
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.totalPoints = 0;
+                this.maxPoints = gameData.main_total_max_points || 0;
+                this.answers = [];
+                this.container = null;
+                this.currentAnswer = null;
+            }
+
+            init(containerId) {
+                this.container = document.getElementById(containerId);
+                if (!this.container) return;
+                this.render();
+            }
+
+            render() {
+                if (this.currentQuestionIndex < this.questions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.renderResults();
+                }
+            }
+
+            renderQuestion() {
+                const q = this.questions[this.currentQuestionIndex];
+                const total = this.questions.length;
+                const num = this.currentQuestionIndex + 1;
+
+                let qHtml = '';
+                switch (q.qtype) {
+                    case 'mcq': qHtml = this.renderMCQ(q); break;
+                    case 'multi': qHtml = this.renderMulti(q); break;
+                    case 'image_mcq': qHtml = this.renderImageMCQ(q); break;
+                    case 'image_multi': qHtml = this.renderImageMulti(q); break;
+                    case 'hotspot': qHtml = this.renderHotspot(q); break;
+                    case 'multi_hotspot': qHtml = this.renderMultiHotspot(q); break;
+                    case 'order': qHtml = this.renderOrder(q); break;
+                    case 'image_pair': qHtml = this.renderImagePair(q); break;
+                    case 'drag_drop': qHtml = this.renderDragDrop(q); break;
+                }
+
+                this.container.innerHTML = `
+                    <div class="quiz-container">
+                        ${num === 1 ? `<div class="quiz-header">
+                            <h1 class="quiz-main-title">${this.gameData.main_title}</h1>
+                            <p class="quiz-description">${this.gameData.main_description}</p>
+                        </div>` : ''}
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(num / total) * 100}%"></div>
+                            </div>
+                            <div class="progress-text">Câu ${num} / ${total} • ${q.pmax} điểm</div>
+                        </div>
+                        <div class="question-container">
+                            <span class="question-type-badge">${this.getTypeLabel(q.qtype)}</span>
+                            <h2 class="question-title">${q.qtxt}</h2>
+                            ${qHtml}
+                        </div>
+                    </div>
+                `;
+                this.attachEventListeners(q);
+            }
+
+            getTypeLabel(t) {
+                const l = {
+                    'mcq': 'Chọn 1 đáp án', 'multi': 'Chọn nhiều đáp án',
+                    'image_mcq': 'Chọn 1 hình', 'image_multi': 'Chọn nhiều hình',
+                    'hotspot': 'Click điểm', 'multi_hotspot': 'Click nhiều điểm',
+                    'order': 'Sắp xếp', 'image_pair': 'Ghép cặp', 'drag_drop': 'Kéo thả'
+                };
+                return l[t] || t;
+            }
+
+            renderMCQ(q) {
+                return `
+                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    <div class="text-answers-container">
+                        ${q.opt_array.map((a, i) => `
+                            <div class="text-answer-option" data-index="${i}">
+                                <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
+                                <span class="answer-text">${a}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderMulti(q) {
+                return `
+                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    <div class="text-answers-container">
+                        ${q.opt_array.map((a, i) => `
+                            <div class="text-answer-option" data-index="${i}">
+                                <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
+                                <span class="answer-text">${a}</span>
+                                <span class="answer-checkbox">☐</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-multi">Xác nhận</button>
+                `;
+            }
+
+            renderImageMCQ(q) {
+                return `
+                    <div class="image-answers-container">
+                        ${q.opt_array.map((a, i) => `
+                            <div class="image-answer-option" data-index="${i}">
+                                <img src="${a.image}" alt="${a.text}" class="image-answer-img">
+                                <div class="image-answer-text">${a.text}</div>
+                                <div class="image-answer-checkbox">○</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            renderImageMulti(q) {
+                return `
+                    <div class="image-answers-container">
+                        ${q.opt_array.map((a, i) => `
+                            <div class="image-answer-option" data-index="${i}">
+                                <img src="${a.image}" alt="${a.text}" class="image-answer-img">
+                                <div class="image-answer-text">${a.text}</div>
+                                <div class="image-answer-checkbox">☐</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="submit-button" id="submit-image-multi">Xác nhận</button>
+                `;
+            }
+
+            renderHotspot(q) {
+                return `
+                    <div class="hotspot-container">
+                        <div class="hotspot-instructions">📍 ${q.qtxt}</div>
+                        <div class="hotspot-image-wrapper">
+                            <img src="${q.image_json[0]}" class="hotspot-image" id="hotspot-img">
+                            <div class="hotspot-overlay" id="hotspot-overlay"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderMultiHotspot(q) {
+                const count = q.sol_array ? q.sol_array.length : 0;
+                return `
+                    <div class="hotspot-container">
+                        <div class="hotspot-instructions">
+                            📍 Click vào tất cả các điểm nguy hiểm (${count} điểm)
+                        </div>
+                        <div class="hotspot-image-wrapper">
+                            <img src="${q.image_json[0]}" class="hotspot-image">
+                            <div class="hotspot-overlay">
+                                ${q.hotspot_array.map((h, i) => `
+                                    <div class="hotspot-point" data-id="${h.id}" style="left: ${h.x}%; top: ${h.y}%;">${i+1}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-multi-hotspot">Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderOrder(q) {
+                return `
+                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    <div class="order-container">
+                        <div class="order-items" id="order-items">
+                            ${q.opt_array.map((item, i) => `
+                                <div class="order-item" draggable="true" data-text="${item}">
+                                    <span class="order-number">${i + 1}</span>
+                                    <span class="order-text">${item}</span>
+                                    <span class="drag-handle">☰</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="submit-button" id="submit-order">Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderImagePair(q) {
+                const safe = q.image_json.slice(0, 3);
+                const danger = q.image_json.slice(3, 6);
+                return `
+                    <div class="image-pair-container">
+                        <div class="pair-instructions">🔄 ${q.qtxt}</div>
+                        <div class="pair-columns">
+                            <div class="pair-column safe">
+                                <div class="pair-column-header">✓ An Toàn</div>
+                                ${safe.map((img, i) => `
+                                    <div class="pair-item" data-group="safe" data-index="${i}">
+                                        <img src="${img}" class="pair-item-img">
+                                        <div class="pair-item-label">${i + 1}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div class="pair-column danger">
+                                <div class="pair-column-header">⚠ Nguy Hiểm</div>
+                                ${danger.map((img, i) => `
+                                    <div class="pair-item" data-group="danger" data-index="${i}">
+                                        <img src="${img}" class="pair-item-img">
+                                        <div class="pair-item-label">${i + 4}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-pair" disabled>Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            renderDragDrop(q) {
+                return `
+                    <div class="drag-drop-container">
+                        <div class="drag-source">
+                            <div class="drag-source-title">Kéo các hình vào cột phù hợp:</div>
+                            <div class="draggable-items">
+                                ${q.drag_items.map((item, i) => `
+                                    <div class="draggable-item" draggable="true" data-id="${item.id}">
+                                        <img src="${item.image}" class="draggable-item-img">
+                                        <div class="draggable-item-label">${item.label}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="drop-zones">
+                            <div class="drop-zone safe" data-zone="safe">
+                                <div class="drop-zone-header">✓ An Toàn</div>
+                                <div class="drop-zone-items"></div>
+                            </div>
+                            <div class="drop-zone danger" data-zone="danger">
+                                <div class="drop-zone-header">⚠ Nguy Cơ</div>
+                                <div class="drop-zone-items"></div>
+                            </div>
+                        </div>
+                        <button class="submit-button" id="submit-drag-drop">Xác nhận</button>
+                    </div>
+                `;
+            }
+
+            attachEventListeners(q) {
+                switch (q.qtype) {
+                    case 'mcq': this.onMCQ(q); break;
+                    case 'multi': this.onMulti(q); break;
+                    case 'image_mcq': this.onImageMCQ(q); break;
+                    case 'image_multi': this.onImageMulti(q); break;
+                    case 'hotspot': this.onHotspot(q); break;
+                    case 'multi_hotspot': this.onMultiHotspot(q); break;
+                    case 'order': this.onOrder(q); break;
+                    case 'image_pair': this.onImagePair(q); break;
+                    case 'drag_drop': this.onDragDrop(q); break;
+                }
+            }
+
+            onMCQ(q) {
+                const opts = this.container.querySelectorAll('.text-answer-option');
+                opts.forEach((opt, i) => {
+                    opt.onclick = () => {
+                        if (opt.classList.contains('disabled')) return;
+                        const ok = q.opt_array[i] === q.sol_array;
+                        opts.forEach(o => o.classList.add('disabled'));
+                        opt.classList.add(ok ? 'correct' : 'incorrect');
+                        if (!ok) opts[q.opt_array.indexOf(q.sol_array)].classList.add('correct');
+                        this.feedback(ok, q.pmax, q);
+                    };
+                });
+            }
+
+            onMulti(q) {
+                const opts = this.container.querySelectorAll('.text-answer-option');
+                const btn = this.container.querySelector('#submit-multi');
+                const sel = new Set();
+                opts.forEach((opt, i) => {
+                    opt.onclick = () => {
+                        if (opt.classList.contains('disabled')) return;
+                        const a = q.opt_array[i];
+                        if (sel.has(a)) {
+                            sel.delete(a);
+                            opt.classList.remove('selected');
+                            opt.querySelector('.answer-checkbox').textContent = '☐';
+                        } else {
+                            sel.add(a);
+                            opt.classList.add('selected');
+                            opt.querySelector('.answer-checkbox').textContent = '☑';
+                        }
+                        btn.disabled = sel.size === 0;
+                    };
+                });
+                btn.onclick = () => {
+                    const cor = new Set(q.sol_array);
+                    const ok = sel.size === cor.size && [...sel].every(i => cor.has(i));
+                    opts.forEach((opt, i) => {
+                        opt.classList.add('disabled');
+                        const a = q.opt_array[i];
+                        if (cor.has(a)) opt.classList.add('correct');
+                        else if (sel.has(a)) opt.classList.add('incorrect');
+                    });
+                    btn.disabled = true;
+                    this.feedback(ok, q.pmax, q);
+                };
+            }
+
+            onImageMCQ(q) {
+                const opts = this.container.querySelectorAll('.image-answer-option');
+                opts.forEach((opt, i) => {
+                    opt.onclick = () => {
+                        if (opt.classList.contains('disabled')) return;
+                        const ok = i === q.sol_array;
+                        opts.forEach(o => o.classList.add('disabled'));
+                        opt.classList.add(ok ? 'correct' : 'incorrect');
+                        opt.querySelector('.image-answer-checkbox').textContent = ok ? '✓' : '✗';
+                        if (!ok) {
+                            opts[q.sol_array].classList.add('correct');
+                            opts[q.sol_array].querySelector('.image-answer-checkbox').textContent = '✓';
+                        }
+                        this.feedback(ok, q.pmax, q);
+                    };
+                });
+            }
+
+            onImageMulti(q) {
+                const opts = this.container.querySelectorAll('.image-answer-option');
+                const btn = this.container.querySelector('#submit-image-multi');
+                const sel = new Set();
+                opts.forEach((opt, i) => {
+                    opt.onclick = () => {
+                        if (opt.classList.contains('disabled')) return;
+                        if (sel.has(i)) {
+                            sel.delete(i);
+                            opt.classList.remove('selected');
+                            opt.querySelector('.image-answer-checkbox').textContent = '☐';
+                        } else {
+                            sel.add(i);
+                            opt.classList.add('selected');
+                            opt.querySelector('.image-answer-checkbox').textContent = '☑';
+                        }
+                        btn.disabled = sel.size === 0;
+                    };
+                });
+                btn.onclick = () => {
+                    const cor = new Set(q.sol_array);
+                    const ok = sel.size === cor.size && [...sel].every(i => cor.has(i));
+                    opts.forEach((opt, i) => {
+                        opt.classList.add('disabled');
+                        const ck = opt.querySelector('.image-answer-checkbox');
+                        if (cor.has(i)) { opt.classList.add('correct'); ck.textContent = '✓'; }
+                        else if (sel.has(i)) { opt.classList.add('incorrect'); ck.textContent = '✗'; }
+                    });
+                    btn.disabled = true;
+                    this.feedback(ok, q.pmax, q);
+                };
+            }
+
+            onHotspot(q) {
+                const overlay = this.container.querySelector('#hotspot-overlay');
+                const img = this.container.querySelector('#hotspot-img');
+                let clicked = false;
+                overlay.onclick = (e) => {
+                    if (clicked) return;
+                    const rect = img.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) * (img.naturalWidth / rect.width);
+                    const y = (e.clientY - rect.top) * (img.naturalHeight / rect.height);
+                    const dist = Math.sqrt(Math.pow(x - q.sol_json.x, 2) + Math.pow(y - q.sol_json.y, 2));
+                    const ok = dist <= q.sol_json.radius;
+                    
+                    const pt = document.createElement('div');
+                    pt.className = `hotspot-click-point ${ok ? 'correct' : 'incorrect'}`;
+                    pt.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
+                    pt.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
+                    pt.textContent = ok ? '✓' : '✗';
+                    overlay.appendChild(pt);
+                    
+                    if (!ok) {
+                        const cor = document.createElement('div');
+                        cor.className = 'hotspot-click-point correct';
+                        cor.style.left = `${(q.sol_json.x / img.naturalWidth) * 100}%`;
+                        cor.style.top = `${(q.sol_json.y / img.naturalHeight) * 100}%`;
+                        cor.textContent = '✓';
+                        overlay.appendChild(cor);
+                    }
+                    clicked = true;
+                    this.feedback(ok, q.pmax, q);
+                };
+            }
+
+            onMultiHotspot(q) {
+                const pts = this.container.querySelectorAll('.hotspot-point');
+                const btn = this.container.querySelector('#submit-multi-hotspot');
+                const sel = new Set();
+                pts.forEach(pt => {
+                    pt.onclick = () => {
+                        if (pt.classList.contains('disabled')) return;
+                        const id = pt.dataset.id;
+                        if (sel.has(id)) {
+                            sel.delete(id);
+                            pt.classList.remove('selected');
+                        } else {
+                            sel.add(id);
+                            pt.classList.add('selected');
+                        }
+                    };
+                });
+                btn.onclick = () => {
+                    const cor = new Set(q.sol_array);
+                    let cnt = 0;
+                    pts.forEach(pt => {
+                        pt.classList.add('disabled');
+                        const id = pt.dataset.id;
+                        if (cor.has(id)) {
+                            pt.classList.add('correct');
+                            if (sel.has(id)) cnt++;
+                        } else if (sel.has(id)) {
+                            pt.classList.add('incorrect');
+                        }
+                    });
+                    const ok = cnt === cor.size && sel.size === cor.size;
+                    btn.disabled = true;
+                    this.feedback(ok, q.pmax, q, `Đúng ${cnt}/${cor.size} điểm`);
+                };
+            }
+
+            onOrder(q) {
+                const items = this.container.querySelectorAll('.order-item');
+                const btn = this.container.querySelector('#submit-order');
+                let drag = null;
+                items.forEach(item => {
+                    item.ondragstart = () => { drag = item; item.classList.add('dragging'); };
+                    item.ondragend = () => item.classList.remove('dragging');
+                    item.ondragover = (e) => {
+                        e.preventDefault();
+                        const cont = this.container.querySelector('#order-items');
+                        const after = this.getDragAfter(cont, e.clientY);
+                        if (!after) cont.appendChild(drag);
+                        else cont.insertBefore(drag, after);
+                        this.updateOrderNums();
+                    };
+                });
+                btn.onclick = () => {
+                    const curr = Array.from(items).map(i => i.dataset.text);
+                    const ok = JSON.stringify(curr) === JSON.stringify(q.sol_array);
+                    items.forEach(i => { i.classList.add('disabled'); i.draggable = false; });
+                    btn.disabled = true;
+                    this.feedback(ok, q.pmax, q);
+                };
+            }
+
+            updateOrderNums() {
+                this.container.querySelectorAll('.order-item').forEach((i, idx) => {
+                    i.querySelector('.order-number').textContent = idx + 1;
+                });
+            }
+
+            getDragAfter(cont, y) {
+                const els = [...cont.querySelectorAll('.order-item:not(.dragging)')];
+                return els.reduce((close, child) => {
+                    const box = child.getBoundingClientRect();
+                    const off = y - box.top - box.height / 2;
+                    if (off < 0 && off > close.offset) return { offset: off, element: child };
+                    return close;
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+
+            onImagePair(q) {
+                const items = this.container.querySelectorAll('.pair-item');
+                const btn = this.container.querySelector('#submit-pair');
+                let first = null;
+                const pairs = [];
+                items.forEach(item => {
+                    item.onclick = () => {
+                        if (item.classList.contains('matched') || item.classList.contains('disabled')) return;
+                        if (!first) {
+                            first = item;
+                            item.classList.add('selected');
+                        } else {
+                            if (first === item) {
+                                first.classList.remove('selected');
+                                first = null;
+                                return;
+                            }
+                            if (first.dataset.group !== item.dataset.group) {
+                                const si = first.dataset.group === 'safe' ? parseInt(first.dataset.index) : parseInt(item.dataset.index);
+                                const di = first.dataset.group === 'danger' ? parseInt(first.dataset.index) : parseInt(item.dataset.index);
+                                pairs.push([si, di]);
+                                first.classList.add('matched');
+                                first.classList.remove('selected');
+                                item.classList.add('matched');
+                                first = null;
+                                btn.disabled = pairs.length !== 3;
+                            } else {
+                                first.classList.remove('selected');
+                                first = item;
+                                item.classList.add('selected');
+                            }
+                        }
+                    };
+                });
+                btn.onclick = () => {
+                    let cnt = 0;
+                    pairs.forEach(p => { if (p[0] === p[1]) cnt++; });
+                    const ok = cnt === 3;
+                    items.forEach(i => i.classList.add('disabled'));
+                    btn.disabled = true;
+                    this.feedback(ok, q.pmax, q, `Ghép đúng ${cnt}/3`);
+                };
+            }
+
+            onDragDrop(q) {
+                const drags = this.container.querySelectorAll('.draggable-item');
+                const zones = this.container.querySelectorAll('.drop-zone');
+                const btn = this.container.querySelector('#submit-drag-drop');
+                const place = {};
+                
+                drags.forEach(d => {
+                    d.ondragstart = (e) => {
+                        if (d.classList.contains('placed')) return;
+                        d.classList.add('dragging');
+                        e.dataTransfer.setData('id', d.dataset.id);
+                    };
+                    d.ondragend = () => d.classList.remove('dragging');
+                });
+                
+                zones.forEach(z => {
+                    z.ondragover = (e) => { e.preventDefault(); z.classList.add('drag-over'); };
+                    z.ondragleave = () => z.classList.remove('drag-over');
+                    z.ondrop = (e) => {
+                        e.preventDefault();
+                        z.classList.remove('drag-over');
+                        const id = e.dataTransfer.getData('id');
+                        const d = this.container.querySelector(`.draggable-item[data-id="${id}"]`);
+                        if (!d || d.classList.contains('placed')) return;
+                        
+                        const zType = z.dataset.zone;
+                        const zItems = z.querySelector('.drop-zone-items');
+                        const clone = d.cloneNode(true);
+                        clone.classList.add('dropped-item');
+                        clone.removeAttribute('draggable');
+                        
+                        const rmBtn = document.createElement('button');
+                        rmBtn.className = 'remove-item';
+                        rmBtn.innerHTML = '×';
+                        rmBtn.onclick = () => {
+                            clone.remove();
+                            d.classList.remove('placed');
+                            delete place[id];
+                            btn.disabled = Object.keys(place).length !== q.drag_items.length;
+                        };
+                        clone.appendChild(rmBtn);
+                        zItems.appendChild(clone);
+                        d.classList.add('placed');
+                        place[id] = zType;
+                        btn.disabled = Object.keys(place).length !== q.drag_items.length;
+                    };
+                });
+                
+                btn.onclick = () => {
+                    let cnt = 0;
+                    q.drag_items.forEach(item => {
+                        if (place[item.id] === item.correct_zone) cnt++;
+                    });
+                    const ok = cnt === q.drag_items.length;
+                    btn.disabled = true;
+                    drags.forEach(d => d.draggable = false);
+                    this.feedback(ok, q.pmax, q, `Xếp đúng ${cnt}/${q.drag_items.length}`);
+                };
+            }
+
+            feedback(ok, pts, q, msg = '') {
+                if (ok) this.score++;
+                this.totalPoints += pts;
+                const m = msg || (ok ? 'Chính xác! ✓' : 'Chưa chính xác! ✗');
+                const html = `
+                    <div class="feedback-message ${ok ? 'feedback-correct' : 'feedback-incorrect'}">
+                        <span class="feedback-icon">${ok ? '✓' : '✗'}</span>
+                        <span>${m} (+${pts} điểm)</span>
+                    </div>
+                    ${q.expl ? `<div class="explanation"><strong>💡</strong> ${q.expl}</div>` : ''}
+                `;
+                const qc = this.container.querySelector('.question-container');
+                qc.insertAdjacentHTML('beforeend', html);
+                const next = document.createElement('button');
+                next.className = 'next-button';
+                next.textContent = this.currentQuestionIndex < this.questions.length - 1 ? 'Câu tiếp theo →' : 'Xem kết quả';
+                next.onclick = () => this.nextQuestion();
+                qc.appendChild(next);
+            }
+
+            nextQuestion() {
+                this.currentQuestionIndex++;
+                this.render();
+            }
+
+            renderResults() {
+                const t = this.questions.length;
+                const p = Math.round((this.score / t) * 100);
+                const pass = p >= (this.gameData.main_pass_threshold_percent || 70);
+                this.container.innerHTML = `
+                    <div class="quiz-container results-container">
+                        <div class="results-header"><h2>🎯 Kết quả</h2></div>
+                        <div class="results-score">
+                            <div class="score-circle ${pass ? 'passed' : 'failed'}">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="score-circle-bg"></circle>
+                                    <circle cx="50" cy="50" r="45" class="score-circle-fill" style="stroke-dasharray: ${p * 2.827}, 282.7"></circle>
+                                </svg>
+                                <div class="score-text">
+                                    <div class="score-percentage">${p}%</div>
+                                    <div class="score-fraction">${this.score}/${t} câu</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="results-message ${pass ? 'message-passed' : 'message-failed'}">
+                            ${pass ? '🎉 Xuất sắc! Bạn đã đạt!' : '😔 Hãy thử lại nhé!'}
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">
+                            <strong>Tổng điểm:</strong> ${this.totalPoints}/${this.maxPoints}
+                        </div>
+                        <button class="retry-button" onclick="location.reload()">🔄 Làm lại</button>
+                    </div>
+                `;
+            }
+        }
+
+        // DATA: 12 CÂU HỎI
+        const quizData = {
+            "main_game_id": "complete_quiz_2025",
+            "main_title": "Quiz Hoàn Chỉnh - 12 Câu Hỏi Đa Dạng",
+            "main_description": "Bộ câu hỏi bao gồm tất cả các dạng: MCQ, Multi, Image, Hotspot, Order, Pair, Drag-Drop",
+            "main_total_questions": 12,
+            "main_total_max_points": 200,
+            "main_pass_threshold_percent": 70,
+            "EachQuiz": [
+                {
+                    "qn": 1, "qid": "q001", "qtype": "hotspot", "qtxt": "Click vào vạch kẻ đường", "pmax": 10, "diff": "easy",
+                    "opt_array": null,
+                    "sol_json": { "x": 400, "y": 300, "radius": 80 },
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463771/68633251_tr3nqn.jpg"],
+                    "expl": "Vạch kẻ là nơi an toàn để qua đường."
+                },
+                {
+                    "qn": 2, "qid": "q002", "qtype": "multi", "qtxt": "Chọn phương tiện an toàn cho học sinh", "pmax": 15, "diff": "medium",
+                    "opt_array": ["Xe đạp", "Xe máy", "Ô tô đi cùng bố mẹ", "Xe buýt trường", "Xe tải"],
+                    "sol_array": ["Xe đạp", "Ô tô đi cùng bố mẹ", "Xe buýt trường"],
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463465/important_road_safety_rules_to_teach_your_children_illustration.jpg_vk7gty.webp"],
+                    "expl": "Học sinh chỉ nên đi xe đạp hoặc được đưa đón."
+                },
+                {
+                    "qn": 3, "qid": "q003", "qtype": "mcq", "qtxt": "Đèn đỏ nghĩa là gì?", "pmax": 10, "diff": "easy",
+                    "opt_array": ["Dừng lại", "Đi chậm", "Được đi", "Rẽ phải"],
+                    "sol_array": "Dừng lại",
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463334/Teach-Road-Safety-to-Kids-1_kibxvw.png"],
+                    "expl": "Đèn đỏ = dừng lại."
+                },
+                {
+                    "qn": 4, "qid": "q004", "qtype": "order", "qtxt": "Sắp xếp các bước qua đường", "pmax": 20, "diff": "hard",
+                    "opt_array": ["Nhìn trái – nhìn phải", "Chờ đèn xanh", "Đi nhanh qua vạch", "Không dừng giữa đường"],
+                    "sol_array": ["Chờ đèn xanh", "Nhìn trái – nhìn phải", "Đi nhanh qua vạch", "Không dừng giữa đường"],
+                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1759660871/88745398_road-safety_qjetaw.jpg"],
+                    "expl": "Chờ → Quan sát → Đi qua → Không dừng."
+                },
+                {
+                    "qn": 5, "qid": "q005", "qtype": "image_pair", "qtxt": "Ghép cặp an toàn/nguy hiểm", "pmax": 25, "diff": "hard",
+                    "opt_array": null,
+                    "sol_array": [[0,0], [1,1], [2,2]],
+                    "image_json": [
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662280/89039832_children_tw6zrn.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759661153/87498090_a-car-bumping-the-traffic-cones_pk60x0.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662493/88589066_children_1_j24kzx.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662282/89505552_children_snzywa.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662851/36960374_children_xterrv.jpg",
+                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662490/87614454_children_rkfqo3.jpg"
+                    ],
+                    "expl": "Ghép hành động đúng với sai tương ứng."
+                },
+                {
+                    "qn": 6, "qid": "q006", "qtype": "image_mcq", "qtxt": "Thiết bị nào BẮT BUỘC khi đi xe đạp?", "pmax": 15, "diff": "medium",
+                    "opt_array": [
+                        { "text": "Mũ bảo hiểm", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
+                        { "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
+                        { "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
+                        { "text": "Không cần", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+                    ],
+                    "sol_array": 0,
+                    "image_json": null,
+                    "expl": "Mũ bảo hiểm bảo vệ đầu khi té."
+                },
+                {
+                    "qn": 7, "qid": "q007", "qtype": "image_mcq", "qtxt": "Chọn biển báo CẤM ĐI NGƯỢC CHIỀU", "pmax": 10, "diff": "easy",
+                    "opt_array": [
+                        { "text": "Biển cấm đi ngược chiều", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=400&h=300&fit=crop" },
+                        { "text": "Biển dừng lại", "image": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop" },
+                        { "text": "Biển ưu tiên", "image": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=400&h=300&fit=crop" },
+                        { "text": "Biển chỉ đường", "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&h=300&fit=crop" }
+                    ],
+                    "sol_array": 0,
+                    "image_json": null,
+                    "expl": "Biển cấm đi ngược chiều có hình tròn đỏ với vạch trắng ngang."
+                },
+                {
+                    "qn": 8, "qid": "q008", "qtype": "image_multi", "qtxt": "Chọn TẤT CẢ biển báo NGUY HIỂM", "pmax": 15, "diff": "medium",
+                    "opt_array": [
+                        { "text": "Cẩn thận", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=300&h=200&fit=crop" },
+                        { "text": "Nguy hiểm điện", "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
+                        { "text": "Chỉ dẫn", "image": "https://images.unsplash.com/photo-1542831371-d531d36971e6?w=300&h=200&fit=crop" },
+                        { "text": "Ngã tư nguy hiểm", "image": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?w=300&h=200&fit=crop" }
+                    ],
+                    "sol_array": [0, 1, 3],
+                    "image_json": null,
+                    "expl": "Biển nguy hiểm thường có màu vàng tam giác."
+                },
+                {
+                    "qn": 9, "qid": "q009", "qtype": "drag_drop", "qtxt": "Kéo thả hình vào cột đúng", "pmax": 20, "diff": "medium",
+                    "opt_array": null,
+                    "drag_items": [
+                        { "id": "i1", "label": "Mặc đồ bảo hộ", "image": "https://images.unsplash.com/photo-1572107248692-1d32d1f5fc3a?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                        { "id": "i2", "label": "Hút thuốc", "image": "https://images.unsplash.com/photo-1605671919743-c3cd293be5e7?w=200&h=150&fit=crop", "correct_zone": "danger" },
+                        { "id": "i3", "label": "Đeo kính", "image": "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                        { "id": "i4", "label": "Chạy nhanh", "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=200&h=150&fit=crop", "correct_zone": "danger" },
+                        { "id": "i5", "label": "Rửa tay", "image": "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                        { "id": "i6", "label": "Dùng điện thoại", "image": "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200&h=150&fit=crop", "correct_zone": "danger" }
+                    ],
+                    "sol_array": null,
+                    "image_json": null,
+                    "expl": "Phân biệt hành động an toàn và nguy hiểm."
+                },
+                {
+                    "qn": 10, "qid": "q010", "qtype": "multi_hotspot", "qtxt": "Click vào TẤT CẢ điểm nguy hiểm", "pmax": 20, "diff": "hard",
+                    "opt_array": null,
+                    "hotspot_array": [
+                        { "id": "s1", "x": 25, "y": 30 },
+                        { "id": "s2", "x": 50, "y": 40 },
+                        { "id": "s3", "x": 75, "y": 35 },
+                        { "id": "s4", "x": 30, "y": 70 },
+                        { "id": "s5", "x": 65, "y": 75 }
+                    ],
+                    "sol_array": ["s1", "s3", "s5"],
+                    "image_json": ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop"],
+                    "expl": "Nhận biết điểm nguy hiểm trên công trường."
+                },
+                {
+                    "qn": 11, "qid": "q011", "qtype": "image_mcq", "qtxt": "Chọn thiết bị BẮT BUỘC ở công trường", "pmax": 10, "diff": "easy",
+                    "opt_array": [
+                        { "text": "Mũ bảo hiểm", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
+                        { "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
+                        { "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
+                        { "text": "Không cần", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+                    ],
+                    "sol_array": 0,
+                    "image_json": null,
+                    "expl": "Mũ bảo hiểm là thiết bị bắt buộc."
+                },
+                {
+                    "qn": 12, "qid": "q012", "qtype": "image_multi", "qtxt": "Chọn TẤT CẢ thiết bị cần thiết với hóa chất", "pmax": 15, "diff": "medium",
+                    "opt_array": [
+                        { "text": "Găng tay", "image": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=400&h=300&fit=crop" },
+                        { "text": "Kính bảo hộ", "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?w=400&h=300&fit=crop" },
+                        { "text": "Quần áo thường", "image": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=300&fit=crop" },
+                        { "text": "Khẩu trang", "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=300&fit=crop" }
+                    ],
+                    "sol_array": [0, 1, 3],
+                    "image_json": null,
+                    "expl": "Cần găng tay, kính và khẩu trang."
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const quiz = new QuizEngine(quizData);
+            quiz.init('quiz-container');
+        });
+    </script>
+</body>
+</html>
