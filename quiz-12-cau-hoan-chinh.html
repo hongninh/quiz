@@ -473,13 +473,19 @@
                 this.totalPoints = 0;
                 this.maxPoints = gameData.main_total_max_points || 0;
                 this.answers = [];
+                this.quizResults = [];
                 this.container = null;
                 this.currentAnswer = null;
+                this.currentQuestionStartTime = null;
+                this.quizStartTime = null;
+                this.streak = 0;
+                this.cumulativeScore = 0;
             }
 
             init(containerId) {
                 this.container = document.getElementById(containerId);
                 if (!this.container) return;
+                this.quizStartTime = new Date();
                 this.render();
             }
 
@@ -495,6 +501,9 @@
                 const q = this.questions[this.currentQuestionIndex];
                 const total = this.questions.length;
                 const num = this.currentQuestionIndex + 1;
+                
+                // Bắt đầu đếm thời gian câu hỏi
+                this.currentQuestionStartTime = new Date();
 
                 let qHtml = '';
                 switch (q.qtype) {
@@ -1037,8 +1046,41 @@
             }
 
             feedback(ok, pts, q, msg = '') {
-                if (ok) this.score++;
+                const endTime = new Date();
+                const playTime = endTime - this.currentQuestionStartTime;
+                const timeRemaining = (q.tmax || 0) - playTime;
+                
+                if (ok) {
+                    this.score++;
+                    this.streak++;
+                } else {
+                    this.streak = 0;
+                }
                 this.totalPoints += pts;
+                this.cumulativeScore += pts;
+                
+                // Lưu kết quả chi tiết
+                this.quizResults.push({
+                    "qn": q.qn,
+                    "lq": q.lq,
+                    "qid": q.qid,
+                    "ts_start": this.currentQuestionStartTime.toISOString(),
+                    "ts_end": endTime.toISOString(),
+                    "pt": playTime,
+                    "ps": pts,
+                    "ans": this.currentAnswer ? (this.currentAnswer.selected || this.currentAnswer.order || []) : [],
+                    "cor": ok,
+                    "skip": false,
+                    "trem": Math.max(0, timeRemaining),
+                    "hint": false,
+                    "pen": ok ? 0 : (q.penalty_points || 0),
+                    "cum": this.cumulativeScore,
+                    "streak": this.streak,
+                    "sol": q.sol_array || q.sol_json || [],
+                    "expl": q.expl || "",
+                    "show_sol": q.display_correct_answer === "y"
+                });
+                
                 const m = msg || (ok ? 'Chính xác! ✓' : 'Chưa chính xác! ✗');
                 const html = `
                     <div class="feedback-message ${ok ? 'feedback-correct' : 'feedback-incorrect'}">
@@ -1065,6 +1107,46 @@
                 const t = this.questions.length;
                 const p = Math.round((this.score / t) * 100);
                 const pass = p >= (this.gameData.main_pass_threshold_percent || 70);
+                const quizEndTime = new Date();
+                const totalTime = quizEndTime - this.quizStartTime;
+                
+                // Tạo summary output
+                const skippedCount = this.quizResults.filter(r => r.skip).length;
+                const avgTime = Math.round(totalTime / t);
+                
+                const finalOutput = {
+                    "main_game_id": this.gameData.main_game_id,
+                    "main_game_version": this.gameData.main_game_version,
+                    "main_author": this.gameData.main_author,
+                    "main_language": this.gameData.main_language,
+                    "main_total_questions": t,
+                    "main_total_points": this.maxPoints,
+                    "player_info": {
+                        "uid": "user_" + Math.random().toString(36).substr(2, 9),
+                        "sid": "session_" + Date.now(),
+                        "att": 1,
+                        "ua": navigator.userAgent,
+                        "ip": "hidden"
+                    },
+                    "quiz_results": this.quizResults,
+                    "summary": {
+                        "total_score": this.totalPoints,
+                        "max_score": this.maxPoints,
+                        "correct_count": this.score,
+                        "wrong_count": t - this.score - skippedCount,
+                        "skipped_count": skippedCount,
+                        "avg_time_per_question_ms": avgTime,
+                        "total_time_ms": totalTime,
+                        "completion_rate_percent": 100,
+                        "pass_status": pass ? "passed" : "failed",
+                        "percentage": p
+                    }
+                };
+                
+                // Lưu vào console và localStorage
+                console.log("📊 KẾT QUẢ QUIZ:", JSON.stringify(finalOutput, null, 2));
+                localStorage.setItem('quiz_result_latest', JSON.stringify(finalOutput));
+                
                 this.container.innerHTML = `
                     <div class="quiz-container results-container">
                         <div class="results-header"><h2>🎯 Kết quả</h2></div>
@@ -1084,11 +1166,23 @@
                             ${pass ? '🎉 Xuất sắc! Bạn đã đạt!' : '😔 Hãy thử lại nhé!'}
                         </div>
                         <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-bottom: 20px;">
-                            <strong>Tổng điểm:</strong> ${this.totalPoints}/${this.maxPoints}
+                            <div><strong>Tổng điểm:</strong> ${this.totalPoints}/${this.maxPoints}</div>
+                            <div style="font-size: 13px; color: #666; margin-top: 8px;">
+                                Thời gian: ${Math.floor(totalTime/1000)}s | Trung bình: ${Math.floor(avgTime/1000)}s/câu
+                            </div>
                         </div>
+                        <button class="submit-button" onclick="window.downloadResults()" style="background: #28a745; margin-bottom: 10px;">
+                            📥 Tải kết quả JSON
+                        </button>
+                        <button class="submit-button" onclick="window.copyResults()" style="background: #17a2b8; margin-bottom: 10px;">
+                            📋 Copy kết quả
+                        </button>
                         <button class="retry-button" onclick="location.reload()">🔄 Làm lại</button>
                     </div>
                 `;
+                
+                // Gán vào window để các button có thể gọi
+                window.quizFinalOutput = finalOutput;
             }
         }
 
