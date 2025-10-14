@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game - Modular Architecture</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+        .card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #28a745;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+        }
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        .feature-list li::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 Quiz Game - Modular Architecture</h1>
+        <p class="subtitle">Hệ thống quiz game được tách thành Global (dùng chung) và Local (riêng từng screen)</p>
+
+        <div class="section">
+            <h2>🚀 Bắt đầu nhanh</h2>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="example-usage.html" class="btn">📱 Demo đầy đủ (12 câu)</a>
+                <a href="demo-single-type.html" class="btn btn-secondary">🎯 Demo đơn giản (3 câu)</a>
+            </div>
+            
+            <div class="highlight">
+                <strong>💡 Gợi ý:</strong> Mở file demo bằng trình duyệt để xem quiz hoạt động. 
+                Kiểm tra source code để hiểu cách tích hợp.
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 Tài liệu</h2>
+            <div class="grid">
+                <div class="card" onclick="window.open('HUONG-DAN-SU-DUNG.md')">
+                    <div class="icon">📖</div>
+                    <h3>Hướng dẫn sử dụng</h3>
+                    <p>Hướng dẫn chi tiết bằng tiếng Việt, bao gồm ví dụ và cách tích hợp</p>
+                </div>
+                
+                <div class="card" onclick="window.open('README.md')">
+                    <div class="icon">📄</div>
+                    <h3>README.md</h3>
+                    <p>Documentation đầy đủ bằng tiếng Anh, API reference và best practices</p>
+                </div>
+                
+                <div class="card" onclick="window.open('CAU-TRUC-DU-AN.txt')">
+                    <div class="icon">📋</div>
+                    <h3>Cấu trúc dự án</h3>
+                    <p>Sơ đồ chi tiết cấu trúc thư mục và mapping question types</p>
+                </div>
+                
+                <div class="card" onclick="window.open('BAT-DAU-NHANH.txt')">
+                    <div class="icon">⚡</div>
+                    <h3>Bắt đầu nhanh</h3>
+                    <p>Hướng dẫn 3 bước đơn giản để bắt đầu sử dụng ngay</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Các loại câu hỏi hỗ trợ</h2>
+            <ul class="feature-list">
+                <li><strong>MCQ</strong> - Chọn 1 đáp án (text)</li>
+                <li><strong>Multi</strong> - Chọn nhiều đáp án (text)</li>
+                <li><strong>Image MCQ</strong> - Chọn 1 hình ảnh</li>
+                <li><strong>Image Multi</strong> - Chọn nhiều hình ảnh</li>
+                <li><strong>Hotspot</strong> - Click vào 1 điểm trên hình</li>
+                <li><strong>Multi Hotspot</strong> - Click vào nhiều điểm</li>
+                <li><strong>Order</strong> - Sắp xếp thứ tự bằng drag & drop</li>
+                <li><strong>Image Pair</strong> - Ghép cặp hình ảnh</li>
+                <li><strong>Drag Drop</strong> - Kéo thả để phân loại</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>💻 Cách sử dụng cơ bản</h2>
+            <div class="code-block">
+&lt;!-- 1. Load Global CSS (bắt buộc) --&gt;
+&lt;link rel="stylesheet" href="quiz-game/global/quiz-global.css"&gt;
+
+&lt;!-- 2. Load Screen CSS (chỉ load loại câu hỏi bạn dùng) --&gt;
+&lt;link rel="stylesheet" href="quiz-game/screens/mcq/screen-mcq.css"&gt;
+
+&lt;!-- 3. Container --&gt;
+&lt;div id="quiz-container"&gt;&lt;/div&gt;
+
+&lt;!-- 4. Load Global JS (bắt buộc) --&gt;
+&lt;script src="quiz-game/global/quiz-global.js"&gt;&lt;/script&gt;
+
+&lt;!-- 5. Load Screen JS (chỉ load loại câu hỏi bạn dùng) --&gt;
+&lt;script src="quiz-game/screens/mcq/screen-mcq.js"&gt;&lt;/script&gt;
+
+&lt;!-- 6. Khởi tạo --&gt;
+&lt;script&gt;
+    const quiz = new QuizEngine(yourData);
+    quiz.registerQuestionType('mcq', MCQHandler);
+    quiz.init('quiz-container');
+&lt;/script&gt;
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✨ Ưu điểm của kiến trúc này</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="icon">⚡</div>
+                    <h3>Tối ưu hiệu năng</h3>
+                    <p>Chỉ load những file CSS/JS cần thiết, giảm băng thông</p>
+                </div>
+                
+                <div class="card">
+                    <div class="icon">🔧</div>
+                    <h3>Dễ maintain</h3>
+                    <p>Mỗi loại câu hỏi độc lập, sửa 1 không ảnh hưởng các loại khác</p>
+                </div>
+                
+                <div class="card">
+                    <div class="icon">📈</div>
+                    <h3>Scalable</h3>
+                    <p>Dễ dàng thêm loại câu hỏi mới mà không cần refactor code cũ</p>
+                </div>
+                
+                <div class="card">
+                    <div class="icon">🎨</div>
+                    <h3>Customize dễ dàng</h3>
+                    <p>Override CSS cho từng trang mà không ảnh hưởng global styles</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📦 Cấu trúc thư mục</h2>
+            <div class="code-block">
+quiz-game/
+├── global/
+│   ├── quiz-global.css        ← CSS dùng chung
+│   └── quiz-global.js         ← Core engine
+├── screens/
+│   ├── mcq/                   ← Text questions
+│   ├── image/                 ← Image questions
+│   ├── hotspot/               ← Hotspot questions
+│   ├── order/                 ← Order questions
+│   ├── pair/                  ← Pairing questions
+│   └── drag-drop/             ← Drag & drop questions
+├── example-usage.html         ← Demo đầy đủ
+├── demo-single-type.html      ← Demo đơn giản
+├── HUONG-DAN-SU-DUNG.md      ← Hướng dẫn tiếng Việt
+└── README.md                  ← Documentation
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎉 Chúc bạn tích hợp thành công vào procfu.com!</p>
+            <p style="margin-top: 10px; font-size: 14px;">Nếu cần hỗ trợ, vui lòng xem tài liệu hoặc file demo</p>
+        </div>
+    </div>
+</body>
+</html>

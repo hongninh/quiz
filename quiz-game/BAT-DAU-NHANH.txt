@@ -1,0 +1,64 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                    🚀 BẮT ĐẦU NHANH                          ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📝 3 BƯỚC ĐƠN GIẢN:
+
+1️⃣ Copy folder `quiz-game` vào project của bạn
+
+2️⃣ Thêm vào HTML:
+
+   <link rel="stylesheet" href="quiz-game/global/quiz-global.css">
+   <link rel="stylesheet" href="quiz-game/screens/mcq/screen-mcq.css">
+   
+   <div id="quiz-container"></div>
+   
+   <script src="quiz-game/global/quiz-global.js"></script>
+   <script src="quiz-game/screens/mcq/screen-mcq.js"></script>
+   <script>
+       const quiz = new QuizEngine(yourData);
+       quiz.registerQuestionType('mcq', MCQHandler);
+       quiz.init('quiz-container');
+   </script>
+
+3️⃣ Xong! Mở trình duyệt xem kết quả
+
+╔═══════════════════════════════════════════════════════════════╗
+║                    📂 FILE DEMO                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+✅ Mở file: example-usage.html          (Demo đầy đủ)
+✅ Mở file: demo-single-type.html       (Demo đơn giản)
+
+╔═══════════════════════════════════════════════════════════════╗
+║                    📚 TÀI LIỆU                                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+📖 HUONG-DAN-SU-DUNG.md    → Hướng dẫn chi tiết (tiếng Việt)
+📖 README.md               → Documentation (English)
+📋 CAU-TRUC-DU-AN.txt      → Cấu trúc dự án
+
+╔═══════════════════════════════════════════════════════════════╗
+║                    💡 LƯU Ý                                   ║
+╚═══════════════════════════════════════════════════════════════╝
+
+⚠️  LUÔN load global files TRƯỚC
+⚠️  CHỈ load screen files bạn cần dùng
+✅  Tiết kiệm băng thông
+✅  Code dễ maintain
+
+╔═══════════════════════════════════════════════════════════════╗
+║              🎯 CÁC LOẠI CÂU HỎI CÓ SẴN                      ║
+╚═══════════════════════════════════════════════════════════════╝
+
+✓ MCQ              - Chọn 1 đáp án (text)
+✓ Multi            - Chọn nhiều đáp án (text)
+✓ Image MCQ        - Chọn 1 hình
+✓ Image Multi      - Chọn nhiều hình
+✓ Hotspot          - Click 1 điểm trên hình
+✓ Multi Hotspot    - Click nhiều điểm
+✓ Order            - Sắp xếp thứ tự
+✓ Image Pair       - Ghép cặp hình
+✓ Drag Drop        - Kéo thả phân loại
+
+Chúc bạn thành công! 🎉

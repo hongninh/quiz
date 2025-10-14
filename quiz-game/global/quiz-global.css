@@ -1,0 +1,304 @@
+/**
+ * QUIZ GAME - GLOBAL CSS
+ * CSS dùng chung cho tất cả các màn hình quiz
+ * Bao gồm: layout, container, progress, feedback, results, buttons
+ */
+
+/* ==================== RESET & BASE ==================== */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ==================== CONTAINER ==================== */
+#quiz-container { 
+    width: 100%; 
+    max-width: 900px; 
+}
+
+.quiz-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ==================== HEADER ==================== */
+.quiz-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.quiz-main-title { 
+    font-size: 28px; 
+    color: #333; 
+    margin-bottom: 10px; 
+}
+
+.quiz-description { 
+    font-size: 14px; 
+    color: #666; 
+    line-height: 1.6; 
+}
+
+/* ==================== PROGRESS BAR ==================== */
+.quiz-progress { 
+    margin-bottom: 30px; 
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text { 
+    text-align: center; 
+    color: #666; 
+    font-size: 14px; 
+    font-weight: 600; 
+}
+
+/* ==================== QUESTION ==================== */
+.question-container {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+.question-title { 
+    font-size: 22px; 
+    color: #333; 
+    margin-bottom: 20px; 
+    line-height: 1.5; 
+}
+
+.question-type-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    background: #667eea;
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.question-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ==================== BUTTONS ==================== */
+.submit-button, 
+.next-button, 
+.retry-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover:not(:disabled), 
+.next-button:hover, 
+.retry-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+    transform: none; 
+}
+
+/* ==================== FEEDBACK ==================== */
+.feedback-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+}
+
+.feedback-correct { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.feedback-incorrect { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+.feedback-icon { 
+    font-size: 24px; 
+}
+
+.explanation {
+    background: #e7f3ff;
+    border-left: 4px solid #2196F3;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    color: #0c5460;
+    line-height: 1.6;
+}
+
+/* ==================== RESULTS ==================== */
+.results-container { 
+    text-align: center; 
+}
+
+.results-header h2 { 
+    font-size: 32px; 
+    color: #333; 
+    margin-bottom: 30px; 
+}
+
+.results-score { 
+    display: flex; 
+    justify-content: center; 
+    margin-bottom: 30px; 
+}
+
+.score-circle { 
+    position: relative; 
+    width: 200px; 
+    height: 200px; 
+}
+
+.score-circle svg { 
+    transform: rotate(-90deg); 
+}
+
+.score-circle-bg { 
+    fill: none; 
+    stroke: #e0e0e0; 
+    stroke-width: 8; 
+}
+
+.score-circle-fill { 
+    fill: none; 
+    stroke-width: 8; 
+    transition: stroke-dasharray 1s ease; 
+}
+
+.score-circle.passed .score-circle-fill { 
+    stroke: #28a745; 
+}
+
+.score-circle.failed .score-circle-fill { 
+    stroke: #dc3545; 
+}
+
+.score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.score-percentage { 
+    font-size: 48px; 
+    font-weight: bold; 
+    color: #333; 
+}
+
+.score-fraction { 
+    font-size: 18px; 
+    color: #666; 
+    margin-top: 5px; 
+}
+
+.results-message { 
+    font-size: 20px; 
+    font-weight: 600; 
+    padding: 20px; 
+    border-radius: 10px; 
+    margin-bottom: 30px; 
+}
+
+.message-passed { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.message-failed { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .quiz-container { 
+        padding: 20px; 
+    }
+    
+    .question-title { 
+        font-size: 18px; 
+    }
+    
+    .score-circle { 
+        width: 150px; 
+        height: 150px; 
+    }
+    
+    .score-percentage { 
+        font-size: 36px; 
+    }
+}

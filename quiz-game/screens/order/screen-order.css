@@ -1,0 +1,64 @@
+/**
+ * SCREEN: ORDER
+ * CSS cho câu hỏi dạng sắp xếp thứ tự
+ */
+
+.order-container { 
+    margin-top: 20px; 
+}
+
+.order-items { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.order-item:hover:not(.disabled) {
+    background: #f0f0f0;
+    border-color: #667eea;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-item.dragging { 
+    opacity: 0.5; 
+}
+
+.order-item.disabled { 
+    cursor: not-allowed; 
+}
+
+.order-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.order-text { 
+    flex: 1; 
+    color: #333; 
+}
+
+.drag-handle { 
+    font-size: 20px; 
+    color: #999; 
+    cursor: move; 
+}
