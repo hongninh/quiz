@@ -8,13 +8,9 @@ Code quiz game đã được **tách thành 2 phần**:
 - `global/quiz-global.css` - CSS chung (container, nút, progress bar, kết quả)
 - `global/quiz-global.js` - Engine chính (QuizEngine class)
 
-### 2. **LOCAL** (Riêng từng loại câu hỏi)
-- `screens/mcq/` - Câu hỏi text (chọn 1 hoặc nhiều)
-- `screens/image/` - Câu hỏi hình ảnh
-- `screens/hotspot/` - Click điểm trên hình
-- `screens/order/` - Sắp xếp thứ tự
-- `screens/pair/` - Ghép cặp
-- `screens/drag-drop/` - Kéo thả phân loại
+### 2. **SCREENS** (Tất cả loại câu hỏi trong 2 file)
+- `screens/screens-all.css` - CSS cho tất cả loại câu hỏi
+- `screens/screens-all.js` - JS handlers cho tất cả loại câu hỏi
 
 ## 🚀 Cách dùng nhanh
 
@@ -35,10 +31,8 @@ your-project/
     <!-- 1. LUÔN LOAD GLOBAL CSS -->
     <link rel="stylesheet" href="quiz-game/global/quiz-global.css">
     
-    <!-- 2. LOAD CSS CHO CÁC LOẠI CÂU HỎI BẠN SẼ DÙNG -->
-    <link rel="stylesheet" href="quiz-game/screens/mcq/screen-mcq.css">
-    <link rel="stylesheet" href="quiz-game/screens/image/screen-image.css">
-    <!-- Thêm các loại khác nếu cần... -->
+    <!-- 2. LOAD SCREENS CSS (tất cả loại câu hỏi) -->
+    <link rel="stylesheet" href="quiz-game/screens/screens-all.css">
 </head>
 <body>
     <!-- Container để hiển thị quiz -->
@@ -47,10 +41,8 @@ your-project/
     <!-- 3. LUÔN LOAD GLOBAL JS -->
     <script src="quiz-game/global/quiz-global.js"></script>
     
-    <!-- 4. LOAD JS CHO CÁC LOẠI CÂU HỎI BẠN SẼ DÙNG -->
-    <script src="quiz-game/screens/mcq/screen-mcq.js"></script>
-    <script src="quiz-game/screens/image/screen-image.js"></script>
-    <!-- Thêm các loại khác nếu cần... -->
+    <!-- 4. LOAD SCREENS JS (tất cả handlers) -->
+    <script src="quiz-game/screens/screens-all.js"></script>
 
     <script>
         // 5. DATA QUIZ CỦA BẠN
@@ -96,75 +88,56 @@ your-project/
 
 ## 📝 Các loại câu hỏi và Handler
 
-| Loại | `qtype` | Handler | File CSS | File JS |
-|------|---------|---------|----------|---------|
-| Chọn 1 đáp án (text) | `mcq` | `MCQHandler` | `screens/mcq/screen-mcq.css` | `screens/mcq/screen-mcq.js` |
-| Chọn nhiều đáp án (text) | `multi` | `MultiHandler` | `screens/mcq/screen-mcq.css` | `screens/mcq/screen-mcq.js` |
-| Chọn 1 hình | `image_mcq` | `ImageMCQHandler` | `screens/image/screen-image.css` | `screens/image/screen-image.js` |
-| Chọn nhiều hình | `image_multi` | `ImageMultiHandler` | `screens/image/screen-image.css` | `screens/image/screen-image.js` |
-| Click 1 điểm | `hotspot` | `HotspotHandler` | `screens/hotspot/screen-hotspot.css` | `screens/hotspot/screen-hotspot.js` |
-| Click nhiều điểm | `multi_hotspot` | `MultiHotspotHandler` | `screens/hotspot/screen-hotspot.css` | `screens/hotspot/screen-hotspot.js` |
-| Sắp xếp | `order` | `OrderHandler` | `screens/order/screen-order.css` | `screens/order/screen-order.js` |
-| Ghép cặp | `image_pair` | `ImagePairHandler` | `screens/pair/screen-pair.css` | `screens/pair/screen-pair.js` |
-| Kéo thả | `drag_drop` | `DragDropHandler` | `screens/drag-drop/screen-drag-drop.css` | `screens/drag-drop/screen-drag-drop.js` |
+| Loại | `qtype` | Handler | Files |
+|------|---------|---------|-------|
+| Chọn 1 đáp án (text) | `mcq` | `MCQHandler` | `screens/screens-all.*` |
+| Chọn nhiều đáp án (text) | `multi` | `MultiHandler` | `screens/screens-all.*` |
+| Chọn 1 hình | `image_mcq` | `ImageMCQHandler` | `screens/screens-all.*` |
+| Chọn nhiều hình | `image_multi` | `ImageMultiHandler` | `screens/screens-all.*` |
+| Click 1 điểm | `hotspot` | `HotspotHandler` | `screens/screens-all.*` |
+| Click nhiều điểm | `multi_hotspot` | `MultiHotspotHandler` | `screens/screens-all.*` |
+| Sắp xếp | `order` | `OrderHandler` | `screens/screens-all.*` |
+| Ghép cặp | `image_pair` | `ImagePairHandler` | `screens/screens-all.*` |
+| Kéo thả | `drag_drop` | `DragDropHandler` | `screens/screens-all.*` |
+
+**Lưu ý:** Tất cả CSS và JS đã được gộp vào 2 file `screens-all.css` và `screens-all.js` để dễ sử dụng.
 
 ## 💡 Ví dụ cụ thể
 
-### Ví dụ 1: Quiz chỉ có MCQ (tối ưu)
+### Ví dụ: Sử dụng quiz (rất đơn giản!)
 
 ```html
 <head>
-    <!-- Chỉ load global + mcq -->
+    <!-- Load 3 files: global CSS, screens CSS, global JS, screens JS -->
     <link rel="stylesheet" href="quiz-game/global/quiz-global.css">
-    <link rel="stylesheet" href="quiz-game/screens/mcq/screen-mcq.css">
+    <link rel="stylesheet" href="quiz-game/screens/screens-all.css">
 </head>
 <body>
     <div id="quiz-container"></div>
     
     <script src="quiz-game/global/quiz-global.js"></script>
-    <script src="quiz-game/screens/mcq/screen-mcq.js"></script>
-    
-    <script>
-        const quiz = new QuizEngine(quizData);
-        quiz.registerQuestionType('mcq', MCQHandler);
-        quiz.init('quiz-container');
-    </script>
-</body>
-```
-
-### Ví dụ 2: Quiz có nhiều loại
-
-```html
-<head>
-    <!-- Global -->
-    <link rel="stylesheet" href="quiz-game/global/quiz-global.css">
-    
-    <!-- Các screen cần dùng -->
-    <link rel="stylesheet" href="quiz-game/screens/mcq/screen-mcq.css">
-    <link rel="stylesheet" href="quiz-game/screens/image/screen-image.css">
-    <link rel="stylesheet" href="quiz-game/screens/hotspot/screen-hotspot.css">
-</head>
-<body>
-    <div id="quiz-container"></div>
-    
-    <script src="quiz-game/global/quiz-global.js"></script>
-    <script src="quiz-game/screens/mcq/screen-mcq.js"></script>
-    <script src="quiz-game/screens/image/screen-image.js"></script>
-    <script src="quiz-game/screens/hotspot/screen-hotspot.js"></script>
+    <script src="quiz-game/screens/screens-all.js"></script>
     
     <script>
         const quiz = new QuizEngine(quizData);
         
-        // Đăng ký tất cả loại câu hỏi sẽ dùng
+        // Đăng ký tất cả loại câu hỏi (đã có sẵn trong screens-all.js)
         quiz.registerQuestionType('mcq', MCQHandler);
         quiz.registerQuestionType('multi', MultiHandler);
         quiz.registerQuestionType('image_mcq', ImageMCQHandler);
+        quiz.registerQuestionType('image_multi', ImageMultiHandler);
         quiz.registerQuestionType('hotspot', HotspotHandler);
+        quiz.registerQuestionType('multi_hotspot', MultiHotspotHandler);
+        quiz.registerQuestionType('order', OrderHandler);
+        quiz.registerQuestionType('image_pair', ImagePairHandler);
+        quiz.registerQuestionType('drag_drop', DragDropHandler);
         
         quiz.init('quiz-container');
     </script>
 </body>
 ```
+
+**Lợi ích:** Chỉ cần load 4 files (2 CSS + 2 JS) thay vì nhiều files như trước!
 
 ## 🎨 Tùy chỉnh giao diện
 
