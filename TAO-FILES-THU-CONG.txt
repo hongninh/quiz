@@ -1,0 +1,26 @@
+════════════════════════════════════════════════════════════════
+            📝 HƯỚNG DẪN TẠO FILES THỦ CÔNG
+════════════════════════════════════════════════════════════════
+
+Nếu không tải được file, bạn có thể tạo thủ công:
+
+1. Tạo cấu trúc folder:
+   
+   mkdir -p quiz-game/global
+   mkdir -p quiz-game/screens/mcq
+   mkdir -p quiz-game/screens/image
+   mkdir -p quiz-game/screens/hotspot
+   mkdir -p quiz-game/screens/order
+   mkdir -p quiz-game/screens/pair
+   mkdir -p quiz-game/screens/drag-drop
+
+2. Tôi sẽ cung cấp nội dung từng file để bạn copy-paste
+
+3. Hoặc bạn có thể xem trực tiếp trong Cursor:
+   - Mở file bất kỳ trong /workspace/quiz-game/
+   - Copy nội dung
+   - Paste vào file mới trên máy của bạn
+
+════════════════════════════════════════════════════════════════
+                    BẠN MUỐN CÁCH NÀO?
+════════════════════════════════════════════════════════════════
