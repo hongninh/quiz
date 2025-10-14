@@ -490,6 +490,24 @@
                 this.render();
             }
 
+            // Helper: Extract URL from image_json (handles both string and object format)
+            getImageUrl(imageItem) {
+                if (!imageItem) return '';
+                return typeof imageItem === 'string' ? imageItem : (imageItem.url || '');
+            }
+
+            // Helper: Extract text from opt_array item (handles both string and object format)
+            getOptText(optItem) {
+                if (!optItem) return '';
+                return typeof optItem === 'string' ? optItem : (optItem.text || '');
+            }
+
+            // Helper: Extract opt_id from opt_array item
+            getOptId(optItem, index) {
+                if (!optItem) return index;
+                return typeof optItem === 'string' ? index : (optItem.opt_id || index);
+            }
+
             render() {
                 if (this.currentQuestionIndex < this.questions.length) {
                     this.renderQuestion();
@@ -552,13 +570,14 @@
             }
 
             renderMCQ(q) {
+                const imgUrl = this.getImageUrl(q.image_json?.[0]);
                 return `
-                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    ${imgUrl ? `<img src="${imgUrl}" class="question-image">` : ''}
                     <div class="text-answers-container">
                         ${q.opt_array.map((a, i) => `
-                            <div class="text-answer-option" data-index="${i}">
+                            <div class="text-answer-option" data-id="${this.getOptId(a, i)}">
                                 <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
-                                <span class="answer-text">${a}</span>
+                                <span class="answer-text">${this.getOptText(a)}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -566,13 +585,14 @@
             }
 
             renderMulti(q) {
+                const imgUrl = this.getImageUrl(q.image_json?.[0]);
                 return `
-                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    ${imgUrl ? `<img src="${imgUrl}" class="question-image">` : ''}
                     <div class="text-answers-container">
                         ${q.opt_array.map((a, i) => `
-                            <div class="text-answer-option" data-index="${i}">
+                            <div class="text-answer-option" data-id="${this.getOptId(a, i)}">
                                 <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
-                                <span class="answer-text">${a}</span>
+                                <span class="answer-text">${this.getOptText(a)}</span>
                                 <span class="answer-checkbox">☐</span>
                             </div>
                         `).join('')}
@@ -611,11 +631,12 @@
             }
 
             renderHotspot(q) {
+                const imgUrl = this.getImageUrl(q.image_json[0]);
                 return `
                     <div class="hotspot-container">
                         <div class="hotspot-instructions">📍 ${q.qtxt}</div>
                         <div class="hotspot-image-wrapper">
-                            <img src="${q.image_json[0]}" class="hotspot-image" id="hotspot-img">
+                            <img src="${imgUrl}" class="hotspot-image" id="hotspot-img">
                             <div class="hotspot-overlay" id="hotspot-overlay"></div>
                         </div>
                     </div>
@@ -624,13 +645,14 @@
 
             renderMultiHotspot(q) {
                 const count = q.sol_array ? q.sol_array.length : 0;
+                const imgUrl = this.getImageUrl(q.image_json[0]);
                 return `
                     <div class="hotspot-container">
                         <div class="hotspot-instructions">
                             📍 Click vào tất cả các điểm nguy hiểm (${count} điểm)
                         </div>
                         <div class="hotspot-image-wrapper">
-                            <img src="${q.image_json[0]}" class="hotspot-image">
+                            <img src="${imgUrl}" class="hotspot-image">
                             <div class="hotspot-overlay">
                                 ${q.hotspot_array.map((h, i) => `
                                     <div class="hotspot-point" data-id="${h.id}" style="left: ${h.x}%; top: ${h.y}%;">${i+1}</div>
@@ -643,14 +665,15 @@
             }
 
             renderOrder(q) {
+                const imgUrl = this.getImageUrl(q.image_json?.[0]);
                 return `
-                    ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+                    ${imgUrl ? `<img src="${imgUrl}" class="question-image">` : ''}
                     <div class="order-container">
                         <div class="order-items" id="order-items">
                             ${q.opt_array.map((item, i) => `
-                                <div class="order-item" draggable="true" data-text="${item}">
+                                <div class="order-item" draggable="true" data-id="${this.getOptId(item, i)}" data-text="${this.getOptText(item)}">
                                     <span class="order-number">${i + 1}</span>
-                                    <span class="order-text">${item}</span>
+                                    <span class="order-text">${this.getOptText(item)}</span>
                                     <span class="drag-handle">☰</span>
                                 </div>
                             `).join('')}
@@ -661,29 +684,39 @@
             }
 
             renderImagePair(q) {
-                const safe = q.image_json.slice(0, 3);
-                const danger = q.image_json.slice(3, 6);
+                // Handle both old format (array of URLs) and new format (array of {image_id, url})
+                const images = q.image_json || [];
+                const safe = images.slice(0, 3);
+                const danger = images.slice(3, 6);
                 return `
                     <div class="image-pair-container">
                         <div class="pair-instructions">🔄 ${q.qtxt}</div>
                         <div class="pair-columns">
                             <div class="pair-column safe">
                                 <div class="pair-column-header">✓ An Toàn</div>
-                                ${safe.map((img, i) => `
-                                    <div class="pair-item" data-group="safe" data-index="${i}">
-                                        <img src="${img}" class="pair-item-img">
-                                        <div class="pair-item-label">${i + 1}</div>
-                                    </div>
-                                `).join('')}
+                                ${safe.map((img, i) => {
+                                    const imgUrl = this.getImageUrl(img);
+                                    const imgId = typeof img === 'string' ? `safe_${i}` : (img.image_id || `safe_${i}`);
+                                    return `
+                                        <div class="pair-item" data-group="safe" data-id="${imgId}">
+                                            <img src="${imgUrl}" class="pair-item-img">
+                                            <div class="pair-item-label">${i + 1}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                             <div class="pair-column danger">
                                 <div class="pair-column-header">⚠ Nguy Hiểm</div>
-                                ${danger.map((img, i) => `
-                                    <div class="pair-item" data-group="danger" data-index="${i}">
-                                        <img src="${img}" class="pair-item-img">
-                                        <div class="pair-item-label">${i + 4}</div>
-                                    </div>
-                                `).join('')}
+                                ${danger.map((img, i) => {
+                                    const imgUrl = this.getImageUrl(img);
+                                    const imgId = typeof img === 'string' ? `danger_${i}` : (img.image_id || `danger_${i}`);
+                                    return `
+                                        <div class="pair-item" data-group="danger" data-id="${imgId}">
+                                            <img src="${imgUrl}" class="pair-item-img">
+                                            <div class="pair-item-label">${i + 4}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                         <button class="submit-button" id="submit-pair" disabled>Xác nhận</button>
@@ -739,11 +772,24 @@
                 opts.forEach((opt, i) => {
                     opt.onclick = () => {
                         if (opt.classList.contains('disabled')) return;
-                        const ok = q.opt_array[i] === q.sol_array;
+                        const selectedId = opt.getAttribute('data-id');
+                        const correctIds = Array.isArray(q.sol_array) ? q.sol_array : [q.sol_array];
+                        const ok = correctIds.includes(selectedId);
+                        
                         opts.forEach(o => o.classList.add('disabled'));
                         opt.classList.add(ok ? 'correct' : 'incorrect');
-                        if (!ok) opts[q.opt_array.indexOf(q.sol_array)].classList.add('correct');
-                        this.feedback(ok, q.pmax, q);
+                        
+                        // Highlight correct answer if wrong
+                        if (!ok) {
+                            opts.forEach(o => {
+                                if (correctIds.includes(o.getAttribute('data-id'))) {
+                                    o.classList.add('correct');
+                                }
+                            });
+                        }
+                        
+                        this.currentAnswer = { selected: [selectedId] };
+                        this.feedback(ok, ok ? q.pmax : 0, q);
                     };
                 });
             }
@@ -755,13 +801,13 @@
                 opts.forEach((opt, i) => {
                     opt.onclick = () => {
                         if (opt.classList.contains('disabled')) return;
-                        const a = q.opt_array[i];
-                        if (sel.has(a)) {
-                            sel.delete(a);
+                        const optId = opt.getAttribute('data-id');
+                        if (sel.has(optId)) {
+                            sel.delete(optId);
                             opt.classList.remove('selected');
                             opt.querySelector('.answer-checkbox').textContent = '☐';
                         } else {
-                            sel.add(a);
+                            sel.add(optId);
                             opt.classList.add('selected');
                             opt.querySelector('.answer-checkbox').textContent = '☑';
                         }
@@ -773,12 +819,13 @@
                     const ok = sel.size === cor.size && [...sel].every(i => cor.has(i));
                     opts.forEach((opt, i) => {
                         opt.classList.add('disabled');
-                        const a = q.opt_array[i];
-                        if (cor.has(a)) opt.classList.add('correct');
-                        else if (sel.has(a)) opt.classList.add('incorrect');
+                        const optId = opt.getAttribute('data-id');
+                        if (cor.has(optId)) opt.classList.add('correct');
+                        else if (sel.has(optId)) opt.classList.add('incorrect');
                     });
                     btn.disabled = true;
-                    this.feedback(ok, q.pmax, q);
+                    this.currentAnswer = { selected: Array.from(sel) };
+                    this.feedback(ok, ok ? q.pmax : 0, q);
                 };
             }
 
@@ -918,11 +965,12 @@
                     };
                 });
                 btn.onclick = () => {
-                    const curr = Array.from(items).map(i => i.dataset.text);
+                    const curr = Array.from(items).map(i => i.getAttribute('data-id'));
                     const ok = JSON.stringify(curr) === JSON.stringify(q.sol_array);
                     items.forEach(i => { i.classList.add('disabled'); i.draggable = false; });
                     btn.disabled = true;
-                    this.feedback(ok, q.pmax, q);
+                    this.currentAnswer = { order: curr };
+                    this.feedback(ok, ok ? q.pmax : 0, q);
                 };
             }
 
@@ -960,9 +1008,9 @@
                                 return;
                             }
                             if (first.dataset.group !== item.dataset.group) {
-                                const si = first.dataset.group === 'safe' ? parseInt(first.dataset.index) : parseInt(item.dataset.index);
-                                const di = first.dataset.group === 'danger' ? parseInt(first.dataset.index) : parseInt(item.dataset.index);
-                                pairs.push([si, di]);
+                                const id1 = first.getAttribute('data-id');
+                                const id2 = item.getAttribute('data-id');
+                                pairs.push([id1, id2]);
                                 first.classList.add('matched');
                                 first.classList.remove('selected');
                                 item.classList.add('matched');
@@ -977,12 +1025,21 @@
                     };
                 });
                 btn.onclick = () => {
+                    // Check pairs against sol_array: [[id1, id2], [id3, id4], ...]
+                    const correctPairs = q.sol_array || [];
                     let cnt = 0;
-                    pairs.forEach(p => { if (p[0] === p[1]) cnt++; });
-                    const ok = cnt === 3;
+                    pairs.forEach(pair => {
+                        const found = correctPairs.some(cp => 
+                            (cp[0] === pair[0] && cp[1] === pair[1]) || 
+                            (cp[0] === pair[1] && cp[1] === pair[0])
+                        );
+                        if (found) cnt++;
+                    });
+                    const ok = cnt === correctPairs.length && pairs.length === correctPairs.length;
                     items.forEach(i => i.classList.add('disabled'));
                     btn.disabled = true;
-                    this.feedback(ok, q.pmax, q, `Ghép đúng ${cnt}/3`);
+                    this.currentAnswer = { pairs: pairs };
+                    this.feedback(ok, ok ? q.pmax : 0, q, `Ghép đúng ${cnt}/${correctPairs.length}`);
                 };
             }
 
@@ -1187,20 +1244,21 @@
         }
 
         // DATA: 12 CÂU HỎI - CHUẨN HÓA THEO FORMAT ĐẦY ĐỦ
+
         const quizData = {
-            "main_game_id": "complete_quiz_2025",
-            "main_title": "Quiz Hoàn Chỉnh - 12 Câu Hỏi Đa Dạng",
-            "main_description": "Bộ câu hỏi bao gồm tất cả các dạng: MCQ, Multi, Image, Hotspot, Order, Pair, Drag-Drop",
+            "main_game_id": "traffic_safety_primary_2025",
+            "main_title": "An Toàn Giao Thông: Thử Thách Cho Học Sinh Tiểu Học",
+            "main_description": "Bộ câu hỏi kiểm tra kiến thức và kỹ năng an toàn giao thông đường bộ cơ bản cho học sinh tiểu học (8-11 tuổi).",
             "main_project_id": "proj_hazard_2025",
             "main_game_version": "1.0.0",
-            "main_author": "Quiz Team",
+            "main_author": "Traffic Safety Team",
             "main_age_array": [8, 9, 10, 11],
             "main_grade": "Primary",
             "main_total_questions": 12,
-            "main_total_max_points": 200,
-            "main_max_time_per_game_ms": 300000,
+            "main_total_max_points": 166,
+            "main_max_time_per_game_ms": 200000,
             "main_language": "vi",
-            "main_theme": "safety_traffic",
+            "main_theme": "traffic_safety",
             "main_difficulty_level": "mixed",
             "main_show_correct_answer_after_each_quiz": true,
             "main_shuffle_questions_order": false,
@@ -1208,34 +1266,40 @@
             "main_default_hint_penalty_percent": 20,
             "main_feedback_mode": "detailed_explanation",
             "main_pass_threshold_percent": 70,
+            "main_media_assets_root_url": "https://example.com/quiz/",
             "main_status": "published",
             "EachQuiz": [
                 {
                     "qn": 1,
                     "qid": "traffic_001",
-                    "qtype": "hotspot",
-                    "qtxt": "Hãy bấm vào vị trí có vạch kẻ dành cho người đi bộ",
-                    "pmax": 10,
-                    "tmax": 30000,
-                    "diff": "easy",
                     "fq": true,
                     "lq": false,
+                    "tmax": 30000,
+                    "pmax": 10,
+                    "diff": "easy",
+                    "qtype": "hotspot",
+                    "qtxt": "Hãy bấm vào vị trí có vạch kẻ dành cho người đi bộ.",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": null,
-                    "sol_json": { "x": 400, "y": 300, "radius": 80 },
+                    "sol_json": {"x": 200, "y": 250, "radius": 40},
                     "expl": "Vạch kẻ trắng ngang đường là nơi an toàn để học sinh sang đường.",
                     "tag_array": ["crosswalk", "pedestrian"],
-                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463771/68633251_tr3nqn.jpg"],
+                    "lang": "vi",
+                    "image_json": [{"image_id": "IA", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463771/68633251_tr3nqn.jpg"}],
                     "image_total_number": 1,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": false,
                     "opt_fmt": "image_only",
                     "media_placement": "background",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1245,39 +1309,45 @@
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
                     "hint_content_text": "Tìm dấu hiệu an toàn nhất để qua đường.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_content_media": null
                 },
                 {
                     "qn": 2,
                     "qid": "traffic_002",
-                    "qtype": "multi",
-                    "qtxt": "Trong các lựa chọn sau, đâu là phương tiện giao thông an toàn, hợp pháp cho học sinh tiểu học?",
-                    "pmax": 15,
-                    "tmax": 40000,
-                    "diff": "medium",
                     "fq": false,
                     "lq": false,
-                    "opt_array": ["Xe đạp", "Xe máy", "Ô tô đi cùng bố mẹ", "Xe buýt trường học", "Xe tải"],
-                    "sol_array": ["Xe đạp", "Ô tô đi cùng bố mẹ", "Xe buýt trường học"],
+                    "tmax": 40000,
+                    "pmax": 15,
+                    "diff": "medium",
+                    "qtype": "multi",
+                    "qtxt": "Trong các lựa chọn sau, đâu là phương tiện giao thông an toàn, hợp pháp cho học sinh tiểu học? (Chọn tất cả đáp án đúng)",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {"opt_id": "AA", "text": "Xe đạp"},
+                        {"opt_id": "BB", "text": "Xe máy"},
+                        {"opt_id": "CC", "text": "Ô tô đi cùng bố mẹ"},
+                        {"opt_id": "DD", "text": "Xe buýt trường học"},
+                        {"opt_id": "EE", "text": "Xe tải"}
+                    ],
+                    "sol_array": ["AA", "CC", "DD"],
                     "expl": "Học sinh tiểu học chỉ nên đi bộ, đi xe đạp hoặc được đưa đón bằng xe buýt/ô tô cùng người lớn.",
                     "tag_array": ["vehicle", "safe"],
-                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463465/important_road_safety_rules_to_teach_your_children_illustration.jpg_vk7gty.webp"],
+                    "lang": "vi",
+                    "image_json": [{"image_id": "IB", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463465/important_road_safety_rules_to_teach_your_children_illustration.jpg_vk7gty.webp"}],
                     "image_total_number": 1,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": true,
                     "opt_fmt": "text_only",
                     "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1287,39 +1357,44 @@
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
                     "hint_content_text": "Luật giao thông quy định độ tuổi và giấy phép lái xe cho từng loại phương tiện.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "hide",
-                    "display_correct_answer": "y"
+                    "hint_content_media": null
                 },
                 {
                     "qn": 3,
                     "qid": "traffic_003",
-                    "qtype": "mcq",
-                    "qtxt": "Đèn tín hiệu giao thông màu đỏ nghĩa là gì?",
-                    "pmax": 10,
-                    "tmax": 20000,
-                    "diff": "easy",
                     "fq": false,
                     "lq": false,
-                    "opt_array": ["Dừng lại", "Đi chậm", "Được đi tiếp", "Rẽ phải"],
-                    "sol_array": "Dừng lại",
+                    "tmax": 20000,
+                    "pmax": 10,
+                    "diff": "easy",
+                    "qtype": "mcq",
+                    "qtxt": "Đèn tín hiệu giao thông màu đỏ nghĩa là gì?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {"opt_id": "AA", "text": "Dừng lại"},
+                        {"opt_id": "BB", "text": "Đi chậm"},
+                        {"opt_id": "CC", "text": "Được đi tiếp"},
+                        {"opt_id": "DD", "text": "Rẽ phải"}
+                    ],
+                    "sol_array": ["AA"],
                     "expl": "Đèn đỏ nghĩa là mọi phương tiện và người đi bộ phải dừng lại.",
                     "tag_array": ["traffic_light"],
-                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463334/Teach-Road-Safety-to-Kids-1_kibxvw.png"],
+                    "lang": "vi",
+                    "image_json": [{"image_id": "IC", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463334/Teach-Road-Safety-to-Kids-1_kibxvw.png"}],
                     "image_total_number": 1,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": true,
                     "opt_fmt": "text_only",
                     "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1328,40 +1403,45 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": false,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Đây là kiến thức cơ bản nhất về luật giao thông.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "hide",
-                    "display_correct_answer": "y"
+                    "hint_content_text": "Đây là kiến thức cơ bản nhất về tín hiệu giao thông.",
+                    "hint_content_media": null
                 },
                 {
                     "qn": 4,
                     "qid": "traffic_004",
-                    "qtype": "order",
-                    "qtxt": "Sắp xếp đúng thứ tự các bước khi qua đường tại ngã tư có đèn tín hiệu",
-                    "pmax": 20,
-                    "tmax": 50000,
-                    "diff": "hard",
                     "fq": false,
-                    "lq": false,
-                    "opt_array": ["Nhìn trái – nhìn phải", "Chờ đèn xanh cho người đi bộ", "Đi nhanh qua vạch kẻ", "Không dừng giữa đường"],
-                    "sol_array": ["Chờ đèn xanh cho người đi bộ", "Nhìn trái – nhìn phải", "Đi nhanh qua vạch kẻ", "Không dừng giữa đường"],
-                    "expl": "Trẻ em cần tuân thủ đủ 4 bước: chờ tín hiệu, quan sát an toàn, và đi qua dứt khoát.",
+                    "lq": true,
+                    "tmax": 50000,
+                    "pmax": 20,
+                    "diff": "hard",
+                    "qtype": "order",
+                    "qtxt": "Sắp xếp đúng thứ tự các bước khi qua đường tại ngã tư có đèn tín hiệu.",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {"opt_id": "AA", "text": "Chờ đèn xanh cho người đi bộ"},
+                        {"opt_id": "BB", "text": "Nhìn trái – nhìn phải"},
+                        {"opt_id": "CC", "text": "Đi nhanh qua vạch kẻ"},
+                        {"opt_id": "DD", "text": "Không dừng giữa đường"}
+                    ],
+                    "sol_array": ["AA", "BB", "CC", "DD"],
+                    "expl": "Tuân thủ: chờ tín hiệu → quan sát → qua đường dứt khoát → không dừng giữa đường.",
                     "tag_array": ["order", "crossing"],
-                    "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1759660871/88745398_road-safety_qjetaw.jpg"],
+                    "lang": "vi",
+                    "image_json": [{"image_id": "ID", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759660871/88745398_road-safety_qjetaw.jpg"}],
                     "image_total_number": 1,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": false,
                     "opt_fmt": "text_only",
                     "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1370,47 +1450,47 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Điều đầu tiên luôn là phải tuân theo tín hiệu, sau đó mới đến quan sát.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "hide",
-                    "display_correct_answer": "y"
+                    "hint_content_text": "Điều đầu tiên luôn là tín hiệu đèn; sau đó mới đến quan sát.",
+                    "hint_content_media": {"video_id": "VA", "url": "https://example.com/quiz/crossing_video_hint.mp4"}
                 },
                 {
                     "qn": 5,
                     "qid": "traffic_005",
-                    "qtype": "image_pair",
-                    "qtxt": "Ghép cặp hành động an toàn và nguy hiểm tương ứng",
-                    "pmax": 25,
-                    "tmax": 60000,
-                    "diff": "hard",
                     "fq": false,
-                    "lq": false,
+                    "lq": true,
+                    "tmax": 60000,
+                    "pmax": 25,
+                    "diff": "hard",
+                    "qtype": "image_pair",
+                    "qtxt": "Ghép cặp hành động an toàn và nguy hiểm tương ứng.",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": null,
-                    "sol_array": [[0, 0], [1, 1], [2, 2]],
+                    "sol_array": [["IA", "ID"], ["IB", "IE"], ["IC", "IF"]],
                     "expl": "Luôn ghép hành động đúng với hành động sai tương ứng.",
                     "tag_array": ["image_pair", "safe_vs_danger"],
+                    "lang": "vi",
                     "image_json": [
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662280/89039832_children_tw6zrn.jpg",
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759661153/87498090_a-car-bumping-the-traffic-cones_pk60x0.jpg",
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662493/88589066_children_1_j24kzx.jpg",
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662282/89505552_children_snzywa.jpg",
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662851/36960374_children_xterrv.jpg",
-                        "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662490/87614454_children_rkfqo3.jpg"
+                        {"image_id": "IA", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662280/89039832_children_tw6zrn.jpg"},
+                        {"image_id": "ID", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759661153/87498090_a-car-bumping-the-traffic-cones_pk60x0.jpg"},
+                        {"image_id": "IB", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662493/88589066_children_1_j24kzx.jpg"},
+                        {"image_id": "IE", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662282/89505552_children_snzywa.jpg"},
+                        {"image_id": "IC", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662851/36960374_children_xterrv.jpg"},
+                        {"image_id": "IF", "url": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662490/87614454_children_rkfqo3.jpg"}
                     ],
                     "image_total_number": 6,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": true,
                     "opt_fmt": "image_only",
                     "media_placement": "side_by_side",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1419,92 +1499,90 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Ghép hình ảnh 1 với 4, 2 với 5, 3 với 6.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "hide",
-                    "display_correct_answer": "y"
+                    "hint_content_text": "Gợi ý: 1↔4, 2↔5, 3↔6.",
+                    "hint_content_media": null
                 },
                 {
                     "qn": 6,
                     "qid": "traffic_006",
-                    "qtype": "image_mcq",
-                    "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi đi xe đạp trên đường?",
-                    "pmax": 15,
-                    "tmax": 30000,
-                    "diff": "medium",
                     "fq": false,
                     "lq": false,
+                    "tmax": 15000,
+                    "pmax": 8,
+                    "diff": "easy",
+                    "qtype": "mcq",
+                    "qtxt": "Đi bộ dưới lòng đường là an toàn hơn đi trên vỉa hè. (Đúng/Sai)",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": [
-                        { "text": "Mũ bảo hiểm xe đạp", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
-                        { "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
-                        { "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
-                        { "text": "Không cần đội gì", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+                        {"opt_id": "AA", "text": "Đúng"},
+                        {"opt_id": "BB", "text": "Sai"}
                     ],
-                    "sol_array": 0,
-                    "expl": "Mũ bảo hiểm xe đạp là thiết bị bảo hộ quan trọng giúp bảo vệ đầu khi té ngã.",
-                    "tag_array": ["helmet", "bicycle", "safety"],
-                    "image_json": null,
+                    "sol_array": ["BB"],
+                    "expl": "Đi trên vỉa hè luôn an toàn hơn lòng đường.",
+                    "tag_array": ["pedestrian", "sidewalk"],
+                    "lang": "vi",
+                    "image_json": [],
                     "image_total_number": 0,
                     "audio_json": null,
                     "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
                     "penalty_points": 0,
                     "min_points": 0,
                     "speed_bonus_eligible": true,
-                    "hint_allow": true,
+                    "hint_allow": false,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Tìm thiết bị được thiết kế chuyên dụng cho xe đạp.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_content_text": null,
+                    "hint_content_media": null
                 },
                 {
                     "qn": 7,
                     "qid": "traffic_007",
-                    "qtype": "image_mcq",
-                    "qtxt": "Chọn biển báo CẤM ĐI NGƯỢC CHIỀU",
-                    "pmax": 10,
-                    "tmax": 25000,
-                    "diff": "easy",
                     "fq": false,
                     "lq": false,
+                    "tmax": 25000,
+                    "pmax": 12,
+                    "diff": "medium",
+                    "qtype": "mcq",
+                    "qtxt": "Biển báo nào cho biết khu vực trường học (cần giảm tốc)?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": [
-                        { "text": "Biển cấm đi ngược chiều", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=400&h=300&fit=crop" },
-                        { "text": "Biển dừng lại", "image": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop" },
-                        { "text": "Biển ưu tiên", "image": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=400&h=300&fit=crop" },
-                        { "text": "Biển chỉ đường", "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&h=300&fit=crop" }
+                        {"opt_id": "AA", "text": "Biển khu vực trường học"},
+                        {"opt_id": "BB", "text": "Biển cấm đỗ"},
+                        {"opt_id": "CC", "text": "Biển cho phép quay đầu"},
+                        {"opt_id": "DD", "text": "Biển bệnh viện"}
                     ],
-                    "sol_array": 0,
-                    "expl": "Biển cấm đi ngược chiều có hình tròn đỏ với vạch trắng ngang.",
-                    "tag_array": ["traffic_sign", "prohibition"],
-                    "image_json": null,
+                    "sol_array": ["AA"],
+                    "expl": "Biển khu vực trường học nhắc giảm tốc, chú ý trẻ em qua đường.",
+                    "tag_array": ["signs", "school_zone"],
+                    "lang": "vi",
+                    "image_json": [],
                     "image_total_number": 0,
                     "audio_json": null,
                     "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1512,46 +1590,46 @@
                     "min_points": 0,
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
-                    "hint_penalty_percent": 15,
-                    "hint_content_text": "Biển cấm có hình tròn với viền đỏ.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": "Biển có hình học sinh qua đường.",
+                    "hint_content_media": null
                 },
                 {
                     "qn": 8,
                     "qid": "traffic_008",
-                    "qtype": "image_multi",
-                    "qtxt": "Chọn TẤT CẢ các biển báo NGUY HIỂM",
-                    "pmax": 15,
-                    "tmax": 35000,
-                    "diff": "medium",
                     "fq": false,
                     "lq": false,
+                    "tmax": 30000,
+                    "pmax": 12,
+                    "diff": "medium",
+                    "qtype": "multi",
+                    "qtxt": "Khi đi xe đạp, em nên sử dụng những đồ bảo hộ nào? (Chọn tất cả)",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": [
-                        { "text": "Cẩn thận công trình", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=300&h=200&fit=crop" },
-                        { "text": "Nguy hiểm điện cao thế", "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
-                        { "text": "Chỉ dẫn hướng đi", "image": "https://images.unsplash.com/photo-1542831371-d531d36971e6?w=300&h=200&fit=crop" },
-                        { "text": "Ngã tư nguy hiểm", "image": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?w=300&h=200&fit=crop" }
+                        {"opt_id": "AA", "text": "Mũ bảo hiểm"},
+                        {"opt_id": "BB", "text": "Bảo vệ khuỷu tay"},
+                        {"opt_id": "CC", "text": "Dép lê"},
+                        {"opt_id": "DD", "text": "Bảo vệ đầu gối"}
                     ],
-                    "sol_array": [0, 1, 3],
-                    "expl": "Biển nguy hiểm thường có màu vàng hình tam giác để cảnh báo.",
-                    "tag_array": ["warning_sign", "danger"],
-                    "image_json": null,
+                    "sol_array": ["AA", "BB", "DD"],
+                    "expl": "Mũ bảo hiểm và bảo vệ khớp giúp giảm chấn thương khi ngã.",
+                    "tag_array": ["bicycle", "gear"],
+                    "lang": "vi",
+                    "image_json": [],
                     "image_total_number": 0,
                     "audio_json": null,
                     "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1560,97 +1638,87 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Biển nguy hiểm có hình tam giác màu vàng với viền đỏ.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_content_text": "Ưu tiên bảo vệ vùng đầu và khớp.",
+                    "hint_content_media": null
                 },
                 {
                     "qn": 9,
-                    "qid": "safety_009",
-                    "qtype": "drag_drop",
-                    "qtxt": "Kéo thả các hình ảnh vào cột AN TOÀN hoặc NGUY CƠ",
-                    "pmax": 20,
-                    "tmax": 45000,
-                    "diff": "medium",
+                    "qid": "traffic_009",
                     "fq": false,
                     "lq": false,
-                    "opt_array": null,
-                    "drag_items": [
-                        { "id": "item_1", "label": "Mặc đồ bảo hộ", "image": "https://images.unsplash.com/photo-1572107248692-1d32d1f5fc3a?w=200&h=150&fit=crop", "correct_zone": "safe" },
-                        { "id": "item_2", "label": "Hút thuốc", "image": "https://images.unsplash.com/photo-1605671919743-c3cd293be5e7?w=200&h=150&fit=crop", "correct_zone": "danger" },
-                        { "id": "item_3", "label": "Đeo kính bảo hộ", "image": "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=200&h=150&fit=crop", "correct_zone": "safe" },
-                        { "id": "item_4", "label": "Chạy trong nhà máy", "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=200&h=150&fit=crop", "correct_zone": "danger" },
-                        { "id": "item_5", "label": "Rửa tay đúng cách", "image": "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=200&h=150&fit=crop", "correct_zone": "safe" },
-                        { "id": "item_6", "label": "Dùng điện thoại khi vận hành", "image": "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200&h=150&fit=crop", "correct_zone": "danger" }
-                    ],
-                    "sol_array": null,
-                    "expl": "Phân biệt rõ hành động an toàn và nguy hiểm tại nơi làm việc.",
-                    "tag_array": ["drag_drop", "workplace_safety"],
-                    "image_json": null,
-                    "image_total_number": 6,
-                    "audio_json": null,
-                    "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
-                    "expl_fmt": "plain",
-                    "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
+                    "tmax": 25000,
+                    "pmax": 12,
+                    "diff": "medium",
+                    "qtype": "mcq",
+                    "qtxt": "Nếu thấy xe cứu thương bật còi và đèn ưu tiên đang đến gần, em nên làm gì?",
                     "age": "8-11",
                     "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {"opt_id": "AA", "text": "Tiếp tục đi như bình thường"},
+                        {"opt_id": "BB", "text": "Tránh sang bên phải và dừng lại"},
+                        {"opt_id": "CC", "text": "Đi sát theo sau xe cứu thương"},
+                        {"opt_id": "DD", "text": "Đứng giữa đường để nhìn"}
+                    ],
+                    "sol_array": ["BB"],
+                    "expl": "Nhường đường cho xe ưu tiên bằng cách tránh sang phải và dừng lại.",
+                    "tag_array": ["priority_vehicle"],
                     "lang": "vi",
+                    "image_json": [],
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
                     "penalty_points": 0,
                     "min_points": 0,
                     "speed_bonus_eligible": true,
-                    "hint_allow": true,
+                    "hint_allow": false,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Quan sát kỹ từng hành động và đánh giá mức độ an toàn.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_content_text": null,
+                    "hint_content_media": null
                 },
                 {
                     "qn": 10,
-                    "qid": "safety_010",
-                    "qtype": "multi_hotspot",
-                    "qtxt": "Click vào TẤT CẢ các điểm NGUY HIỂM trên hình ảnh công trường",
-                    "pmax": 20,
-                    "tmax": 60000,
-                    "diff": "hard",
+                    "qid": "traffic_010",
                     "fq": false,
                     "lq": false,
+                    "tmax": 30000,
+                    "pmax": 14,
+                    "diff": "medium",
+                    "qtype": "hotspot",
+                    "qtxt": "Hãy bấm vào vị trí an toàn để đứng chờ xe buýt (trên vỉa hè, cách mép đường).",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": null,
-                    "hotspot_array": [
-                        { "id": "spot_1", "x": 25, "y": 30 },
-                        { "id": "spot_2", "x": 50, "y": 40 },
-                        { "id": "spot_3", "x": 75, "y": 35 },
-                        { "id": "spot_4", "x": 30, "y": 70 },
-                        { "id": "spot_5", "x": 65, "y": 75 }
-                    ],
-                    "sol_array": ["spot_1", "spot_3", "spot_5"],
-                    "expl": "Cần nhận biết được các điểm nguy hiểm để tránh tai nạn lao động.",
-                    "tag_array": ["multi_hotspot", "workplace_hazard"],
-                    "image_json": ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop"],
+                    "sol_json": {"x": 120, "y": 300, "radius": 35},
+                    "expl": "Đứng trên vỉa hè, cách mép đường và không chen lấn khi xe tới.",
+                    "tag_array": ["bus_stop", "hotspot"],
+                    "lang": "vi",
+                    "image_json": [{"image_id": "IE", "url": "https://example.com/quiz/bus_stop_scene.jpg"}],
                     "image_total_number": 1,
                     "audio_json": null,
                     "video_json": null,
+                    "shuf": false,
                     "opt_fmt": "image_only",
                     "media_placement": "background",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
+                    "created_at": "2025-01-10T10:00:00Z",
+                    "updated_at": "2025-01-10T10:00:00Z",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1659,92 +1727,45 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Tìm các vị trí không có biện pháp bảo vệ hoặc có nguy cơ rơi, va chạm.",
-                    "hint_content_media": null,
-                    "created_at": "2025-01-10T10:00:00Z",
-                    "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "hint_content_text": "Vị trí an toàn không sát lòng đường.",
+                    "hint_content_media": null
                 },
                 {
                     "qn": 11,
-                    "qid": "safety_011",
-                    "qtype": "image_mcq",
-                    "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi làm việc ở công trường xây dựng?",
-                    "pmax": 10,
-                    "tmax": 25000,
-                    "diff": "easy",
+                    "qid": "traffic_011",
                     "fq": false,
                     "lq": false,
+                    "tmax": 40000,
+                    "pmax": 16,
+                    "diff": "medium",
+                    "qtype": "order",
+                    "qtxt": "Sắp xếp các bước khi dắt xe đạp qua vạch kẻ dành cho người đi bộ.",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
                     "opt_array": [
-                        { "text": "Mũ bảo hiểm", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
-                        { "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
-                        { "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
-                        { "text": "Không cần đội gì", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+                        {"opt_id": "AA", "text": "Xuống xe đạp, dắt bộ"},
+                        {"opt_id": "BB", "text": "Quan sát trái – phải"},
+                        {"opt_id": "CC", "text": "Dắt xe qua vạch kẻ nhanh gọn"},
+                        {"opt_id": "DD", "text": "Không dùng điện thoại khi qua đường"}
                     ],
-                    "sol_array": 0,
-                    "expl": "Mũ bảo hiểm là thiết bị bảo hộ bắt buộc tại mọi công trường xây dựng theo quy định an toàn lao động.",
-                    "tag_array": ["helmet", "construction", "ppe"],
-                    "image_json": null,
+                    "sol_array": ["AA", "BB", "CC", "DD"],
+                    "expl": "Xuống xe → quan sát → dắt nhanh qua → không xao nhãng.",
+                    "tag_array": ["order", "bicycle"],
+                    "lang": "vi",
+                    "image_json": [],
                     "image_total_number": 0,
                     "audio_json": null,
                     "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
+                    "shuf": false,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
                     "expl_fmt": "plain",
                     "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
-                    "status": "active",
-                    "version": "1.0",
-                    "is_private": false,
-                    "penalty_points": 0,
-                    "min_points": 0,
-                    "speed_bonus_eligible": true,
-                    "hint_allow": true,
-                    "hint_penalty_percent": 15,
-                    "hint_content_text": "Tìm thiết bị được thiết kế để bảo vệ đầu khỏi va đập.",
-                    "hint_content_media": null,
                     "created_at": "2025-01-10T10:00:00Z",
                     "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": false,
-                    "display": "show",
-                    "display_correct_answer": "y"
-                },
-                {
-                    "qn": 12,
-                    "qid": "safety_012",
-                    "qtype": "image_multi",
-                    "qtxt": "Chọn TẤT CẢ các thiết bị bảo hộ cá nhân cần thiết khi làm việc với hóa chất",
-                    "pmax": 15,
-                    "tmax": 40000,
-                    "diff": "medium",
-                    "fq": false,
-                    "lq": true,
-                    "opt_array": [
-                        { "text": "Găng tay chống hóa chất", "image": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=400&h=300&fit=crop" },
-                        { "text": "Kính bảo hộ", "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?w=400&h=300&fit=crop" },
-                        { "text": "Quần áo thời trang", "image": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=300&fit=crop" },
-                        { "text": "Khẩu trang phòng độc", "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=300&fit=crop" }
-                    ],
-                    "sol_array": [0, 1, 3],
-                    "expl": "Cần đầy đủ găng tay chống hóa chất, kính bảo hộ và khẩu trang phòng độc khi làm việc với hóa chất.",
-                    "tag_array": ["ppe", "chemical_safety", "multi_choice"],
-                    "image_json": null,
-                    "image_total_number": 0,
-                    "audio_json": null,
-                    "video_json": null,
-                    "opt_fmt": "image_text",
-                    "media_placement": "inline",
-                    "expl_fmt": "plain",
-                    "author_id": "admin_001",
-                    "project_id": "proj_hazard_2025",
-                    "age": "8-11",
-                    "grade": "primary",
-                    "lang": "vi",
                     "status": "active",
                     "version": "1.0",
                     "is_private": false,
@@ -1753,13 +1774,55 @@
                     "speed_bonus_eligible": true,
                     "hint_allow": true,
                     "hint_penalty_percent": 20,
-                    "hint_content_text": "Hóa chất có thể gây hại qua da, mắt và đường hô hấp.",
-                    "hint_content_media": null,
+                    "hint_content_text": "Luôn xuống xe trước khi băng qua.",
+                    "hint_content_media": null
+                },
+                {
+                    "qn": 12,
+                    "qid": "traffic_012",
+                    "fq": false,
+                    "lq": false,
+                    "tmax": 20000,
+                    "pmax": 12,
+                    "diff": "easy",
+                    "qtype": "mcq",
+                    "qtxt": "Khi đi bộ trên vỉa hè, em nên đi ở đâu?",
+                    "age": "8-11",
+                    "grade": "primary",
+                    "project_id": "proj_hazard_2025",
+                    "display": "show",
+                    "display_correct_answer": "y",
+                    "opt_array": [
+                        {"opt_id": "AA", "text": "Dưới lòng đường"},
+                        {"opt_id": "BB", "text": "Giữa lòng đường"},
+                        {"opt_id": "CC", "text": "Trên vỉa hè bên phải"},
+                        {"opt_id": "DD", "text": "Đuổi theo xe bạn bè"}
+                    ],
+                    "sol_array": ["CC"],
+                    "expl": "Vỉa hè dành cho người đi bộ, an toàn hơn lòng đường.",
+                    "tag_array": ["sidewalk", "pedestrian"],
+                    "lang": "vi",
+                    "image_json": [],
+                    "image_total_number": 0,
+                    "audio_json": null,
+                    "video_json": null,
+                    "shuf": true,
+                    "opt_fmt": "text_only",
+                    "media_placement": "above",
+                    "expl_fmt": "plain",
+                    "author_id": "admin_001",
                     "created_at": "2025-01-10T10:00:00Z",
                     "updated_at": "2025-01-10T10:00:00Z",
-                    "shuf": true,
-                    "display": "show",
-                    "display_correct_answer": "y"
+                    "status": "active",
+                    "version": "1.0",
+                    "is_private": false,
+                    "penalty_points": 0,
+                    "min_points": 0,
+                    "speed_bonus_eligible": true,
+                    "hint_allow": false,
+                    "hint_penalty_percent": 20,
+                    "hint_content_text": null,
+                    "hint_content_media": null
                 }
             ]
         };
