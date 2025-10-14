@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Demo - Single Question Type</title>
+    
+    <!-- Global CSS (luôn cần) -->
+    <link rel="stylesheet" href="global/quiz-global.css">
+    
+    <!-- Chỉ load CSS cho MCQ (ví dụ) -->
+    <link rel="stylesheet" href="screens/mcq/screen-mcq.css">
+</head>
+<body>
+    <div id="quiz-container"></div>
+
+    <!-- Global JS (luôn cần) -->
+    <script src="global/quiz-global.js"></script>
+    
+    <!-- Chỉ load JS cho MCQ (ví dụ) -->
+    <script src="screens/mcq/screen-mcq.js"></script>
+
+    <script>
+        // Demo: Quiz chỉ có câu hỏi MCQ
+        const quizData = {
+            "main_game_id": "demo_mcq_only",
+            "main_title": "Demo: Chỉ câu hỏi MCQ",
+            "main_description": "Ví dụ về quiz chỉ sử dụng câu hỏi single choice",
+            "main_game_version": "1.0.0",
+            "main_author": "Quiz Team",
+            "main_total_questions": 3,
+            "main_total_max_points": 30,
+            "main_language": "vi",
+            "main_pass_threshold_percent": 70,
+            "EachQuiz": [
+                {
+                    "qn": 1,
+                    "qid": "demo_001",
+                    "qtype": "mcq",
+                    "qtxt": "Thủ đô của Việt Nam là gì?",
+                    "pmax": 10,
+                    "tmax": 20000,
+                    "opt_array": ["Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Cần Thơ"],
+                    "sol_array": "Hà Nội",
+                    "expl": "Hà Nội là thủ đô của Việt Nam.",
+                    "display_correct_answer": "y"
+                },
+                {
+                    "qn": 2,
+                    "qid": "demo_002",
+                    "qtype": "mcq",
+                    "qtxt": "Việt Nam có bao nhiêu tỉnh thành?",
+                    "pmax": 10,
+                    "tmax": 20000,
+                    "opt_array": ["58", "60", "63", "65"],
+                    "sol_array": "63",
+                    "expl": "Việt Nam có 63 tỉnh thành (tính đến 2024).",
+                    "display_correct_answer": "y"
+                },
+                {
+                    "qn": 3,
+                    "qid": "demo_003",
+                    "qtype": "mcq",
+                    "qtxt": "Đâu là sông dài nhất Việt Nam?",
+                    "pmax": 10,
+                    "tmax": 20000,
+                    "opt_array": ["Sông Hồng", "Sông Mekong", "Sông Đồng Nai", "Sông Cửu Long"],
+                    "sol_array": "Sông Mekong",
+                    "expl": "Sông Mekong (đoạn chảy qua Việt Nam) là sông dài nhất.",
+                    "display_correct_answer": "y"
+                }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const quiz = new QuizEngine(quizData);
+            
+            // Chỉ đăng ký handler cho MCQ
+            quiz.registerQuestionType('mcq', MCQHandler);
+            
+            quiz.init('quiz-container');
+        });
+    </script>
+</body>
+</html>

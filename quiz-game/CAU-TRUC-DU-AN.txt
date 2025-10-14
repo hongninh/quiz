@@ -1,0 +1,112 @@
+┌─────────────────────────────────────────────────────────────────┐
+│                    QUIZ GAME - CẤU TRÚC DỰ ÁN                  │
+└─────────────────────────────────────────────────────────────────┘
+
+📦 quiz-game/
+│
+├── 📁 global/                          ← DÙNG CHUNG CHO TẤT CẢ
+│   ├── 📄 quiz-global.css               CSS chung: container, progress, buttons, feedback, results
+│   └── 📄 quiz-global.js                JS chung: QuizEngine class, utilities
+│
+├── 📁 screens/                         ← RIÊNG TỪNG LOẠI CÂU HỎI
+│   │
+│   ├── 📁 mcq/                          Câu hỏi text (single/multi choice)
+│   │   ├── 📄 screen-mcq.css            CSS cho text answers
+│   │   └── 📄 screen-mcq.js             MCQHandler + MultiHandler
+│   │
+│   ├── 📁 image/                        Câu hỏi hình ảnh
+│   │   ├── 📄 screen-image.css          CSS cho image answers
+│   │   └── 📄 screen-image.js           ImageMCQHandler + ImageMultiHandler
+│   │
+│   ├── 📁 hotspot/                      Click điểm trên hình
+│   │   ├── 📄 screen-hotspot.css        CSS cho hotspot
+│   │   └── 📄 screen-hotspot.js         HotspotHandler + MultiHotspotHandler
+│   │
+│   ├── 📁 order/                        Sắp xếp thứ tự (drag to reorder)
+│   │   ├── 📄 screen-order.css          CSS cho order items
+│   │   └── 📄 screen-order.js           OrderHandler
+│   │
+│   ├── 📁 pair/                         Ghép cặp hình ảnh
+│   │   ├── 📄 screen-pair.css           CSS cho image pairing
+│   │   └── 📄 screen-pair.js            ImagePairHandler
+│   │
+│   └── 📁 drag-drop/                    Kéo thả phân loại
+│       ├── 📄 screen-drag-drop.css      CSS cho drag & drop zones
+│       └── 📄 screen-drag-drop.js       DragDropHandler
+│
+├── 📄 example-usage.html               ✅ Demo đầy đủ tất cả loại
+├── 📄 demo-single-type.html            ✅ Demo chỉ dùng 1 loại (MCQ)
+├── 📄 README.md                        📚 Hướng dẫn tiếng Anh
+├── 📄 HUONG-DAN-SU-DUNG.md            📚 Hướng dẫn tiếng Việt
+└── 📄 CAU-TRUC-DU-AN.txt              📋 File này
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         CÁCH SỬ DỤNG                           │
+└─────────────────────────────────────────────────────────────────┘
+
+1️⃣ LUÔN LOAD GLOBAL FILES (bắt buộc):
+   <link rel="stylesheet" href="global/quiz-global.css">
+   <script src="global/quiz-global.js"></script>
+
+2️⃣ LOAD SCREEN FILES (chỉ load loại câu hỏi bạn dùng):
+   
+   VD: Nếu quiz có MCQ và Image MCQ:
+   
+   <link rel="stylesheet" href="screens/mcq/screen-mcq.css">
+   <link rel="stylesheet" href="screens/image/screen-image.css">
+   
+   <script src="screens/mcq/screen-mcq.js"></script>
+   <script src="screens/image/screen-image.js"></script>
+
+3️⃣ KHỞI TẠO:
+   
+   const quiz = new QuizEngine(quizData);
+   quiz.registerQuestionType('mcq', MCQHandler);
+   quiz.registerQuestionType('image_mcq', ImageMCQHandler);
+   quiz.init('quiz-container');
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    MAPPING: QTYPE → HANDLER                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌────────────────┬─────────────────────┬────────────────────────────┐
+│ qtype          │ Handler             │ Files                      │
+├────────────────┼─────────────────────┼────────────────────────────┤
+│ mcq            │ MCQHandler          │ screens/mcq/*              │
+│ multi          │ MultiHandler        │ screens/mcq/*              │
+│ image_mcq      │ ImageMCQHandler     │ screens/image/*            │
+│ image_multi    │ ImageMultiHandler   │ screens/image/*            │
+│ hotspot        │ HotspotHandler      │ screens/hotspot/*          │
+│ multi_hotspot  │ MultiHotspotHandler │ screens/hotspot/*          │
+│ order          │ OrderHandler        │ screens/order/*            │
+│ image_pair     │ ImagePairHandler    │ screens/pair/*             │
+│ drag_drop      │ DragDropHandler     │ screens/drag-drop/*        │
+└────────────────┴─────────────────────┴────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         LƯU Ý QUAN TRỌNG                        │
+└─────────────────────────────────────────────────────────────────┘
+
+✅ GLOBAL files: BẮT BUỘC luôn phải load
+✅ SCREEN files: CHỈ load khi cần dùng loại câu hỏi đó
+✅ Giảm băng thông: Chỉ load những gì cần thiết
+✅ Dễ maintain: Mỗi loại câu hỏi độc lập, sửa 1 không ảnh hưởng khác
+✅ Scalable: Dễ thêm loại câu hỏi mới
+
+┌─────────────────────────────────────────────────────────────────┐
+│                        FILES DEMO                               │
+└─────────────────────────────────────────────────────────────────┘
+
+🌟 example-usage.html
+   → Demo đầy đủ 12 câu hỏi, tất cả các loại
+   → Load tất cả screen files
+   → Phù hợp để tham khảo cách implement đầy đủ
+
+🌟 demo-single-type.html
+   → Demo 3 câu MCQ đơn giản
+   → Chỉ load global + mcq screen
+   → Phù hợp để hiểu cách tối ưu
+
+📚 Đọc thêm: HUONG-DAN-SU-DUNG.md (tiếng Việt)
+📚 Read more: README.md (English)
+

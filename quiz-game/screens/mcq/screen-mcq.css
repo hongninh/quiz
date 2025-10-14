@@ -1,0 +1,80 @@
+/**
+ * SCREEN: MCQ & MULTI - Text-based questions
+ * CSS cho câu hỏi dạng chọn 1 hoặc nhiều đáp án (text)
+ */
+
+.text-answers-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.text-answer-option {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.text-answer-option:hover:not(.disabled) {
+    background: #f0f0f0;
+    border-color: #667eea;
+    transform: translateX(5px);
+}
+
+.text-answer-option.selected { 
+    background: #f0f4ff; 
+    border-color: #667eea; 
+}
+
+.text-answer-option.correct { 
+    background: #d4edda; 
+    border-color: #28a745; 
+}
+
+.text-answer-option.incorrect { 
+    background: #f8d7da; 
+    border-color: #dc3545; 
+}
+
+.text-answer-option.disabled { 
+    cursor: not-allowed; 
+}
+
+.answer-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.text-answer-option.correct .answer-letter { 
+    background: #28a745; 
+}
+
+.text-answer-option.incorrect .answer-letter { 
+    background: #dc3545; 
+}
+
+.answer-text { 
+    flex: 1; 
+    color: #333; 
+}
+
+.answer-checkbox { 
+    margin-left: 10px; 
+    font-size: 20px; 
+    color: #667eea; 
+}
