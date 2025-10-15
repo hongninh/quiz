@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Tool - Hotspot Creator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+        }
+        
+        /* Left Panel - Image Editor */
+        .editor-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .upload-section {
+            margin-bottom: 20px;
+        }
+        .upload-box {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        .upload-box:hover {
+            background: #f0f4ff;
+            border-color: #764ba2;
+        }
+        .upload-box.has-image {
+            padding: 0;
+            border: none;
+            background: transparent;
+        }
+        #imageInput {
+            display: none;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        #previewImage {
+            max-width: 100%;
+            display: block;
+            cursor: crosshair;
+        }
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        /* Hotspot Points */
+        .hotspot-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            pointer-events: all;
+            transition: all 0.3s ease;
+            animation: markerPulse 2s infinite;
+        }
+        @keyframes markerPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+            50% { box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+        }
+        .hotspot-marker:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+        .hotspot-marker.correct {
+            background: #28a745;
+            border: 3px solid #fff;
+            color: white;
+        }
+        .hotspot-marker.incorrect {
+            background: #dc3545;
+            border: 3px solid #fff;
+            color: white;
+        }
+        
+        /* Right Panel - Controls */
+        .control-panel {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* Question Type Toggle */
+        .question-type {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+        }
+        .type-btn:hover {
+            border-color: #667eea;
+        }
+        .type-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        /* Point Mode Toggle */
+        .point-mode {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-weight: 500;
+        }
+        .mode-btn.correct {
+            border-color: #28a745;
+            color: #28a745;
+        }
+        .mode-btn.correct.active {
+            background: #28a745;
+            color: white;
+        }
+        .mode-btn.incorrect {
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+        .mode-btn.incorrect.active {
+            background: #dc3545;
+            color: white;
+        }
+        
+        /* Points List */
+        .points-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .point-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .point-item:hover {
+            background: #e9ecef;
+        }
+        .point-item.correct {
+            border-color: #28a745;
+        }
+        .point-item.incorrect {
+            border-color: #dc3545;
+        }
+        .point-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+        }
+        .point-badge.correct { background: #28a745; }
+        .point-badge.incorrect { background: #dc3545; }
+        .point-info {
+            flex: 1;
+            font-size: 13px;
+            color: #666;
+        }
+        .point-actions {
+            display: flex;
+            gap: 5px;
+        }
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .btn-toggle {
+            background: #667eea;
+            color: white;
+        }
+        .btn-toggle:hover {
+            background: #5568d3;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #28a745;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #218838;
+        }
+        .btn-clear {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-clear:hover {
+            background: #5a6268;
+        }
+        
+        /* JSON Output */
+        .json-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        /* Input */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span>🎯</span>
+            Admin Tool - Hotspot Creator
+        </h1>
+        <p class="subtitle">Tạo câu hỏi Hotspot dễ dàng bằng cách click vào ảnh</p>
+        
+        <div class="main-grid">
+            <!-- Left Panel: Image Editor -->
+            <div class="editor-panel">
+                <div class="upload-section">
+                    <div class="upload-box" id="uploadBox" onclick="document.getElementById('imageInput').click()">
+                        <div id="uploadPrompt">
+                            <h3>📁 Upload hoặc kéo thả ảnh vào đây</h3>
+                            <p style="color: #666; margin-top: 10px;">Hỗ trợ: JPG, PNG, WEBP</p>
+                        </div>
+                        <div id="imagePreview" style="display: none;">
+                            <div class="image-container">
+                                <img id="previewImage" src="" alt="Preview">
+                                <div class="image-overlay" id="imageOverlay"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*">
+                </div>
+            </div>
+            
+            <!-- Right Panel: Controls -->
+            <div class="control-panel">
+                <!-- Alert -->
+                <div class="alert alert-success" id="alertBox"></div>
+                
+                <!-- Question Type -->
+                <div class="section">
+                    <h3>📝 Loại câu hỏi</h3>
+                    <div class="question-type">
+                        <div class="type-btn active" data-type="hotspot" onclick="setQuestionType('hotspot')">
+                            Hotspot<br><small>(1 điểm đúng)</small>
+                        </div>
+                        <div class="type-btn" data-type="multi_hotspot" onclick="setQuestionType('multi_hotspot')">
+                            Multi Hotspot<br><small>(Nhiều điểm)</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Point Mode (for multi_hotspot) -->
+                <div class="section" id="pointModeSection" style="display: none;">
+                    <h3>🎨 Chế độ đánh dấu</h3>
+                    <div class="point-mode">
+                        <div class="mode-btn correct active" onclick="setPointMode('correct')">
+                            ✓ Điểm đúng
+                        </div>
+                        <div class="mode-btn incorrect" onclick="setPointMode('incorrect')">
+                            ✗ Điểm sai
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats -->
+                <div class="section">
+                    <h3>📊 Thống kê</h3>
+                    <div class="stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="totalPoints">0</div>
+                            <div class="stat-label">Tổng điểm</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="correctPoints" style="color: #28a745;">0</div>
+                            <div class="stat-label">Đúng</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="incorrectPoints" style="color: #dc3545;">0</div>
+                            <div class="stat-label">Sai</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Points List -->
+                <div class="section">
+                    <h3>📍 Danh sách điểm</h3>
+                    <div class="points-list" id="pointsList">
+                        <p style="text-align: center; color: #999; padding: 20px;">
+                            Click vào ảnh để thêm điểm
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Question Info -->
+                <div class="section">
+                    <h3>✏️ Thông tin câu hỏi</h3>
+                    <div style="margin-bottom: 15px;">
+                        <label>Câu hỏi:</label>
+                        <textarea id="questionText" placeholder="VD: Click vào điểm nguy hiểm trên hình...">Click vào điểm nguy hiểm trên hình</textarea>
+                    </div>
+                    <div>
+                        <label>URL ảnh:</label>
+                        <input type="text" id="imageUrl" placeholder="https://..." readonly>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="section">
+                    <button class="btn btn-primary" onclick="generateJSON()">📋 Tạo JSON</button>
+                    <button class="btn btn-secondary" onclick="copyJSON()" style="margin-top: 10px;">📥 Copy JSON</button>
+                    <button class="btn btn-clear" onclick="clearAll()" style="margin-top: 10px;">🗑️ Xóa tất cả</button>
+                </div>
+                
+                <!-- JSON Output -->
+                <div class="section">
+                    <h3>📄 JSON Output</h3>
+                    <div class="json-output" id="jsonOutput">
+                        {
+                          // JSON sẽ xuất hiện ở đây
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let imageData = {
+            url: '',
+            naturalWidth: 0,
+            naturalHeight: 0
+        };
+        let points = [];
+        let questionType = 'hotspot'; // 'hotspot' or 'multi_hotspot'
+        let currentPointMode = 'correct'; // 'correct' or 'incorrect'
+        let pointIdCounter = 1;
+
+        // Upload Image
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.getElementById('previewImage');
+                    img.src = event.target.result;
+                    imageData.url = event.target.result;
+                    
+                    img.onload = function() {
+                        imageData.naturalWidth = img.naturalWidth;
+                        imageData.naturalHeight = img.naturalHeight;
+                        
+                        document.getElementById('uploadPrompt').style.display = 'none';
+                        document.getElementById('imagePreview').style.display = 'block';
+                        document.getElementById('uploadBox').classList.add('has-image');
+                        document.getElementById('imageUrl').value = 'data:image/...';
+                        
+                        showAlert('✅ Ảnh đã được tải lên! Click vào ảnh để thêm điểm.');
+                        setupImageClick();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Setup Image Click
+        function setupImageClick() {
+            const img = document.getElementById('previewImage');
+            img.onclick = function(e) {
+                if (questionType === 'hotspot' && points.length >= 1) {
+                    showAlert('⚠️ Hotspot chỉ cho phép 1 điểm! Dùng Multi Hotspot cho nhiều điểm.', 'warning');
+                    return;
+                }
+                
+                const rect = img.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                const isCorrect = questionType === 'hotspot' ? true : (currentPointMode === 'correct');
+                
+                addPoint(x, y, isCorrect);
+                showAlert(`✅ Đã thêm điểm ${isCorrect ? 'đúng' : 'sai'}!`);
+            };
+        }
+
+        // Add Point
+        function addPoint(x, y, isCorrect) {
+            const point = {
+                id: 'point_' + pointIdCounter++,
+                x: Math.round(x * 10) / 10,
+                y: Math.round(y * 10) / 10,
+                isCorrect: isCorrect
+            };
+            points.push(point);
+            renderPoint(point);
+            updatePointsList();
+            updateStats();
+        }
+
+        // Render Point on Image
+        function renderPoint(point) {
+            const overlay = document.getElementById('imageOverlay');
+            const marker = document.createElement('div');
+            marker.className = `hotspot-marker ${point.isCorrect ? 'correct' : 'incorrect'}`;
+            marker.id = point.id;
+            marker.style.left = point.x + '%';
+            marker.style.top = point.y + '%';
+            marker.textContent = point.isCorrect ? '✓' : '✗';
+            marker.onclick = function(e) {
+                e.stopPropagation();
+                togglePoint(point.id);
+            };
+            overlay.appendChild(marker);
+        }
+
+        // Toggle Point
+        function togglePoint(pointId) {
+            const point = points.find(p => p.id === pointId);
+            if (point) {
+                point.isCorrect = !point.isCorrect;
+                const marker = document.getElementById(pointId);
+                marker.className = `hotspot-marker ${point.isCorrect ? 'correct' : 'incorrect'}`;
+                marker.textContent = point.isCorrect ? '✓' : '✗';
+                updatePointsList();
+                updateStats();
+            }
+        }
+
+        // Delete Point
+        function deletePoint(pointId) {
+            points = points.filter(p => p.id !== pointId);
+            document.getElementById(pointId).remove();
+            updatePointsList();
+            updateStats();
+            showAlert('🗑️ Đã xóa điểm!');
+        }
+
+        // Update Points List
+        function updatePointsList() {
+            const list = document.getElementById('pointsList');
+            if (points.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Click vào ảnh để thêm điểm</p>';
+                return;
+            }
+            
+            list.innerHTML = points.map((point, index) => `
+                <div class="point-item ${point.isCorrect ? 'correct' : 'incorrect'}">
+                    <div class="point-badge ${point.isCorrect ? 'correct' : 'incorrect'}">${index + 1}</div>
+                    <div class="point-info">
+                        <strong>${point.isCorrect ? 'Đúng' : 'Sai'}</strong><br>
+                        x: ${point.x}%, y: ${point.y}%
+                    </div>
+                    <div class="point-actions">
+                        <button class="btn-icon btn-toggle" onclick="togglePoint('${point.id}')" title="Toggle">
+                            ⇄
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="deletePoint('${point.id}')" title="Xóa">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update Stats
+        function updateStats() {
+            const total = points.length;
+            const correct = points.filter(p => p.isCorrect).length;
+            const incorrect = total - correct;
+            
+            document.getElementById('totalPoints').textContent = total;
+            document.getElementById('correctPoints').textContent = correct;
+            document.getElementById('incorrectPoints').textContent = incorrect;
+        }
+
+        // Set Question Type
+        function setQuestionType(type) {
+            questionType = type;
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            
+            document.getElementById('pointModeSection').style.display = 
+                type === 'multi_hotspot' ? 'block' : 'none';
+            
+            if (type === 'hotspot' && points.length > 1) {
+                showAlert('⚠️ Chuyển sang Hotspot sẽ chỉ giữ lại 1 điểm đầu tiên!', 'warning');
+            }
+        }
+
+        // Set Point Mode
+        function setPointMode(mode) {
+            currentPointMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Generate JSON
+        function generateJSON() {
+            if (points.length === 0) {
+                showAlert('⚠️ Chưa có điểm nào! Click vào ảnh để thêm điểm.', 'warning');
+                return;
+            }
+            
+            let output = {};
+            
+            if (questionType === 'hotspot') {
+                const correctPoint = points.find(p => p.isCorrect) || points[0];
+                output = {
+                    "qtype": "hotspot",
+                    "qtxt": document.getElementById('questionText').value || "Click vào điểm đúng trên hình",
+                    "pmax": 10,
+                    "image_json": [imageData.url],
+                    "sol_json": {
+                        "x": Math.round((correctPoint.x / 100) * imageData.naturalWidth),
+                        "y": Math.round((correctPoint.y / 100) * imageData.naturalHeight),
+                        "radius": 80
+                    },
+                    "expl": "Giải thích câu trả lời..."
+                };
+            } else {
+                const correctPoints = points.filter(p => p.isCorrect);
+                output = {
+                    "qtype": "multi_hotspot",
+                    "qtxt": document.getElementById('questionText').value || "Click vào tất cả các điểm đúng",
+                    "pmax": 20,
+                    "image_json": [imageData.url],
+                    "hotspot_array": points.map((p, i) => ({
+                        "id": p.id,
+                        "x": p.x,
+                        "y": p.y
+                    })),
+                    "sol_array": correctPoints.map(p => p.id),
+                    "expl": "Giải thích câu trả lời..."
+                };
+            }
+            
+            document.getElementById('jsonOutput').textContent = JSON.stringify(output, null, 2);
+            showAlert('✅ JSON đã được tạo! Bạn có thể copy ngay.');
+        }
+
+        // Copy JSON
+        function copyJSON() {
+            const json = document.getElementById('jsonOutput').textContent;
+            if (json.includes('// JSON sẽ xuất hiện ở đây')) {
+                showAlert('⚠️ Hãy tạo JSON trước!', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(json).then(() => {
+                showAlert('✅ Đã copy JSON vào clipboard!');
+            });
+        }
+
+        // Clear All
+        function clearAll() {
+            if (!confirm('⚠️ Bạn có chắc muốn xóa tất cả?')) return;
+            
+            points = [];
+            document.getElementById('imageOverlay').innerHTML = '';
+            updatePointsList();
+            updateStats();
+            document.getElementById('jsonOutput').textContent = '{\n  // JSON sẽ xuất hiện ở đây\n}';
+            showAlert('🗑️ Đã xóa tất cả điểm!');
+        }
+
+        // Show Alert
+        function showAlert(message, type = 'success') {
+            const alert = document.getElementById('alertBox');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        // Drag & Drop
+        const uploadBox = document.getElementById('uploadBox');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, preventDefaults, false);
+        });
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        uploadBox.addEventListener('drop', handleDrop, false);
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                document.getElementById('imageInput').files = files;
+                document.getElementById('imageInput').dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+</body>
+</html>

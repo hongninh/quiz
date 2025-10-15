@@ -1,0 +1,99 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║         🎯 ADMIN TOOL - HOTSPOT CREATOR - HƯỚNG DẪN NHANH                ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📂 FILE: quiz-game/admin-hotspot-creator.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 5 BƯỚC ĐƠN GIẢN:
+
+1️⃣  Mở file admin-hotspot-creator.html trong trình duyệt
+
+2️⃣  Upload ảnh (hoặc kéo thả)
+
+3️⃣  Chọn loại:
+    • Hotspot → 1 điểm đúng
+    • Multi Hotspot → nhiều điểm đúng/sai
+
+4️⃣  Click vào ảnh để đặt điểm
+    • Xanh (✓) = Đúng
+    • Đỏ (✗) = Sai
+
+5️⃣  Click "Tạo JSON" → "Copy JSON" → Done! ✅
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 TÍNH NĂNG NỔI BẬT:
+
+✅ Upload ảnh bằng kéo thả
+✅ Click trực tiếp trên ảnh (không cần tính toán tọa độ!)
+✅ Toggle đúng/sai dễ dàng
+✅ Xem thống kê real-time
+✅ Tạo JSON tự động
+✅ Copy một click
+✅ Responsive, UI đẹp
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 GIAO DIỆN:
+
+┌──────────────────────────┬─────────────────────────────┐
+│                          │  Loại: ☑ Multi Hotspot     │
+│                          │  Mode: ☑ Điểm đúng         │
+│                          ├─────────────────────────────┤
+│      [ẢNH CỦA BẠN]      │  📊 Tổng: 5 | Đúng: 3      │
+│                          │                             │
+│    ✓ Điểm 1 (đúng)      │  📍 Danh sách:              │
+│    ✓ Điểm 2 (đúng)      │  1. ✓ Đúng (25%, 30%)      │
+│    ✗ Điểm 3 (sai)       │  2. ✓ Đúng (50%, 40%)      │
+│    ✓ Điểm 4 (đúng)      │  3. ✗ Sai  (60%, 50%)      │
+│    ✗ Điểm 5 (sai)       │                             │
+│                          │  📋 [Tạo JSON]              │
+│    Click để thêm điểm    │  📥 [Copy JSON]             │
+└──────────────────────────┴─────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 VÍ DỤ JSON OUTPUT:
+
+Hotspot (1 điểm):
+{
+  "qtype": "hotspot",
+  "qtxt": "Click vào điểm đúng...",
+  "sol_json": { "x": 400, "y": 300, "radius": 80 }
+}
+
+Multi Hotspot (nhiều điểm):
+{
+  "qtype": "multi_hotspot",
+  "qtxt": "Click vào tất cả điểm đúng...",
+  "hotspot_array": [
+    { "id": "point_1", "x": 25.5, "y": 30.2 },
+    { "id": "point_2", "x": 50.0, "y": 40.0 }
+  ],
+  "sol_array": ["point_1"]
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 USE CASE:
+
+✓ Tạo câu hỏi an toàn giao thông
+✓ Tìm điểm nguy hiểm trên hình
+✓ Xác định vị trí đúng
+✓ Bài tập nhận diện
+✓ Quiz về hình ảnh
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 TÀI LIỆU:
+
+Xem chi tiết: ADMIN-TOOL-GUIDE.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 KHÔNG CẦN CODE - CHỈ CLICK VÀ COPY!
+
