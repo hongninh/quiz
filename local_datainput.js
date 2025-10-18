@@ -5,7 +5,10 @@
  */
 
 // Khai báo biến global chứa quiz data
-window.quizData = {
+// Nếu nhận data từ backend dưới dạng JSON string, cần parse
+window.quizData = (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_input_text_format) 
+    ? JSON.parse(my_variables.questions_and_answers_input_text_format)
+    : {
     "main_game_id": "complete_quiz_2025",
     "main_title": "Quiz Hoàn Chỉnh - 12 Câu Hỏi Đa Dạng",
     "main_description": "Bộ câu hỏi bao gồm tất cả các dạng: MCQ, Multi, Image, Hotspot, Order, Pair, Drag-Drop",
