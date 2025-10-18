@@ -61,10 +61,33 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
             
         } catch (error) {
             console.error('❌ Lỗi parse JSON:', error);
-            console.error('   Position:', error.message.match(/position (\d+)/)?.[1]);
+            const errorPos = error.message.match(/position (\d+)/)?.[1];
+            console.error('   Position:', errorPos);
             console.error('   Data length:', rawData.length);
+            
+            // Debug context around error
+            if (errorPos) {
+                const pos = parseInt(errorPos);
+                console.error('   Context before:', rawData.substring(Math.max(0, pos - 50), pos));
+                console.error('   Context after:', rawData.substring(pos, Math.min(rawData.length, pos + 50)));
+            }
+            
             console.error('   First 500 chars:', rawData.substring(0, 500));
             console.error('   Last 500 chars:', rawData.substring(rawData.length - 500));
+            
+            // Check if JSON is truncated
+            const openBraces = (rawData.match(/\{/g) || []).length;
+            const closeBraces = (rawData.match(/\}/g) || []).length;
+            const openBrackets = (rawData.match(/\[/g) || []).length;
+            const closeBrackets = (rawData.match(/\]/g) || []).length;
+            
+            console.error('   Brace balance: { =', openBraces, '} =', closeBraces, '(diff:', openBraces - closeBraces + ')');
+            console.error('   Bracket balance: [ =', openBrackets, '] =', closeBrackets, '(diff:', openBrackets - closeBrackets + ')');
+            
+            if (openBraces !== closeBraces || openBrackets !== closeBrackets) {
+                console.error('   ⚠️ JSON IS TRUNCATED! Backend is cutting off data.');
+                console.error('   📋 SOLUTION: Increase backend output buffer or use API endpoint.');
+            }
             
             // Thử tìm và sửa lỗi JSON
             console.warn('⚠️ Attempting to fix JSON...');
@@ -74,7 +97,8 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
                 window.quizData = JSON.parse(cleaned);
                 console.log('✅ Fixed and parsed successfully!');
             } catch (e2) {
-                console.error('❌ Cannot fix JSON. Using fallback data.');
+                console.error('❌ Cannot fix JSON. Data is likely truncated.');
+                console.error('   REQUIRED: Fix backend to output complete JSON or use API.');
                 window.quizData = null;
             }
         }
