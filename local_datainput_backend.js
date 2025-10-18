@@ -11,6 +11,23 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
         window.quizData = JSON.parse(my_variables.questions_and_answers_input_text_format);
         console.log('✅ Quiz data loaded from backend:', window.quizData.main_title);
         console.log('📊 Total questions:', window.quizData.main_total_questions);
+        
+        // FIX: Parse EachQuiz nếu nó là string
+        if (window.quizData.EachQuiz && typeof window.quizData.EachQuiz === 'string') {
+            console.log('⚠️ EachQuiz is string, parsing...');
+            window.quizData.EachQuiz = JSON.parse(window.quizData.EachQuiz);
+        }
+        
+        // Verify EachQuiz là array
+        if (!Array.isArray(window.quizData.EachQuiz)) {
+            console.error('❌ EachQuiz is not an array!');
+            console.error('   Type:', typeof window.quizData.EachQuiz);
+            console.error('   Value:', window.quizData.EachQuiz);
+            window.quizData = null;
+        } else {
+            console.log('✅ EachQuiz loaded:', window.quizData.EachQuiz.length, 'questions');
+        }
+        
     } catch (error) {
         console.error('❌ Lỗi parse JSON:', error);
         console.error('   Raw data:', my_variables.questions_and_answers_input_text_format);
