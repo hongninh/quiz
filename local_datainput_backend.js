@@ -6,48 +6,85 @@
 
 // Kiểm tra và parse data từ backend
 if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_input_text_format) {
-    try {
-        // Parse JSON string thành object
-        window.quizData = JSON.parse(my_variables.questions_and_answers_input_text_format);
-        console.log('✅ Quiz data loaded from backend:', window.quizData.main_title);
-        console.log('📊 Total questions:', window.quizData.main_total_questions);
+    
+    let rawData = my_variables.questions_and_answers_input_text_format;
+    
+    // FIX 1: Nếu backend truyền object thẳng (không phải string), dùng luôn
+    if (typeof rawData === 'object' && rawData !== null) {
+        console.log('✅ Backend data is object (not string), using directly');
+        window.quizData = rawData;
         
-        // FIX: Backend wrap sai cấu trúc - EachQuiz chứa toàn bộ quiz data
+        // FIX: Backend wrap sai cấu trúc
         if (window.quizData.EachQuiz && 
             typeof window.quizData.EachQuiz === 'object' && 
             !Array.isArray(window.quizData.EachQuiz)) {
             
-            // Check nếu EachQuiz chứa main_game_id → đây là toàn bộ quiz data
             if (window.quizData.EachQuiz.main_game_id && window.quizData.EachQuiz.EachQuiz) {
-                console.log('⚠️ Backend wrapped structure detected, fixing...');
-                window.quizData = window.quizData.EachQuiz;  // Unwrap
-                console.log('✅ Fixed! Title:', window.quizData.main_title);
+                console.log('⚠️ Unwrapping nested structure...');
+                window.quizData = window.quizData.EachQuiz;
             }
         }
         
-        // FIX: Parse EachQuiz nếu nó là string
-        if (window.quizData.EachQuiz && typeof window.quizData.EachQuiz === 'string') {
-            console.log('⚠️ EachQuiz is string, parsing...');
-            window.quizData.EachQuiz = JSON.parse(window.quizData.EachQuiz);
-        }
+        console.log('✅ Quiz loaded:', window.quizData.main_title);
+        console.log('📊 Questions:', window.quizData.EachQuiz?.length);
         
-        // Verify EachQuiz là array
-        if (!Array.isArray(window.quizData.EachQuiz)) {
-            console.error('❌ EachQuiz is not an array!');
-            console.error('   Type:', typeof window.quizData.EachQuiz);
-            console.error('   Value:', window.quizData.EachQuiz);
-            window.quizData = null;
-        } else {
-            console.log('✅ EachQuiz loaded:', window.quizData.EachQuiz.length, 'questions');
-        }
+    } else if (typeof rawData === 'string') {
+        // FIX 2: Nếu là string, parse JSON
+        console.log('⚠️ Backend data is string, parsing JSON...');
         
-    } catch (error) {
-        console.error('❌ Lỗi parse JSON:', error);
-        console.error('   Raw data:', my_variables.questions_and_answers_input_text_format);
+        try {
+            // Clean string trước khi parse
+            rawData = rawData.trim();
+            
+            // Parse JSON
+            window.quizData = JSON.parse(rawData);
+            console.log('✅ Quiz data parsed:', window.quizData.main_title);
+            
+            // FIX: Backend wrap sai cấu trúc
+            if (window.quizData.EachQuiz && 
+                typeof window.quizData.EachQuiz === 'object' && 
+                !Array.isArray(window.quizData.EachQuiz)) {
+                
+                if (window.quizData.EachQuiz.main_game_id && window.quizData.EachQuiz.EachQuiz) {
+                    console.log('⚠️ Unwrapping nested structure...');
+                    window.quizData = window.quizData.EachQuiz;
+                }
+            }
+            
+            console.log('📊 Questions loaded:', window.quizData.EachQuiz?.length);
+            
+        } catch (error) {
+            console.error('❌ Lỗi parse JSON:', error);
+            console.error('   Position:', error.message.match(/position (\d+)/)?.[1]);
+            console.error('   Data length:', rawData.length);
+            console.error('   First 500 chars:', rawData.substring(0, 500));
+            console.error('   Last 500 chars:', rawData.substring(rawData.length - 500));
+            
+            // Thử tìm và sửa lỗi JSON
+            console.warn('⚠️ Attempting to fix JSON...');
+            try {
+                // Loại bỏ ký tự không hợp lệ
+                const cleaned = rawData.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+                window.quizData = JSON.parse(cleaned);
+                console.log('✅ Fixed and parsed successfully!');
+            } catch (e2) {
+                console.error('❌ Cannot fix JSON. Using fallback data.');
+                window.quizData = null;
+            }
+        }
+    } else {
+        console.error('❌ Invalid data type:', typeof rawData);
         window.quizData = null;
     }
+    
+    // Final verify
+    if (window.quizData && !Array.isArray(window.quizData.EachQuiz)) {
+        console.error('❌ Final check failed: EachQuiz is not an array!');
+        console.error('   Type:', typeof window.quizData.EachQuiz);
+        window.quizData = null;
+    }
+    
 } else {
     console.error('❌ Không tìm thấy my_variables.questions_and_answers_input_text_format');
-    console.error('   Kiểm tra backend đã set biến này chưa');
     window.quizData = null;
 }
