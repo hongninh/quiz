@@ -7,15 +7,21 @@ Hệ thống Quiz đã được tách thành **Global** và **Local** để dễ
 ```
 ├── global-quiz.css          # CSS chung cho tất cả quiz
 ├── global-quiz.js           # QuizEngine class (core engine)
+├── local_datainput.js       # ⭐ DATA FILE - Chứa dữ liệu quiz
+├── local-quiz-complete.js   # Init file - Khởi tạo quiz (gọi data)
 ├── local-quiz-complete.css  # CSS đặc thù cho quiz này
-├── local-quiz-complete.js   # Data và khởi tạo quiz cụ thể
 ├── example.html             # File demo cách nhúng
 └── README.md                # Hướng dẫn sử dụng
 ```
 
+### **Cấu trúc mới (v2.0):**
+- ✅ Data đã được tách ra file riêng `local_datainput.js`
+- ✅ File `local-quiz-complete.js` gọi data từ `local_datainput.js`
+- ✅ Dễ thay đổi data hoặc nhận data từ backend
+
 ## 🚀 Cách sử dụng
 
-### 1️⃣ Nhúng vào trang HTML
+### 1️⃣ Nhúng vào trang HTML (CẤU TRÚC MỚI)
 
 ```html
 <!DOCTYPE html>
@@ -31,10 +37,14 @@ Hệ thống Quiz đã được tách thành **Global** và **Local** để dễ
     <!-- Container chứa quiz -->
     <div id="quiz-container"></div>
     
-    <!-- Global JS - Nhúng trước local JS -->
+    <!-- THỨ TỰ QUAN TRỌNG -->
+    <!-- 1. Global JS Engine -->
     <script src="global-quiz.js"></script>
     
-    <!-- Local JS - Nhúng sau global JS -->
+    <!-- 2. Local Data Input (chứa dữ liệu quiz) -->
+    <script src="local_datainput.js"></script>
+    
+    <!-- 3. Local JS Init (khởi tạo quiz) -->
     <script src="local-quiz-complete.js"></script>
 </body>
 </html>
@@ -45,9 +55,11 @@ Hệ thống Quiz đã được tách thành **Global** và **Local** để dễ
 Để tạo quiz mới, bạn chỉ cần:
 
 1. **Giữ nguyên** `global-quiz.css` và `global-quiz.js`
-2. **Tạo mới** 2 files local:
-   - `local-quiz-[tên-quiz].css` (nếu cần tùy chỉnh theme)
-   - `local-quiz-[tên-quiz].js` (chứa data quiz mới)
+2. **Tạo mới** file data:
+   - Copy `local_datainput.js` → `local_datainput_quiz2.js`
+   - Sửa data trong file mới
+3. **Giữ nguyên** `local-quiz-complete.js` (không cần sửa)
+4. **Tùy chọn:** Tạo `local-quiz-[tên].css` nếu cần custom theme
 
 **Ví dụ:** Tạo quiz về "An toàn điện"
 
