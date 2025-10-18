@@ -8,12 +8,18 @@
 // Biến window.quizData đã được define trong local_datainput.js
 function getQuizData() {
     // Kiểm tra xem data đã được load chưa
-    if (typeof window.quizData !== 'undefined') {
+    if (typeof window.quizData !== 'undefined' && window.quizData !== null) {
+        console.log('✅ Quiz data found:', window.quizData.main_title);
         return window.quizData;
     }
     
-    // Fallback: nếu chưa có, log error
-    console.error('❌ Quiz data chưa được load. Hãy chắc chắn local_datainput.js đã được nhúng trước file này.');
+    // Fallback: nếu chưa có, log error với thông tin debug
+    console.error('❌ Quiz data chưa được load!');
+    console.error('   Kiểm tra:');
+    console.error('   1. File local_datainput.js đã được nhúng chưa?');
+    console.error('   2. Nhúng đúng thứ tự: global-quiz.js → local_datainput.js → local-quiz-complete.js');
+    console.error('   3. Đường dẫn file có đúng không?');
+    console.error('   Debug: window.quizData =', window.quizData);
     return null;
 }
 
@@ -45,5 +51,6 @@ function initQuiz() {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initQuiz);
 } else {
-    initQuiz();
+    // Delay một chút để đảm bảo tất cả scripts đã load
+    setTimeout(initQuiz, 100);
 }
