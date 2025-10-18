@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Backend Integration Examples</title>
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="global-quiz.css">
+    <link rel="stylesheet" href="local-quiz-complete.css">
+</head>
+<body>
+    <!-- ================================================================ -->
+    <!-- CÁCH 1: SỬ DỤNG DATA-INPUT ATTRIBUTE (KHUYÊN DÙNG) -->
+    <!-- ================================================================ -->
+    <!-- 
+    Backend (PHP/Laravel):
+    <div id="quiz-container" data-input="{{ json_encode($quizData) }}"></div>
+    
+    Backend (Node.js/Express):
+    <div id="quiz-container" data-input="<%= JSON.stringify(quizData) %>"></div>
+    
+    Backend (Python/Django):
+    <div id="quiz-container" data-input="{{ quiz_data|tojson }}"></div>
+    -->
+    
+    <!-- CÁCH 1A: Data ngắn (dùng single quote bên ngoài) -->
+    <div id="quiz-container" data-input='{"main_game_id":"test_001","main_title":"Quiz Test","main_description":"Đây là quiz test","main_total_questions":2,"main_total_max_points":20,"main_pass_threshold_percent":70,"EachQuiz":[{"qn":1,"qid":"q1","qtype":"mcq","qtxt":"1+1=?","pmax":10,"tmax":30000,"diff":"easy","fq":true,"lq":false,"opt_array":["1","2","3","4"],"sol_array":"2","expl":"1+1=2","tag_array":["math"],"image_json":null,"display_correct_answer":"y"},{"qn":2,"qid":"q2","qtype":"mcq","qtxt":"2+2=?","pmax":10,"tmax":30000,"diff":"easy","fq":false,"lq":true,"opt_array":["2","3","4","5"],"sol_array":"4","expl":"2+2=4","tag_array":["math"],"image_json":null,"display_correct_answer":"y"}]}'></div>
+    
+    <!-- CÁCH 1B: Data dài (escape HTML entities) -->
+    <!--
+    Backend sẽ encode như này:
+    <div id="quiz-container" data-input="&quot;main_title&quot;:&quot;Quiz ABC&quot;..."></div>
+    -->
+    
+    
+    <!-- ================================================================ -->
+    <!-- CÁCH 2: SỬ DỤNG BIẾN GLOBAL JAVASCRIPT -->
+    <!-- ================================================================ -->
+    <!--
+    Backend render inline script:
+    
+    <script>
+    var dataInput = <?php echo json_encode($quizData); ?>;
+    // hoặc
+    window.dataInput = <%= JSON.stringify(quizData) %>;
+    </script>
+    -->
+    
+    <!-- Ví dụ: -->
+    <!--
+    <script>
+    var dataInput = {
+        "main_game_id": "test_002",
+        "main_title": "Quiz từ biến global",
+        "main_description": "Data được load từ biến JavaScript",
+        "main_total_questions": 1,
+        "main_total_max_points": 10,
+        "main_pass_threshold_percent": 70,
+        "EachQuiz": [
+            {
+                "qn": 1,
+                "qid": "q1",
+                "qtype": "mcq",
+                "qtxt": "Câu hỏi test?",
+                "pmax": 10,
+                "opt_array": ["A", "B", "C", "D"],
+                "sol_array": "A",
+                "expl": "Đáp án là A",
+                "display_correct_answer": "y"
+            }
+        ]
+    };
+    </script>
+    -->
+    
+    
+    <!-- ================================================================ -->
+    <!-- CÁCH 3: LOAD TỪ API (AJAX) -->
+    <!-- ================================================================ -->
+    <!--
+    Chỉ cần set attribute data-quiz-id:
+    <div id="quiz-container" data-quiz-id="123"></div>
+    
+    Script sẽ tự động gọi: /api/quiz/123
+    -->
+    
+    
+    <!-- ================================================================ -->
+    <!-- LOAD SCRIPTS -->
+    <!-- ================================================================ -->
+    
+    <!-- Global JS Engine -->
+    <script src="global-quiz.js"></script>
+    
+    <!-- Local JS với backend integration -->
+    <script src="local-quiz-backend-example.js"></script>
+    
+    
+    <!-- ================================================================ -->
+    <!-- DEBUG: Xem data đã load -->
+    <!-- ================================================================ -->
+    <script>
+    // Bạn có thể mở Console (F12) để xem log
+    console.log('🎮 Quiz system initialized');
+    console.log('📦 Container:', document.getElementById('quiz-container'));
+    
+    // Nếu muốn xem raw data
+    const container = document.getElementById('quiz-container');
+    if (container) {
+        const rawData = container.getAttribute('data-input');
+        console.log('📄 Raw data-input:', rawData);
+        
+        if (rawData) {
+            try {
+                const parsed = JSON.parse(rawData);
+                console.log('✅ Parsed data:', parsed);
+            } catch (e) {
+                console.error('❌ Parse error:', e);
+            }
+        }
+    }
+    </script>
+</body>
+</html>
