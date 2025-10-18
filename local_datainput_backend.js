@@ -12,6 +12,19 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
         console.log('✅ Quiz data loaded from backend:', window.quizData.main_title);
         console.log('📊 Total questions:', window.quizData.main_total_questions);
         
+        // FIX: Backend wrap sai cấu trúc - EachQuiz chứa toàn bộ quiz data
+        if (window.quizData.EachQuiz && 
+            typeof window.quizData.EachQuiz === 'object' && 
+            !Array.isArray(window.quizData.EachQuiz)) {
+            
+            // Check nếu EachQuiz chứa main_game_id → đây là toàn bộ quiz data
+            if (window.quizData.EachQuiz.main_game_id && window.quizData.EachQuiz.EachQuiz) {
+                console.log('⚠️ Backend wrapped structure detected, fixing...');
+                window.quizData = window.quizData.EachQuiz;  // Unwrap
+                console.log('✅ Fixed! Title:', window.quizData.main_title);
+            }
+        }
+        
         // FIX: Parse EachQuiz nếu nó là string
         if (window.quizData.EachQuiz && typeof window.quizData.EachQuiz === 'string') {
             console.log('⚠️ EachQuiz is string, parsing...');
