@@ -36,6 +36,12 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
             // Clean string trước khi parse
             rawData = rawData.trim();
             
+            // FIX: Decode HTML entities (&amp; → &, &quot; → ", etc.)
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = rawData;
+            rawData = textarea.value;
+            console.log('✅ HTML entities decoded');
+            
             // Parse JSON
             window.quizData = JSON.parse(rawData);
             console.log('✅ Quiz data parsed:', window.quizData.main_title);
