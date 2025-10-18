@@ -42,6 +42,12 @@ if (typeof my_variables !== 'undefined' && my_variables.questions_and_answers_in
             rawData = textarea.value;
             console.log('✅ HTML entities decoded');
             
+            // FIX: Remove trailing semicolon if exists
+            if (rawData.endsWith(';')) {
+                rawData = rawData.slice(0, -1);
+                console.log('✅ Removed trailing semicolon');
+            }
+            
             // Parse JSON
             window.quizData = JSON.parse(rawData);
             console.log('✅ Quiz data parsed:', window.quizData.main_title);
