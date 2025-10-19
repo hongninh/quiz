@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Quiz Test - ĐÚNG với IDs</title>
+    <link rel="stylesheet" href="global-quiz.css">
+    <style>
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            max-width: 300px;
+            z-index: 9999;
+            font-size: 12px;
+        }
+        .debug-info h3 {
+            margin: 0 0 10px 0;
+            color: #667eea;
+            font-size: 14px;
+        }
+        .debug-info .status {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .debug-info .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .debug-info .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .debug-info button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .debug-info button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Debug Info Panel -->
+    <div class="debug-info" id="debug-info">
+        <h3>🔍 Debug Info</h3>
+        <div id="debug-status"></div>
+        <button onclick="checkSetup()">🔄 Check Setup</button>
+        <button onclick="viewOutput()">📊 View Output</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container"></div>
+
+    <!-- ĐÚNG THỨ TỰ: Global Engine → Data với IDs → Initializer -->
+    <script src="global-quiz-with-ids.js"></script>
+    <script src="local_datainput_with_ids.js"></script>
+    <script src="local-quiz-complete.js"></script>
+
+    <script>
+        // Check setup khi load
+        function checkSetup() {
+            const statusDiv = document.getElementById('debug-status');
+            let html = '';
+
+            // Check 1: Engine loaded
+            if (typeof QuizEngine !== 'undefined') {
+                html += '<div class="status ok">✅ Engine: Loaded</div>';
+            } else {
+                html += '<div class="status error">❌ Engine: Not loaded</div>';
+            }
+
+            // Check 2: Data loaded
+            if (typeof window.quizData !== 'undefined') {
+                html += '<div class="status ok">✅ Data: Loaded</div>';
+                html += `<div class="status ok">📦 Game ID: ${window.quizData.main_game_id}</div>`;
+                html += `<div class="status ok">📊 Questions: ${window.quizData.main_total_questions}</div>`;
+                
+                // Check 3: Data có IDs không
+                const firstQ = window.quizData.EachQuiz?.[0];
+                if (firstQ && firstQ.opt_array && firstQ.opt_array.length > 0) {
+                    const firstOpt = firstQ.opt_array[0];
+                    
+                    if (typeof firstOpt === 'object' && (firstOpt.text_id || firstOpt.image_id)) {
+                        html += '<div class="status ok">✅ IDs: Present!</div>';
+                        html += `<div class="status ok">🔑 Sample ID: ${firstOpt.text_id || firstOpt.image_id}</div>`;
+                    } else {
+                        html += '<div class="status error">❌ IDs: MISSING!</div>';
+                        html += '<div class="status error">⚠️ Wrong data file!</div>';
+                        html += '<div style="margin-top: 10px;">Use: <strong>local_datainput_with_ids.js</strong></div>';
+                    }
+                }
+            } else {
+                html += '<div class="status error">❌ Data: Not loaded</div>';
+            }
+
+            statusDiv.innerHTML = html;
+        }
+
+        function viewOutput() {
+            if (window.detailedQuizOutput) {
+                console.clear();
+                console.log('📊 DETAILED OUTPUT WITH IDs:');
+                console.log('================================');
+                console.log(window.detailedQuizOutput);
+                console.log('================================');
+                console.log('📋 Copy with: QuizUtils.copyJSON()');
+                alert('✅ Check Console (F12) để xem output!');
+            } else {
+                alert('⚠️ Chưa có output. Hãy chơi quiz trước!');
+            }
+        }
+
+        // Auto check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkSetup, 500);
+            
+            // Log instruction
+            console.log('=====================================');
+            console.log('🎯 QUIZ TEST WITH IDs');
+            console.log('=====================================');
+            console.log('1. Check debug panel (top-right)');
+            console.log('2. Play quiz');
+            console.log('3. After finish, run: QuizUtils.copyJSON()');
+            console.log('4. Or click "View Output" button');
+            console.log('=====================================');
+        });
+
+        // Monitor quiz completion
+        const originalRenderResults = QuizEngine.prototype.renderResults;
+        if (typeof QuizEngine !== 'undefined') {
+            QuizEngine.prototype.renderResults = function() {
+                originalRenderResults.call(this);
+                
+                // Show completion message
+                setTimeout(() => {
+                    console.log('🎉 QUIZ COMPLETED!');
+                    console.log('📊 Output available at: window.detailedQuizOutput');
+                    
+                    // Check output có IDs không
+                    if (window.detailedQuizOutput) {
+                        const firstResult = window.detailedQuizOutput.quiz_results[0];
+                        
+                        console.log('\n🔍 CHECKING OUTPUT FORMAT:');
+                        console.log('ans field:', firstResult.ans);
+                        console.log('sol field:', firstResult.sol);
+                        
+                        if (firstResult.ans === null || (Array.isArray(firstResult.ans) && firstResult.ans.length === 0)) {
+                            console.warn('⚠️ WARNING: ans field is empty!');
+                            console.warn('This means data does NOT have IDs.');
+                            console.warn('Expected: ans: "opt_001_1" or ["opt_002_1", "opt_002_3"]');
+                            console.warn('Got:', firstResult.ans);
+                        } else {
+                            console.log('✅ Output looks good! IDs present.');
+                        }
+                        
+                        console.log('\n📋 To copy: QuizUtils.copyJSON()');
+                        console.log('📥 To download: QuizUtils.downloadJSON()');
+                    }
+                }, 500);
+            };
+        }
+    </script>
+</body>
+</html>

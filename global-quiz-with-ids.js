@@ -816,6 +816,7 @@ class QuizEngine {
             sol: lastAnswer ? lastAnswer.correct_answer_ids : (q.sol_array || q.sol_json),
             sol_raw: q.sol_array || q.sol_json,
             show_sol: q.display_correct_answer === 'y'
+            // Note: expl field removed from output (only used for display)
         });
 
         setTimeout(() => {
