@@ -1,4 +1,51 @@
-# 📚 Quiz System - Procfu.com
+# 🎮 Quiz System với ID Tracking - Procfu.com
+
+Hệ thống Quiz đã được nâng cấp với **ID System** để tracking chi tiết và analytics.
+
+## 📥 **DOWNLOAD NGAY:**
+
+### **🎯 Download ZIP (Toàn bộ project):**
+👉 **[CLICK ĐỂ DOWNLOAD ZIP](https://github.com/hongninh/quiz/archive/refs/heads/cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436.zip)** 👈
+
+### **🚀 Hoặc Git Clone:**
+```bash
+git clone https://github.com/hongninh/quiz.git
+cd quiz
+git checkout cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436
+```
+
+### **📖 Chi tiết tất cả links:**
+Xem file [DOWNLOAD-LINKS.md](DOWNLOAD-LINKS.md)
+
+---
+
+## ✨ **PHIÊN BẢN MỚI - ID SYSTEM:**
+
+### **Các cải tiến:**
+- ✅ **ID Tracking**: Mỗi option có ID riêng (`opt_001_1`, `img_006_2`, `spot_010_3`)
+- ✅ **Output chi tiết**: Biết chính xác user chọn option nào
+- ✅ **Analytics ready**: Backend dễ phân tích, track patterns
+- ✅ **Shuffle-safe**: Xáo trộn không ảnh hưởng kết quả
+- ✅ **Multi-language ready**: Giữ ID, chỉ thay text
+
+### **Files chính:**
+- `global-quiz-with-ids.js` - Engine mới với ID system
+- `local_datainput_with_ids.js` - 12 câu mẫu với IDs
+- `TEST-WITH-IDS-CORRECT.html` - File test đầy đủ
+
+**📖 Xem thêm:** [SUMMARY-ID-SYSTEM.md](SUMMARY-ID-SYSTEM.md)
+
+---
+
+## 🎯 **QUICK START (3 BƯỚC):**
+
+1. **Download ZIP** (link ở trên)
+2. **Giải nén** folder
+3. **Mở file** `TEST-WITH-IDS-CORRECT.html` trong browser
+
+→ Quiz chạy ngay! Sau khi chơi xong, mở Console (F12) để xem output với IDs.
+
+---
 
 Hệ thống Quiz đã được tách thành **Global** và **Local** để dễ dàng tái sử dụng cho nhiều quiz khác nhau.
 
