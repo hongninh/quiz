@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Quick Test - Quiz với ID System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .info-box {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .info-box h1 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 28px;
+        }
+        .info-box h2 {
+            color: #667eea;
+            font-size: 20px;
+            margin: 20px 0 10px 0;
+        }
+        .info-box p {
+            color: #666;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 10px 10px 10px 0;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn.secondary {
+            background: #6c757d;
+        }
+        .btn.secondary:hover {
+            background: #5a6268;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        .feature-list li:before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="info-box">
+        <h1>🧪 Quiz System với ID - Quick Test</h1>
+        
+        <div id="status" class="status loading">
+            ⏳ Đang load quiz engine và data...
+        </div>
+
+        <h2>📋 Hướng dẫn:</h2>
+        <ol>
+            <li>Files sẽ tự động load từ GitHub</li>
+            <li>Chơi quiz và trả lời các câu hỏi</li>
+            <li>Sau khi xong, mở <strong>Console (F12)</strong> để xem output</li>
+            <li>Output sẽ có format với IDs chi tiết</li>
+        </ol>
+
+        <h2>🎯 Features:</h2>
+        <ul class="feature-list">
+            <li>12 câu hỏi đa dạng (MCQ, Multi, Image, Hotspot, Order, Pair, Drag-Drop)</li>
+            <li>Output với IDs: <code>ans: "opt_001_1"</code></li>
+            <li>Tracking chi tiết: user chọn gì, đáp án đúng là gì</li>
+            <li>Export JSON với button</li>
+            <li>Analytics ready</li>
+        </ul>
+
+        <h2>📊 Xem Output:</h2>
+        <p><strong>Trong Console:</strong></p>
+        <code>console.log(window.detailedQuizOutput)</code>
+        
+        <p style="margin-top: 15px;"><strong>Hoặc click buttons sau khi hoàn thành:</strong></p>
+        <ul>
+            <li>📥 <strong>Tải JSON</strong> - Download file JSON</li>
+            <li>📋 <strong>Copy JSON</strong> - Copy vào clipboard</li>
+        </ul>
+
+        <div style="margin-top: 30px;">
+            <button class="btn" onclick="startQuiz()">🚀 Bắt đầu Quiz</button>
+            <button class="btn secondary" onclick="location.reload()">🔄 Reload</button>
+            <a href="https://github.com/hongninh/quiz" class="btn secondary" target="_blank">📦 GitHub Repo</a>
+        </div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container"></div>
+
+    <script>
+        // CDN links to files
+        const CDN_BASE = 'https://raw.githubusercontent.com/hongninh/quiz/cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436';
+        
+        const FILES = [
+            { url: `${CDN_BASE}/global-quiz.css`, type: 'css' },
+            { url: `${CDN_BASE}/global-quiz-with-ids.js`, type: 'js' },
+            { url: `${CDN_BASE}/local_datainput_with_ids.js`, type: 'js' },
+            { url: `${CDN_BASE}/local-quiz-complete.js`, type: 'js' }
+        ];
+
+        let filesLoaded = 0;
+        const statusEl = document.getElementById('status');
+
+        function updateStatus(msg, type = 'loading') {
+            statusEl.textContent = msg;
+            statusEl.className = `status ${type}`;
+        }
+
+        function loadFile(file) {
+            return new Promise((resolve, reject) => {
+                if (file.type === 'css') {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = file.url;
+                    link.onload = () => {
+                        filesLoaded++;
+                        updateStatus(`✅ Loaded ${filesLoaded}/${FILES.length} files...`, 'loading');
+                        resolve();
+                    };
+                    link.onerror = reject;
+                    document.head.appendChild(link);
+                } else {
+                    const script = document.createElement('script');
+                    script.src = file.url;
+                    script.onload = () => {
+                        filesLoaded++;
+                        updateStatus(`✅ Loaded ${filesLoaded}/${FILES.length} files...`, 'loading');
+                        resolve();
+                    };
+                    script.onerror = reject;
+                    document.body.appendChild(script);
+                }
+            });
+        }
+
+        async function loadAllFiles() {
+            try {
+                updateStatus('⏳ Loading CSS...', 'loading');
+                await loadFile(FILES[0]); // CSS first
+                
+                updateStatus('⏳ Loading JavaScript files...', 'loading');
+                for (let i = 1; i < FILES.length; i++) {
+                    await loadFile(FILES[i]);
+                }
+                
+                updateStatus('✅ All files loaded! Click "Bắt đầu Quiz" to start.', 'success');
+                console.log('✅ Quiz system loaded successfully!');
+                console.log('📊 After completing the quiz, check: window.detailedQuizOutput');
+            } catch (error) {
+                updateStatus(`❌ Error loading files: ${error.message}`, 'error');
+                console.error('Load error:', error);
+            }
+        }
+
+        function startQuiz() {
+            if (typeof QuizEngine === 'undefined') {
+                alert('❌ Quiz engine chưa load xong. Vui lòng đợi...');
+                return;
+            }
+            
+            // Hide info box
+            document.querySelector('.info-box').style.display = 'none';
+            
+            // Init quiz
+            if (typeof window.quizData !== 'undefined') {
+                const quiz = new QuizEngine(window.quizData);
+                quiz.init('quiz-container');
+                console.log('🚀 Quiz started!');
+            } else {
+                alert('❌ Quiz data not found!');
+            }
+        }
+
+        // Auto load files on page load
+        window.addEventListener('DOMContentLoaded', loadAllFiles);
+    </script>
+</body>
+</html>
