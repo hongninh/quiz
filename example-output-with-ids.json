@@ -1,0 +1,445 @@
+{
+  "main_game_id": "complete_quiz_2025",
+  "main_title": "Quiz Hoàn Chỉnh - 12 Câu Hỏi Đa Dạng",
+  "main_game_version": "1.0.0",
+  "main_author": "Quiz Team",
+  "main_language": "vi",
+  "main_total_questions": 12,
+  "main_total_max_points": 200,
+  "player_info": {
+    "uid": "user_abc123xyz",
+    "sid": "session_1760368702618",
+    "att": 1,
+    "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "ip": "hidden"
+  },
+  "quiz_results": [
+    {
+      "qn": 1,
+      "lq": false,
+      "qid": "traffic_001",
+      "qtype": "hotspot",
+      "ts_start": "2025-10-13T15:16:35.147Z",
+      "ts_end": "2025-10-13T15:16:38.455Z",
+      "pt": 3308,
+      "ps": 10,
+      "ans": "hotspot_001",
+      "ans_raw": {
+        "x": 405,
+        "y": 295,
+        "clicked_id": "hotspot_001"
+      },
+      "cor": true,
+      "skip": false,
+      "trem": 26692,
+      "hint": false,
+      "pen": 0,
+      "cum": 10,
+      "streak": 1,
+      "sol": "hotspot_001",
+      "sol_raw": {
+        "x_y_id": "hotspot_001",
+        "x": 400,
+        "y": 300,
+        "radius": 80
+      },
+      "show_sol": true
+    },
+    {
+      "qn": 2,
+      "lq": false,
+      "qid": "traffic_002",
+      "qtype": "multi",
+      "ts_start": "2025-10-13T15:16:40.139Z",
+      "ts_end": "2025-10-13T15:17:12.317Z",
+      "pt": 32178,
+      "ps": 15,
+      "ans": [
+        "opt_002_1",
+        "opt_002_3"
+      ],
+      "ans_raw": [
+        "opt_002_1",
+        "opt_002_3"
+      ],
+      "cor": false,
+      "skip": false,
+      "trem": 7822,
+      "hint": false,
+      "pen": 0,
+      "cum": 10,
+      "streak": 0,
+      "sol": [
+        "opt_002_1",
+        "opt_002_3",
+        "opt_002_4"
+      ],
+      "sol_raw": [
+        "opt_002_1",
+        "opt_002_3",
+        "opt_002_4"
+      ],
+      "show_sol": true
+    },
+    {
+      "qn": 3,
+      "lq": false,
+      "qid": "traffic_003",
+      "qtype": "mcq",
+      "ts_start": "2025-10-13T15:17:14.192Z",
+      "ts_end": "2025-10-13T15:17:26.921Z",
+      "pt": 12729,
+      "ps": 10,
+      "ans": "opt_003_1",
+      "ans_raw": "opt_003_1",
+      "cor": true,
+      "skip": false,
+      "trem": 7271,
+      "hint": false,
+      "pen": 0,
+      "cum": 20,
+      "streak": 1,
+      "sol": "opt_003_1",
+      "sol_raw": "opt_003_1",
+      "show_sol": true
+    },
+    {
+      "qn": 4,
+      "lq": false,
+      "qid": "traffic_004",
+      "qtype": "order",
+      "ts_start": "2025-10-13T15:17:28.296Z",
+      "ts_end": "2025-10-13T15:17:31.373Z",
+      "pt": 3077,
+      "ps": 20,
+      "ans": [
+        "opt_004_2",
+        "opt_004_1",
+        "opt_004_3",
+        "opt_004_4"
+      ],
+      "ans_raw": [
+        "opt_004_2",
+        "opt_004_1",
+        "opt_004_3",
+        "opt_004_4"
+      ],
+      "cor": true,
+      "skip": false,
+      "trem": 46923,
+      "hint": false,
+      "pen": 0,
+      "cum": 40,
+      "streak": 2,
+      "sol": [
+        "opt_004_2",
+        "opt_004_1",
+        "opt_004_3",
+        "opt_004_4"
+      ],
+      "sol_raw": [
+        "opt_004_2",
+        "opt_004_1",
+        "opt_004_3",
+        "opt_004_4"
+      ],
+      "show_sol": true
+    },
+    {
+      "qn": 5,
+      "lq": false,
+      "qid": "traffic_005",
+      "qtype": "image_pair",
+      "ts_start": "2025-10-13T15:17:32.866Z",
+      "ts_end": "2025-10-13T15:17:41.173Z",
+      "pt": 8307,
+      "ps": 25,
+      "ans": [
+        [
+          "img_005_1",
+          "img_005_4"
+        ],
+        [
+          "img_005_2",
+          "img_005_5"
+        ],
+        [
+          "img_005_3",
+          "img_005_6"
+        ]
+      ],
+      "ans_raw": [
+        [
+          "img_005_1",
+          "img_005_4"
+        ],
+        [
+          "img_005_2",
+          "img_005_5"
+        ],
+        [
+          "img_005_3",
+          "img_005_6"
+        ]
+      ],
+      "cor": true,
+      "skip": false,
+      "trem": 51693,
+      "hint": false,
+      "pen": 0,
+      "cum": 65,
+      "streak": 3,
+      "sol": [
+        [
+          "img_005_1",
+          "img_005_4"
+        ],
+        [
+          "img_005_2",
+          "img_005_5"
+        ],
+        [
+          "img_005_3",
+          "img_005_6"
+        ]
+      ],
+      "sol_raw": [
+        [
+          "img_005_1",
+          "img_005_4"
+        ],
+        [
+          "img_005_2",
+          "img_005_5"
+        ],
+        [
+          "img_005_3",
+          "img_005_6"
+        ]
+      ],
+      "show_sol": true
+    },
+    {
+      "qn": 6,
+      "lq": false,
+      "qid": "traffic_006",
+      "qtype": "image_mcq",
+      "ts_start": "2025-10-13T15:17:43.210Z",
+      "ts_end": "2025-10-13T15:17:44.492Z",
+      "pt": 1282,
+      "ps": 15,
+      "ans": "img_006_1",
+      "ans_raw": "img_006_1",
+      "cor": true,
+      "skip": false,
+      "trem": 28718,
+      "hint": false,
+      "pen": 0,
+      "cum": 80,
+      "streak": 4,
+      "sol": "img_006_1",
+      "sol_raw": "img_006_1",
+      "show_sol": true
+    },
+    {
+      "qn": 7,
+      "lq": false,
+      "qid": "traffic_007",
+      "qtype": "image_mcq",
+      "ts_start": "2025-10-13T15:17:45.666Z",
+      "ts_end": "2025-10-13T15:17:47.140Z",
+      "pt": 1474,
+      "ps": 10,
+      "ans": "img_007_2",
+      "ans_raw": "img_007_2",
+      "cor": false,
+      "skip": false,
+      "trem": 23526,
+      "hint": false,
+      "pen": 0,
+      "cum": 80,
+      "streak": 0,
+      "sol": "img_007_1",
+      "sol_raw": "img_007_1",
+      "show_sol": true
+    },
+    {
+      "qn": 8,
+      "lq": false,
+      "qid": "traffic_008",
+      "qtype": "image_multi",
+      "ts_start": "2025-10-13T15:17:48.112Z",
+      "ts_end": "2025-10-13T15:17:50.419Z",
+      "pt": 2307,
+      "ps": 15,
+      "ans": [
+        "img_008_1",
+        "img_008_2"
+      ],
+      "ans_raw": [
+        "img_008_1",
+        "img_008_2"
+      ],
+      "cor": false,
+      "skip": false,
+      "trem": 32693,
+      "hint": false,
+      "pen": 0,
+      "cum": 80,
+      "streak": 0,
+      "sol": [
+        "img_008_1",
+        "img_008_2",
+        "img_008_4"
+      ],
+      "sol_raw": [
+        "img_008_1",
+        "img_008_2",
+        "img_008_4"
+      ],
+      "show_sol": true
+    },
+    {
+      "qn": 9,
+      "lq": false,
+      "qid": "safety_009",
+      "qtype": "drag_drop",
+      "ts_start": "2025-10-13T15:17:51.992Z",
+      "ts_end": "2025-10-13T15:18:05.196Z",
+      "pt": 13204,
+      "ps": 20,
+      "ans": {
+        "img_009_1": "safe",
+        "img_009_2": "danger",
+        "img_009_3": "safe",
+        "img_009_4": "danger",
+        "img_009_5": "safe",
+        "img_009_6": "danger"
+      },
+      "ans_raw": {
+        "img_009_1": "safe",
+        "img_009_2": "danger",
+        "img_009_3": "safe",
+        "img_009_4": "danger",
+        "img_009_5": "safe",
+        "img_009_6": "danger"
+      },
+      "cor": true,
+      "skip": false,
+      "trem": 31796,
+      "hint": false,
+      "pen": 0,
+      "cum": 100,
+      "streak": 1,
+      "sol": null,
+      "sol_raw": null,
+      "show_sol": true
+    },
+    {
+      "qn": 10,
+      "lq": false,
+      "qid": "safety_010",
+      "qtype": "multi_hotspot",
+      "ts_start": "2025-10-13T15:18:07.184Z",
+      "ts_end": "2025-10-13T15:18:11.635Z",
+      "pt": 4451,
+      "ps": 20,
+      "ans": [
+        "spot_010_1",
+        "spot_010_3"
+      ],
+      "ans_raw": [
+        "spot_010_1",
+        "spot_010_3"
+      ],
+      "cor": false,
+      "skip": false,
+      "trem": 55549,
+      "hint": false,
+      "pen": 0,
+      "cum": 100,
+      "streak": 0,
+      "sol": [
+        "spot_010_1",
+        "spot_010_3",
+        "spot_010_5"
+      ],
+      "sol_raw": [
+        "spot_010_1",
+        "spot_010_3",
+        "spot_010_5"
+      ],
+      "show_sol": true
+    },
+    {
+      "qn": 11,
+      "lq": false,
+      "qid": "safety_011",
+      "qtype": "image_mcq",
+      "ts_start": "2025-10-13T15:18:14.836Z",
+      "ts_end": "2025-10-13T15:18:16.556Z",
+      "pt": 1720,
+      "ps": 10,
+      "ans": "img_011_2",
+      "ans_raw": "img_011_2",
+      "cor": false,
+      "skip": false,
+      "trem": 23280,
+      "hint": false,
+      "pen": 0,
+      "cum": 100,
+      "streak": 0,
+      "sol": "img_011_1",
+      "sol_raw": "img_011_1",
+      "show_sol": true
+    },
+    {
+      "qn": 12,
+      "lq": true,
+      "qid": "safety_012",
+      "qtype": "image_multi",
+      "ts_start": "2025-10-13T15:18:17.816Z",
+      "ts_end": "2025-10-13T15:18:20.551Z",
+      "pt": 2735,
+      "ps": 15,
+      "ans": [
+        "img_012_1",
+        "img_012_2"
+      ],
+      "ans_raw": [
+        "img_012_1",
+        "img_012_2"
+      ],
+      "cor": false,
+      "skip": false,
+      "trem": 37265,
+      "hint": false,
+      "pen": 0,
+      "cum": 100,
+      "streak": 0,
+      "sol": [
+        "img_012_1",
+        "img_012_2",
+        "img_012_4"
+      ],
+      "sol_raw": [
+        "img_012_1",
+        "img_012_2",
+        "img_012_4"
+      ],
+      "show_sol": true
+    }
+  ],
+  "summary": {
+    "total_score": 100,
+    "max_score": 200,
+    "correct_count": 6,
+    "wrong_count": 6,
+    "skipped_count": 0,
+    "avg_time_per_question_ms": 7380,
+    "total_time_ms": 88562,
+    "completion_rate_percent": 100,
+    "pass_status": "failed",
+    "percentage": 50
+  }
+}

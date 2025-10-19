@@ -702,21 +702,67 @@ class QuizEngine {
         };
     }
 
-    // ===== RECORD ANSWER =====
+    // ===== RECORD ANSWER WITH IDS =====
     recordAnswer(q, userAnswer, isCorrect) {
         this.answers.push({
             question_id: q.qid,
             question_number: q.qn,
             question_type: q.qtype,
             user_answer: userAnswer,
+            user_answer_ids: this.extractIds(userAnswer, q.qtype),
             correct_answer: q.sol_array || q.sol_json,
+            correct_answer_ids: this.extractCorrectIds(q),
             is_correct: isCorrect,
             points_earned: isCorrect ? q.pmax : 0,
             max_points: q.pmax
         });
     }
 
-    // ===== FEEDBACK =====
+    // ===== EXTRACT USER ANSWER IDS =====
+    extractIds(answer, qtype) {
+        if (!answer) return null;
+        
+        // Already IDs (string or array of strings)
+        if (typeof answer === 'string') return answer;
+        if (Array.isArray(answer) && answer.every(a => typeof a === 'string')) {
+            return answer;
+        }
+        
+        // Array of pairs (image_pair)
+        if (Array.isArray(answer) && answer.length > 0 && Array.isArray(answer[0])) {
+            return answer; // Already [[id1, id2], ...]
+        }
+        
+        // Object (hotspot, drag_drop)
+        if (typeof answer === 'object') {
+            if (answer.clicked_id) return answer.clicked_id;
+            if (answer.x_y_id) return answer.x_y_id;
+            // Drag drop placement: { img_009_1: "safe", img_009_2: "danger" }
+            return answer;
+        }
+        
+        return answer;
+    }
+
+    // ===== EXTRACT CORRECT ANSWER IDS =====
+    extractCorrectIds(q) {
+        const sol = q.sol_array || q.sol_json;
+        
+        if (!sol) return null;
+        
+        // String ID
+        if (typeof sol === 'string') return sol;
+        
+        // Array of IDs
+        if (Array.isArray(sol)) return sol;
+        
+        // Hotspot object
+        if (sol.x_y_id) return sol.x_y_id;
+        
+        return sol;
+    }
+
+    // ===== FEEDBACK WITH DETAILED TRACKING =====
     feedback(ok, pts, q, msg = '') {
         const endTime = new Date();
         const playTime = endTime - this.currentQuestionStartTime;
@@ -746,15 +792,30 @@ class QuizEngine {
         `;
         this.container.querySelector('.question-container').appendChild(fb);
 
+        // Get last answer for this question
+        const lastAnswer = this.answers[this.answers.length - 1];
+
         this.quizResults.push({
             qn: q.qn,
+            lq: q.lq || false,
             qid: q.qid,
             qtype: q.qtype,
-            correct: ok,
-            points: ok ? pts : 0,
-            max_points: pts,
-            time_spent: playTime,
-            time_remaining: Math.max(0, timeRemaining)
+            ts_start: this.currentQuestionStartTime.toISOString(),
+            ts_end: endTime.toISOString(),
+            pt: playTime,
+            ps: pts,
+            ans: lastAnswer ? lastAnswer.user_answer_ids : null,
+            ans_raw: lastAnswer ? lastAnswer.user_answer : null,
+            cor: ok,
+            skip: false,
+            trem: Math.max(0, timeRemaining),
+            hint: false,
+            pen: 0,
+            cum: this.cumulativeScore,
+            streak: this.streak,
+            sol: lastAnswer ? lastAnswer.correct_answer_ids : (q.sol_array || q.sol_json),
+            sol_raw: q.sol_array || q.sol_json,
+            show_sol: q.display_correct_answer === 'y'
         });
 
         setTimeout(() => {
@@ -769,6 +830,9 @@ class QuizEngine {
         const percent = Math.round((this.score / this.totalPoints) * 100);
         const passThreshold = this.gameData.main_pass_threshold_percent || 70;
         const passed = percent >= passThreshold;
+        
+        // Generate detailed output with IDs
+        this.generateDetailedOutput();
 
         const resultHtml = `
             <div class="quiz-container results-container">
@@ -833,7 +897,8 @@ class QuizEngine {
                 <div class="results-actions">
                     <button class="action-button primary" onclick="location.reload()">Chơi lại</button>
                     <button class="action-button secondary" onclick="QuizUtils.downloadResults()">Tải kết quả</button>
-                    <button class="action-button secondary" onclick="QuizUtils.copyResults()">Copy kết quả</button>
+                    <button class="action-button secondary" onclick="QuizUtils.downloadJSON()">Tải JSON</button>
+                    <button class="action-button secondary" onclick="QuizUtils.copyJSON()">Copy JSON</button>
                 </div>
             </div>
         `;
@@ -850,6 +915,53 @@ class QuizEngine {
             percent: percent,
             totalTime: totalTime
         };
+    }
+
+    // ===== GENERATE DETAILED OUTPUT WITH IDS =====
+    generateDetailedOutput() {
+        const totalTime = new Date() - this.quizStartTime;
+        const correctCount = this.quizResults.filter(r => r.cor).length;
+        const wrongCount = this.quizResults.filter(r => !r.cor && !r.skip).length;
+        const skippedCount = this.quizResults.filter(r => r.skip).length;
+        const percent = Math.round((this.score / this.totalPoints) * 100);
+        const passThreshold = this.gameData.main_pass_threshold_percent || 70;
+
+        const detailedOutput = {
+            main_game_id: this.gameData.main_game_id,
+            main_title: this.gameData.main_title,
+            main_game_version: this.gameData.main_game_version,
+            main_author: this.gameData.main_author,
+            main_language: this.gameData.main_language,
+            main_total_questions: this.gameData.main_total_questions,
+            main_total_max_points: this.gameData.main_total_max_points,
+            player_info: {
+                uid: `user_${Math.random().toString(36).substr(2, 9)}`,
+                sid: `session_${Date.now()}`,
+                att: 1,
+                ua: navigator.userAgent,
+                ip: 'hidden'
+            },
+            quiz_results: this.quizResults,
+            summary: {
+                total_score: this.score,
+                max_score: this.totalPoints,
+                correct_count: correctCount,
+                wrong_count: wrongCount,
+                skipped_count: skippedCount,
+                avg_time_per_question_ms: Math.round(totalTime / this.questions.length),
+                total_time_ms: totalTime,
+                completion_rate_percent: 100,
+                pass_status: percent >= passThreshold ? 'passed' : 'failed',
+                percentage: percent
+            }
+        };
+
+        // Store for download/export
+        window.detailedQuizOutput = detailedOutput;
+        
+        // Log to console
+        console.log('📊 Detailed Quiz Results with IDs:', detailedOutput);
+        console.log('📋 Copy this output:', JSON.stringify(detailedOutput, null, 2));
     }
 
     // ===== FORMAT ANSWER FOR DISPLAY =====
