@@ -136,42 +136,42 @@
             console.log('3. After finish, run: QuizUtils.copyJSON()');
             console.log('4. Or click "View Output" button');
             console.log('=====================================');
-        });
-
-        // Monitor quiz completion
-        const originalRenderResults = QuizEngine.prototype.renderResults;
-        if (typeof QuizEngine !== 'undefined') {
-            QuizEngine.prototype.renderResults = function() {
-                originalRenderResults.call(this);
-                
-                // Show completion message
-                setTimeout(() => {
-                    console.log('🎉 QUIZ COMPLETED!');
-                    console.log('📊 Output available at: window.detailedQuizOutput');
+            
+            // Monitor quiz completion (after DOM loaded)
+            if (typeof QuizEngine !== 'undefined') {
+                const originalRenderResults = QuizEngine.prototype.renderResults;
+                QuizEngine.prototype.renderResults = function() {
+                    originalRenderResults.call(this);
                     
-                    // Check output có IDs không
-                    if (window.detailedQuizOutput) {
-                        const firstResult = window.detailedQuizOutput.quiz_results[0];
+                    // Show completion message
+                    setTimeout(() => {
+                        console.log('🎉 QUIZ COMPLETED!');
+                        console.log('📊 Output available at: window.detailedQuizOutput');
                         
-                        console.log('\n🔍 CHECKING OUTPUT FORMAT:');
-                        console.log('ans field:', firstResult.ans);
-                        console.log('sol field:', firstResult.sol);
-                        
-                        if (firstResult.ans === null || (Array.isArray(firstResult.ans) && firstResult.ans.length === 0)) {
-                            console.warn('⚠️ WARNING: ans field is empty!');
-                            console.warn('This means data does NOT have IDs.');
-                            console.warn('Expected: ans: "opt_001_1" or ["opt_002_1", "opt_002_3"]');
-                            console.warn('Got:', firstResult.ans);
-                        } else {
-                            console.log('✅ Output looks good! IDs present.');
+                        // Check output có IDs không
+                        if (window.detailedQuizOutput) {
+                            const firstResult = window.detailedQuizOutput.quiz_results[0];
+                            
+                            console.log('\n🔍 CHECKING OUTPUT FORMAT:');
+                            console.log('ans field:', firstResult.ans);
+                            console.log('sol field:', firstResult.sol);
+                            
+                            if (firstResult.ans === null || (Array.isArray(firstResult.ans) && firstResult.ans.length === 0)) {
+                                console.warn('⚠️ WARNING: ans field is empty!');
+                                console.warn('This means data does NOT have IDs.');
+                                console.warn('Expected: ans: "opt_001_1" or ["opt_002_1", "opt_002_3"]');
+                                console.warn('Got:', firstResult.ans);
+                            } else {
+                                console.log('✅ Output looks good! IDs present.');
+                            }
+                            
+                            console.log('\n📋 To copy: QuizUtils.copyJSON()');
+                            console.log('📥 To download: QuizUtils.downloadJSON()');
                         }
-                        
-                        console.log('\n📋 To copy: QuizUtils.copyJSON()');
-                        console.log('📥 To download: QuizUtils.downloadJSON()');
-                    }
-                }, 500);
-            };
-        }
+                    }, 500);
+                };
+            }
+        });
     </script>
 </body>
 </html>
