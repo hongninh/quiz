@@ -1912,7 +1912,7 @@ Chi tiết:
 ${r.results.map((res, i) => {
     const ans = r.answers[i];
     return `
-Câu ${res.qn} (${res.qid}): ${res.correct ? '✓' Đúng' : '✗ Sai'} - ${res.points}/${res.max_points} điểm
+Câu ${res.qn} (${res.qid}): ${res.correct ? '✓ Đúng' : '✗ Sai'} - ${res.points}/${res.max_points} điểm
   Bạn chọn: ${this._formatAnswerText(ans.user_answer, res.qtype)}
   ${!res.correct ? `Đáp án đúng: ${this._formatAnswerText(ans.correct_answer, res.qtype)}` : ''}
 `;
