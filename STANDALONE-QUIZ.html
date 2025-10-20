@@ -1,0 +1,2624 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Standalone - Hoạt động 100%</title>
+    <style>
+/**
+ * GLOBAL QUIZ CSS
+ * Styles dùng chung cho tất cả các quiz trên procfu.com
+ * Nhúng file này vào <head> của trang global hoặc từng page
+ */
+
+/* ========== RESET & BASE ========== */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ========== QUIZ CONTAINER ========== */
+#quiz-container { 
+    width: 100%; 
+    max-width: 900px; 
+}
+
+.quiz-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== QUIZ HEADER ========== */
+.quiz-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.quiz-main-title { 
+    font-size: 28px; 
+    color: #333; 
+    margin-bottom: 10px; 
+}
+
+.quiz-description { 
+    font-size: 14px; 
+    color: #666; 
+    line-height: 1.6; 
+}
+
+/* ========== PROGRESS BAR ========== */
+.quiz-progress { 
+    margin-bottom: 30px; 
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text { 
+    text-align: center; 
+    color: #666; 
+    font-size: 14px; 
+    font-weight: 600; 
+}
+
+/* ========== QUESTION ELEMENTS ========== */
+.question-title { 
+    font-size: 22px; 
+    color: #333; 
+    margin-bottom: 20px; 
+    line-height: 1.5; 
+}
+
+.question-type-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    background: #667eea;
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.question-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ========== TEXT ANSWERS (MCQ/MULTI) ========== */
+.text-answers-container { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.text-answer-option {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.text-answer-option:hover:not(.disabled) {
+    background: #f0f0f0;
+    border-color: #667eea;
+    transform: translateX(5px);
+}
+
+.text-answer-option.selected { 
+    background: #f0f4ff; 
+    border-color: #667eea; 
+}
+
+.text-answer-option.correct { 
+    background: #d4edda; 
+    border-color: #28a745; 
+}
+
+.text-answer-option.incorrect { 
+    background: #f8d7da; 
+    border-color: #dc3545; 
+}
+
+.text-answer-option.disabled { 
+    cursor: not-allowed; 
+}
+
+.answer-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.text-answer-option.correct .answer-letter { 
+    background: #28a745; 
+}
+
+.text-answer-option.incorrect .answer-letter { 
+    background: #dc3545; 
+}
+
+.answer-text { 
+    flex: 1; 
+    color: #333; 
+}
+
+.answer-checkbox { 
+    margin-left: 10px; 
+    font-size: 20px; 
+    color: #667eea; 
+}
+
+/* ========== IMAGE ANSWERS ========== */
+.image-answers-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.image-answer-option {
+    position: relative;
+    cursor: pointer;
+    border: 3px solid #e0e0e0;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.image-answer-option:hover:not(.disabled) {
+    border-color: #667eea;
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.image-answer-option.selected { 
+    border-color: #667eea; 
+    background: #f0f4ff; 
+}
+
+.image-answer-option.correct { 
+    border-color: #28a745; 
+    background: #d4edda; 
+}
+
+.image-answer-option.incorrect { 
+    border-color: #dc3545; 
+    background: #f8d7da; 
+}
+
+.image-answer-option.disabled { 
+    cursor: not-allowed; 
+    opacity: 0.7; 
+}
+
+.image-answer-img { 
+    width: 100%; 
+    height: 150px; 
+    object-fit: cover; 
+    display: block; 
+}
+
+.image-answer-text { 
+    padding: 15px; 
+    text-align: center; 
+    font-weight: 500; 
+    color: #333; 
+    font-size: 15px; 
+}
+
+.image-answer-checkbox {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #667eea;
+    transition: all 0.3s ease;
+}
+
+.image-answer-option.selected .image-answer-checkbox { 
+    background: #667eea; 
+    color: white; 
+}
+
+.image-answer-option.correct .image-answer-checkbox { 
+    background: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+}
+
+.image-answer-option.incorrect .image-answer-checkbox { 
+    background: #dc3545; 
+    border-color: #dc3545; 
+    color: white; 
+}
+
+/* ========== HOTSPOT ========== */
+.hotspot-container { 
+    margin-top: 20px; 
+    position: relative; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+}
+
+.hotspot-image-wrapper { 
+    position: relative; 
+    display: inline-block; 
+    max-width: 100%; 
+}
+
+.hotspot-image { 
+    width: 100%; 
+    max-width: 800px; 
+    height: auto; 
+    display: block; 
+    border-radius: 15px; 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+}
+
+.hotspot-overlay { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    cursor: crosshair; 
+}
+
+.hotspot-click-point {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #667eea;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #667eea;
+    font-size: 20px;
+}
+
+.hotspot-click-point.correct { 
+    background: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+}
+
+.hotspot-click-point.incorrect { 
+    background: #dc3545; 
+    border-color: #dc3545; 
+    color: white; 
+}
+
+.hotspot-instructions {
+    background: #fff3cd;
+    color: #856404;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.hotspot-point {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #667eea;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #667eea;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+    50% { box-shadow: 0 0 0 15px rgba(102, 126, 234, 0); }
+}
+
+.hotspot-point:hover { 
+    transform: translate(-50%, -50%) scale(1.2); 
+}
+
+.hotspot-point.selected { 
+    background: #667eea; 
+    color: white; 
+    animation: none; 
+}
+
+.hotspot-point.correct { 
+    background: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+    animation: none; 
+}
+
+.hotspot-point.incorrect { 
+    background: #dc3545; 
+    border-color: #dc3545; 
+    color: white; 
+    animation: none; 
+}
+
+.hotspot-point.disabled { 
+    cursor: not-allowed; 
+}
+
+/* ========== ORDER (DRAG & DROP SEQUENCE) ========== */
+.order-container { 
+    margin-top: 20px; 
+}
+
+.order-items { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f8f9fa;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: move;
+    transition: all 0.3s ease;
+}
+
+.order-item:hover:not(.disabled) {
+    background: #f0f0f0;
+    border-color: #667eea;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.order-item.dragging { 
+    opacity: 0.5; 
+}
+
+.order-item.disabled { 
+    cursor: not-allowed; 
+}
+
+.order-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.order-text { 
+    flex: 1; 
+    color: #333; 
+}
+
+.drag-handle { 
+    font-size: 20px; 
+    color: #999; 
+    cursor: move; 
+}
+
+/* ========== IMAGE PAIR ========== */
+.image-pair-container { 
+    margin-top: 20px; 
+}
+
+.pair-instructions {
+    background: #d1ecf1;
+    color: #0c5460;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.pair-columns { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 30px; 
+}
+
+.pair-column { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+}
+
+.pair-column-header {
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.pair-column.safe .pair-column-header { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.pair-column.danger .pair-column-header { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+.pair-item {
+    position: relative;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.pair-item:hover:not(.disabled) {
+    border-color: #667eea;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pair-item.selected { 
+    border-color: #667eea; 
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3); 
+}
+
+.pair-item.matched { 
+    border-color: #28a745; 
+    opacity: 0.6; 
+}
+
+.pair-item.disabled { 
+    cursor: not-allowed; 
+}
+
+.pair-item-img { 
+    width: 100%; 
+    height: 150px; 
+    object-fit: cover; 
+}
+
+.pair-item-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #667eea;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.pair-item.selected .pair-item-label { 
+    background: #667eea; 
+    color: white; 
+}
+
+.pair-item.matched .pair-item-label { 
+    background: #28a745; 
+    border-color: #28a745; 
+    color: white; 
+}
+
+/* ========== DRAG & DROP ========== */
+.drag-drop-container { 
+    margin-top: 20px; 
+}
+
+.drag-source {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.drag-source-title { 
+    font-size: 16px; 
+    font-weight: 600; 
+    color: #333; 
+    margin-bottom: 15px; 
+}
+
+.draggable-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.draggable-item {
+    cursor: move;
+    border: 2px solid #667eea;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.draggable-item:hover { 
+    transform: scale(1.05); 
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); 
+}
+
+.draggable-item.dragging { 
+    opacity: 0.5; 
+}
+
+.draggable-item.placed { 
+    opacity: 0.3; 
+    cursor: not-allowed; 
+}
+
+.draggable-item-img { 
+    width: 100%; 
+    height: 80px; 
+    object-fit: cover; 
+}
+
+.draggable-item-label {
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    background: #667eea;
+    color: white;
+}
+
+.drop-zones { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 20px; 
+    margin-top: 20px; 
+}
+
+.drop-zone {
+    min-height: 300px;
+    padding: 20px;
+    border: 3px dashed #ccc;
+    border-radius: 15px;
+    background: #fafafa;
+    transition: all 0.3s ease;
+}
+
+.drop-zone.drag-over { 
+    border-color: #667eea; 
+    background: #f0f4ff; 
+}
+
+.drop-zone-header {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.drop-zone.safe .drop-zone-header { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.drop-zone.danger .drop-zone-header { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+.drop-zone-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.dropped-item { 
+    position: relative; 
+}
+
+.remove-item {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* ========== BUTTONS ========== */
+.submit-button, .next-button, .retry-button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button:hover:not(:disabled), 
+.next-button:hover, 
+.retry-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.submit-button:disabled { 
+    opacity: 0.5; 
+    cursor: not-allowed; 
+    transform: none; 
+}
+
+/* ========== FEEDBACK ========== */
+.feedback-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-weight: 600;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; } 
+    to { opacity: 1; } 
+}
+
+.feedback-correct { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.feedback-incorrect { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+.feedback-icon { 
+    font-size: 24px; 
+}
+
+.explanation {
+    background: #e7f3ff;
+    border-left: 4px solid #2196F3;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 8px;
+    color: #0c5460;
+    line-height: 1.6;
+}
+
+/* ========== RESULTS ========== */
+.results-container { 
+    text-align: center; 
+}
+
+.results-header h2 { 
+    font-size: 32px; 
+    color: #333; 
+    margin-bottom: 30px; 
+}
+
+.results-score { 
+    display: flex; 
+    justify-content: center; 
+    margin-bottom: 30px; 
+}
+
+.score-circle { 
+    position: relative; 
+    width: 200px; 
+    height: 200px; 
+}
+
+.score-circle svg { 
+    transform: rotate(-90deg); 
+}
+
+.score-circle-bg { 
+    fill: none; 
+    stroke: #e0e0e0; 
+    stroke-width: 8; 
+}
+
+.score-circle-fill { 
+    fill: none; 
+    stroke-width: 8; 
+    transition: stroke-dasharray 1s ease; 
+}
+
+.score-circle.passed .score-circle-fill { 
+    stroke: #28a745; 
+}
+
+.score-circle.failed .score-circle-fill { 
+    stroke: #dc3545; 
+}
+
+.score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.score-percentage { 
+    font-size: 48px; 
+    font-weight: bold; 
+    color: #333; 
+}
+
+.score-fraction { 
+    font-size: 18px; 
+    color: #666; 
+    margin-top: 5px; 
+}
+
+.results-message { 
+    font-size: 20px; 
+    font-weight: 600; 
+    padding: 20px; 
+    border-radius: 10px; 
+    margin-bottom: 30px; 
+}
+
+.message-passed { 
+    background: #d4edda; 
+    color: #155724; 
+}
+
+.message-failed { 
+    background: #f8d7da; 
+    color: #721c24; 
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .quiz-container { 
+        padding: 20px; 
+    }
+    
+    .question-title { 
+        font-size: 18px; 
+    }
+    
+    .image-answers-container { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .drop-zones, .pair-columns { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .draggable-items { 
+        grid-template-columns: repeat(3, 1fr); 
+    }
+    
+    .score-circle { 
+        width: 150px; 
+        height: 150px; 
+    }
+    
+    .score-percentage { 
+        font-size: 36px; 
+    }
+}
+    </style>
+</head>
+<body>
+    <div id="quiz-container"></div>
+
+    <script>
+/**
+ * GLOBAL QUIZ ENGINE WITH ID SYSTEM
+ * Core JavaScript engine cho tất cả các quiz trên procfu.com
+ * Phiên bản này sử dụng ID thay vì index
+ * Nhúng file này trước local-quiz-*.js
+ */
+
+class QuizEngine {
+    constructor(gameData) {
+        this.gameData = gameData;
+        this.questions = gameData.EachQuiz || [];
+        this.currentQuestionIndex = 0;
+        this.score = 0;
+        this.totalPoints = 0;
+        this.maxPoints = gameData.main_total_max_points || 0;
+        this.answers = [];
+        this.quizResults = [];
+        this.container = null;
+        this.currentAnswer = null;
+        this.currentQuestionStartTime = null;
+        this.quizStartTime = null;
+        this.streak = 0;
+        this.cumulativeScore = 0;
+    }
+
+    init(containerId) {
+        this.container = document.getElementById(containerId);
+        if (!this.container) {
+            console.error('Container not found:', containerId);
+            return;
+        }
+        this.quizStartTime = new Date();
+        this.render();
+    }
+
+    render() {
+        if (this.currentQuestionIndex < this.questions.length) {
+            this.renderQuestion();
+        } else {
+            this.renderResults();
+        }
+    }
+
+    renderQuestion() {
+        const q = this.questions[this.currentQuestionIndex];
+        const total = this.questions.length;
+        const num = this.currentQuestionIndex + 1;
+        this.currentQuestionStartTime = new Date();
+
+        let qHtml = '';
+        switch (q.qtype) {
+            case 'mcq': qHtml = this.renderMCQ(q); break;
+            case 'multi': qHtml = this.renderMulti(q); break;
+            case 'image_mcq': qHtml = this.renderImageMCQ(q); break;
+            case 'image_multi': qHtml = this.renderImageMulti(q); break;
+            case 'hotspot': qHtml = this.renderHotspot(q); break;
+            case 'multi_hotspot': qHtml = this.renderMultiHotspot(q); break;
+            case 'order': qHtml = this.renderOrder(q); break;
+            case 'image_pair': qHtml = this.renderImagePair(q); break;
+            case 'drag_drop': qHtml = this.renderDragDrop(q); break;
+        }
+
+        this.container.innerHTML = `
+            <div class="quiz-container">
+                ${num === 1 ? `<div class="quiz-header">
+                    <h1 class="quiz-main-title">${this.gameData.main_title}</h1>
+                    <p class="quiz-description">${this.gameData.main_description}</p>
+                </div>` : ''}
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(num / total) * 100}%"></div>
+                    </div>
+                    <div class="progress-text">Câu ${num} / ${total} • ${q.pmax} điểm</div>
+                </div>
+                <div class="question-container">
+                    <span class="question-type-badge">${this.getTypeLabel(q.qtype)}</span>
+                    <h2 class="question-title">${q.qtxt}</h2>
+                    ${qHtml}
+                </div>
+            </div>
+        `;
+        this.attachEventListeners(q);
+    }
+
+    getTypeLabel(t) {
+        const l = {
+            'mcq': 'Chọn 1 đáp án',
+            'multi': 'Chọn nhiều đáp án',
+            'image_mcq': 'Chọn 1 hình',
+            'image_multi': 'Chọn nhiều hình',
+            'hotspot': 'Click điểm',
+            'multi_hotspot': 'Click nhiều điểm',
+            'order': 'Sắp xếp',
+            'image_pair': 'Ghép cặp',
+            'drag_drop': 'Kéo thả'
+        };
+        return l[t] || t;
+    }
+
+    // ===== TEXT MCQ (với text_id) =====
+    renderMCQ(q) {
+        return `
+            ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+            <div class="text-answers-container">
+                ${q.opt_array.map((opt, i) => `
+                    <div class="text-answer-option" data-id="${opt.text_id}">
+                        <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
+                        <span class="answer-text">${opt.text}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // ===== TEXT MULTI (với text_id) =====
+    renderMulti(q) {
+        return `
+            ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+            <div class="text-answers-container">
+                ${q.opt_array.map((opt, i) => `
+                    <div class="text-answer-option" data-id="${opt.text_id}">
+                        <span class="answer-letter">${String.fromCharCode(65 + i)}</span>
+                        <span class="answer-text">${opt.text}</span>
+                        <span class="answer-checkbox">☐</span>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="submit-button" id="submit-multi">Xác nhận</button>
+        `;
+    }
+
+    // ===== IMAGE MCQ (với image_id) =====
+    renderImageMCQ(q) {
+        return `
+            <div class="image-answers-container">
+                ${q.opt_array.map((opt, i) => `
+                    <div class="image-answer-option" data-id="${opt.image_id}">
+                        <img src="${opt.image}" alt="${opt.text}" class="image-answer-img">
+                        <div class="image-answer-text">${opt.text}</div>
+                        <div class="image-answer-checkbox">○</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    // ===== IMAGE MULTI (với image_id) =====
+    renderImageMulti(q) {
+        return `
+            <div class="image-answers-container">
+                ${q.opt_array.map((opt, i) => `
+                    <div class="image-answer-option" data-id="${opt.image_id}">
+                        <img src="${opt.image}" alt="${opt.text}" class="image-answer-img">
+                        <div class="image-answer-text">${opt.text}</div>
+                        <div class="image-answer-checkbox">☐</div>
+                    </div>
+                `).join('')}
+            </div>
+            <button class="submit-button" id="submit-image-multi">Xác nhận</button>
+        `;
+    }
+
+    // ===== HOTSPOT (với x_y_id) =====
+    renderHotspot(q) {
+        return `
+            <div class="hotspot-container">
+                <div class="hotspot-instructions">📍 ${q.qtxt}</div>
+                <div class="hotspot-image-wrapper">
+                    <img src="${q.image_json[0]}" class="hotspot-image" id="hotspot-img">
+                    <div class="hotspot-overlay" id="hotspot-overlay"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ===== MULTI HOTSPOT (với x_y_id) =====
+    renderMultiHotspot(q) {
+        const count = q.sol_array ? q.sol_array.length : 0;
+        return `
+            <div class="hotspot-container">
+                <div class="hotspot-instructions">
+                    📍 Click vào tất cả các điểm nguy hiểm (${count} điểm)
+                </div>
+                <div class="hotspot-image-wrapper">
+                    <img src="${q.image_json[0]}" class="hotspot-image">
+                    <div class="hotspot-overlay">
+                        ${q.hotspot_array.map((h, i) => `
+                            <div class="hotspot-point" data-id="${h.x_y_id}" style="left: ${h.x}%; top: ${h.y}%;">${i + 1}</div>
+                        `).join('')}
+                    </div>
+                </div>
+                <button class="submit-button" id="submit-multi-hotspot">Xác nhận</button>
+            </div>
+        `;
+    }
+
+    // ===== ORDER (với text_id) =====
+    renderOrder(q) {
+        return `
+            ${q.image_json?.[0] ? `<img src="${q.image_json[0]}" class="question-image">` : ''}
+            <div class="order-container">
+                <div class="order-items" id="order-items">
+                    ${q.opt_array.map((opt, i) => `
+                        <div class="order-item" draggable="true" data-id="${opt.text_id}">
+                            <span class="order-number">${i + 1}</span>
+                            <span class="order-text">${opt.text}</span>
+                            <span class="drag-handle">☰</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="submit-button" id="submit-order">Xác nhận</button>
+            </div>
+        `;
+    }
+
+    // ===== IMAGE PAIR (với image_id) =====
+    renderImagePair(q) {
+        const halfLen = Math.floor(q.image_json.length / 2);
+        const col1 = q.image_json.slice(0, halfLen);
+        const col2 = q.image_json.slice(halfLen);
+        
+        return `
+            <div class="image-pair-container">
+                <div class="pair-instructions">🔄 ${q.qtxt}</div>
+                <div class="pair-columns">
+                    <div class="pair-column safe">
+                        <div class="pair-column-header">✓ Cột 1</div>
+                        ${col1.map((img, i) => `
+                            <div class="pair-item" data-group="col1" data-id="${img.image_id}">
+                                <img src="${img.image}" class="pair-item-img">
+                                <div class="pair-item-label">${i + 1}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="pair-column danger">
+                        <div class="pair-column-header">⚠️ Cột 2</div>
+                        ${col2.map((img, i) => `
+                            <div class="pair-item" data-group="col2" data-id="${img.image_id}">
+                                <img src="${img.image}" class="pair-item-img">
+                                <div class="pair-item-label">${i + halfLen + 1}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <button class="submit-button" id="submit-pair" disabled>Xác nhận</button>
+            </div>
+        `;
+    }
+
+    // ===== DRAG & DROP (với image_id) =====
+    renderDragDrop(q) {
+        return `
+            <div class="drag-drop-container">
+                <div class="drag-source">
+                    <div class="drag-source-title">Kéo các hình vào cột phù hợp:</div>
+                    <div class="draggable-items">
+                        ${q.drag_items.map((item, i) => `
+                            <div class="draggable-item" draggable="true" data-id="${item.image_id}">
+                                <img src="${item.image}" class="draggable-item-img">
+                                <div class="draggable-item-label">${item.label}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="drop-zones">
+                    <div class="drop-zone safe" data-zone="safe">
+                        <div class="drop-zone-header">✓ An Toàn</div>
+                        <div class="drop-zone-items"></div>
+                    </div>
+                    <div class="drop-zone danger" data-zone="danger">
+                        <div class="drop-zone-header">⚠️ Nguy Cơ</div>
+                        <div class="drop-zone-items"></div>
+                    </div>
+                </div>
+                <button class="submit-button" id="submit-drag-drop">Xác nhận</button>
+            </div>
+        `;
+    }
+
+    attachEventListeners(q) {
+        switch (q.qtype) {
+            case 'mcq': this.onMCQ(q); break;
+            case 'multi': this.onMulti(q); break;
+            case 'image_mcq': this.onImageMCQ(q); break;
+            case 'image_multi': this.onImageMulti(q); break;
+            case 'hotspot': this.onHotspot(q); break;
+            case 'multi_hotspot': this.onMultiHotspot(q); break;
+            case 'order': this.onOrder(q); break;
+            case 'image_pair': this.onImagePair(q); break;
+            case 'drag_drop': this.onDragDrop(q); break;
+        }
+    }
+
+    // ===== EVENT: MCQ (so sánh text_id) =====
+    onMCQ(q) {
+        const opts = this.container.querySelectorAll('.text-answer-option');
+        opts.forEach(opt => {
+            opt.onclick = () => {
+                if (opt.classList.contains('disabled')) return;
+                const selectedId = opt.dataset.id;
+                const ok = selectedId === q.sol_array;
+                
+                opts.forEach(o => o.classList.add('disabled'));
+                opt.classList.add(ok ? 'correct' : 'incorrect');
+                
+                if (!ok) {
+                    const correctOpt = this.container.querySelector(`.text-answer-option[data-id="${q.sol_array}"]`);
+                    if (correctOpt) correctOpt.classList.add('correct');
+                }
+                
+                this.recordAnswer(q, selectedId, ok);
+                this.feedback(ok, q.pmax, q);
+            };
+        });
+    }
+
+    // ===== EVENT: MULTI (so sánh text_id) =====
+    onMulti(q) {
+        const opts = this.container.querySelectorAll('.text-answer-option');
+        const btn = this.container.querySelector('#submit-multi');
+        const sel = new Set();
+        
+        opts.forEach(opt => {
+            opt.onclick = () => {
+                if (opt.classList.contains('disabled')) return;
+                const id = opt.dataset.id;
+                
+                if (sel.has(id)) {
+                    sel.delete(id);
+                    opt.classList.remove('selected');
+                    opt.querySelector('.answer-checkbox').textContent = '☐';
+                } else {
+                    sel.add(id);
+                    opt.classList.add('selected');
+                    opt.querySelector('.answer-checkbox').textContent = '☑️';
+                }
+                btn.disabled = sel.size === 0;
+            };
+        });
+        
+        btn.onclick = () => {
+            const correctIds = new Set(q.sol_array);
+            const ok = sel.size === correctIds.size && [...sel].every(id => correctIds.has(id));
+            
+            opts.forEach(opt => {
+                opt.classList.add('disabled');
+                const id = opt.dataset.id;
+                if (correctIds.has(id)) {
+                    opt.classList.add('correct');
+                } else if (sel.has(id)) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            btn.disabled = true;
+            this.recordAnswer(q, [...sel], ok);
+            this.feedback(ok, q.pmax, q);
+        };
+    }
+
+    // ===== EVENT: IMAGE MCQ (so sánh image_id) =====
+    onImageMCQ(q) {
+        const opts = this.container.querySelectorAll('.image-answer-option');
+        opts.forEach(opt => {
+            opt.onclick = () => {
+                if (opt.classList.contains('disabled')) return;
+                const selectedId = opt.dataset.id;
+                const ok = selectedId === q.sol_array;
+                
+                opts.forEach(o => o.classList.add('disabled'));
+                opt.classList.add(ok ? 'correct' : 'incorrect');
+                opt.querySelector('.image-answer-checkbox').textContent = ok ? '✓' : '✗';
+                
+                if (!ok) {
+                    const correctOpt = this.container.querySelector(`.image-answer-option[data-id="${q.sol_array}"]`);
+                    if (correctOpt) {
+                        correctOpt.classList.add('correct');
+                        correctOpt.querySelector('.image-answer-checkbox').textContent = '✓';
+                    }
+                }
+                
+                this.recordAnswer(q, selectedId, ok);
+                this.feedback(ok, q.pmax, q);
+            };
+        });
+    }
+
+    // ===== EVENT: IMAGE MULTI (so sánh image_id) =====
+    onImageMulti(q) {
+        const opts = this.container.querySelectorAll('.image-answer-option');
+        const btn = this.container.querySelector('#submit-image-multi');
+        const sel = new Set();
+        
+        opts.forEach(opt => {
+            opt.onclick = () => {
+                if (opt.classList.contains('disabled')) return;
+                const id = opt.dataset.id;
+                
+                if (sel.has(id)) {
+                    sel.delete(id);
+                    opt.classList.remove('selected');
+                    opt.querySelector('.image-answer-checkbox').textContent = '☐';
+                } else {
+                    sel.add(id);
+                    opt.classList.add('selected');
+                    opt.querySelector('.image-answer-checkbox').textContent = '☑️';
+                }
+                btn.disabled = sel.size === 0;
+            };
+        });
+        
+        btn.onclick = () => {
+            const correctIds = new Set(q.sol_array);
+            const ok = sel.size === correctIds.size && [...sel].every(id => correctIds.has(id));
+            
+            opts.forEach(opt => {
+                opt.classList.add('disabled');
+                const id = opt.dataset.id;
+                const ck = opt.querySelector('.image-answer-checkbox');
+                
+                if (correctIds.has(id)) {
+                    opt.classList.add('correct');
+                    ck.textContent = '✓';
+                } else if (sel.has(id)) {
+                    opt.classList.add('incorrect');
+                    ck.textContent = '✗';
+                }
+            });
+            
+            btn.disabled = true;
+            this.recordAnswer(q, [...sel], ok);
+            this.feedback(ok, q.pmax, q);
+        };
+    }
+
+    // ===== EVENT: HOTSPOT (so sánh x_y_id) =====
+    onHotspot(q) {
+        const overlay = this.container.querySelector('#hotspot-overlay');
+        const img = this.container.querySelector('#hotspot-img');
+        let clicked = false;
+        
+        overlay.onclick = (e) => {
+            if (clicked) return;
+            
+            const rect = img.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (img.naturalWidth / rect.width);
+            const y = (e.clientY - rect.top) * (img.naturalHeight / rect.height);
+            const dist = Math.hypot(x - q.sol_json.x, y - q.sol_json.y);
+            const ok = dist <= q.sol_json.radius;
+
+            const pt = document.createElement('div');
+            pt.className = `hotspot-click-point ${ok ? 'correct' : 'incorrect'}`;
+            pt.style.left = `${((e.clientX - rect.left) / rect.width) * 100}%`;
+            pt.style.top = `${((e.clientY - rect.top) / rect.height) * 100}%`;
+            pt.textContent = ok ? '✓' : '✗';
+            overlay.appendChild(pt);
+
+            if (!ok) {
+                const cor = document.createElement('div');
+                cor.className = 'hotspot-click-point correct';
+                cor.style.left = `${(q.sol_json.x / img.naturalWidth) * 100}%`;
+                cor.style.top = `${(q.sol_json.y / img.naturalHeight) * 100}%`;
+                cor.textContent = '✓';
+                overlay.appendChild(cor);
+            }
+            
+            clicked = true;
+            this.recordAnswer(q, { x: Math.round(x), y: Math.round(y), clicked_id: q.sol_json.x_y_id }, ok);
+            this.feedback(ok, q.pmax, q);
+        };
+    }
+
+    // ===== EVENT: MULTI HOTSPOT (so sánh x_y_id) =====
+    onMultiHotspot(q) {
+        const pts = this.container.querySelectorAll('.hotspot-point');
+        const btn = this.container.querySelector('#submit-multi-hotspot');
+        const sel = new Set();
+        
+        pts.forEach(pt => {
+            pt.onclick = () => {
+                if (pt.classList.contains('disabled')) return;
+                const id = pt.dataset.id;
+                
+                if (sel.has(id)) {
+                    sel.delete(id);
+                    pt.classList.remove('selected');
+                } else {
+                    sel.add(id);
+                    pt.classList.add('selected');
+                }
+                btn.disabled = sel.size === 0;
+            };
+        });
+        
+        btn.onclick = () => {
+            const correctIds = new Set(q.sol_array);
+            let correctCount = 0;
+            
+            pts.forEach(pt => {
+                pt.classList.add('disabled');
+                const id = pt.dataset.id;
+                
+                if (correctIds.has(id)) {
+                    pt.classList.add('correct');
+                    if (sel.has(id)) correctCount++;
+                } else if (sel.has(id)) {
+                    pt.classList.add('incorrect');
+                }
+            });
+            
+            const ok = correctCount === correctIds.size && sel.size === correctIds.size;
+            btn.disabled = true;
+            
+            this.recordAnswer(q, [...sel], ok);
+            this.feedback(ok, q.pmax, q, `Đúng ${correctCount}/${correctIds.size} điểm`);
+        };
+    }
+
+    // ===== EVENT: ORDER (so sánh text_id) =====
+    onOrder(q) {
+        const items = this.container.querySelectorAll('.order-item');
+        const btn = this.container.querySelector('#submit-order');
+        let drag = null;
+        
+        items.forEach(item => {
+            item.ondragstart = () => { 
+                drag = item;
+                item.classList.add('dragging');
+            };
+            item.ondragend = () => item.classList.remove('dragging');
+            item.ondragover = (e) => {
+                e.preventDefault();
+                const cont = this.container.querySelector('#order-items');
+                const after = this.getDragAfter(cont, e.clientY);
+                if (!after) cont.appendChild(drag);
+                else cont.insertBefore(drag, after);
+                this.updateOrderNums();
+            };
+        });
+        
+        btn.onclick = () => {
+            const currentOrder = Array.from(this.container.querySelectorAll('.order-item'))
+                .map(i => i.dataset.id);
+            const ok = JSON.stringify(currentOrder) === JSON.stringify(q.sol_array);
+            
+            this.container.querySelectorAll('.order-item').forEach(i => {
+                i.classList.add('disabled');
+                i.draggable = false;
+            });
+            
+            btn.disabled = true;
+            this.recordAnswer(q, currentOrder, ok);
+            this.feedback(ok, q.pmax, q);
+        };
+    }
+
+    updateOrderNums() {
+        this.container.querySelectorAll('.order-item').forEach((i, idx) => {
+            i.querySelector('.order-number').textContent = idx + 1;
+        });
+    }
+
+    getDragAfter(cont, y) {
+        const els = [...cont.querySelectorAll('.order-item:not(.dragging)')];
+        return els.reduce((close, child) => {
+            const box = child.getBoundingClientRect();
+            const off = y - box.top - box.height / 2;
+            if (off < 0 && off > close.offset) return { offset: off, element: child };
+            return close;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // ===== EVENT: IMAGE PAIR (so sánh image_id) =====
+    onImagePair(q) {
+        const items = this.container.querySelectorAll('.pair-item');
+        const btn = this.container.querySelector('#submit-pair');
+        let first = null;
+        const pairs = [];
+        
+        items.forEach(item => {
+            item.onclick = () => {
+                if (item.classList.contains('matched') || item.classList.contains('disabled')) return;
+                
+                if (!first) {
+                    first = item;
+                    item.classList.add('selected');
+                } else {
+                    if (first === item) {
+                        first.classList.remove('selected');
+                        first = null;
+                        return;
+                    }
+                    
+                    if (first.dataset.group !== item.dataset.group) {
+                        const id1 = first.dataset.group === 'col1' ? first.dataset.id : item.dataset.id;
+                        const id2 = first.dataset.group === 'col2' ? first.dataset.id : item.dataset.id;
+                        pairs.push([id1, id2]);
+                        
+                        first.classList.add('matched');
+                        first.classList.remove('selected');
+                        item.classList.add('matched');
+                        first = null;
+                        
+                        const expectedPairs = q.sol_array.length;
+                        btn.disabled = pairs.length !== expectedPairs;
+                    } else {
+                        first.classList.remove('selected');
+                        first = item;
+                        item.classList.add('selected');
+                    }
+                }
+            };
+        });
+        
+        btn.onclick = () => {
+            let correctCount = 0;
+            const solutionMap = new Map(q.sol_array.map(p => [JSON.stringify(p.sort()), true]));
+            
+            pairs.forEach(p => {
+                if (solutionMap.has(JSON.stringify([...p].sort()))) {
+                    correctCount++;
+                }
+            });
+            
+            const ok = correctCount === q.sol_array.length;
+            items.forEach(i => i.classList.add('disabled'));
+            btn.disabled = true;
+            
+            this.recordAnswer(q, pairs, ok);
+            this.feedback(ok, q.pmax, q, `Ghép đúng ${correctCount}/${q.sol_array.length}`);
+        };
+    }
+
+    // ===== EVENT: DRAG DROP (so sánh image_id) =====
+    onDragDrop(q) {
+        const drags = this.container.querySelectorAll('.draggable-item');
+        const zones = this.container.querySelectorAll('.drop-zone');
+        const btn = this.container.querySelector('#submit-drag-drop');
+        const placement = {};
+
+        drags.forEach(d => {
+            d.ondragstart = (e) => {
+                if (d.classList.contains('placed')) return;
+                d.classList.add('dragging');
+                e.dataTransfer.setData('id', d.dataset.id);
+            };
+            d.ondragend = () => d.classList.remove('dragging');
+        });
+
+        zones.forEach(z => {
+            z.ondragover = (e) => { 
+                e.preventDefault();
+                z.classList.add('drag-over');
+            };
+            z.ondragleave = () => z.classList.remove('drag-over');
+            z.ondrop = (e) => {
+                e.preventDefault();
+                z.classList.remove('drag-over');
+                const id = e.dataTransfer.getData('id');
+                const d = this.container.querySelector(`.draggable-item[data-id="${id}"]`);
+                if (!d || d.classList.contains('placed')) return;
+
+                const zType = z.dataset.zone;
+                const zItems = z.querySelector('.drop-zone-items');
+                const clone = d.cloneNode(true);
+                clone.classList.add('dropped-item');
+                clone.removeAttribute('draggable');
+
+                const rmBtn = document.createElement('button');
+                rmBtn.className = 'remove-item';
+                rmBtn.innerHTML = '×';
+                rmBtn.onclick = () => {
+                    clone.remove();
+                    d.classList.remove('placed');
+                    delete placement[id];
+                    btn.disabled = Object.keys(placement).length !== q.drag_items.length;
+                };
+                
+                clone.appendChild(rmBtn);
+                zItems.appendChild(clone);
+                d.classList.add('placed');
+                placement[id] = zType;
+                btn.disabled = Object.keys(placement).length !== q.drag_items.length;
+            };
+        });
+
+        btn.onclick = () => {
+            let correctCount = 0;
+            
+            q.drag_items.forEach(item => {
+                if (placement[item.image_id] === item.correct_zone) {
+                    correctCount++;
+                }
+            });
+            
+            const ok = correctCount === q.drag_items.length;
+            btn.disabled = true;
+            drags.forEach(d => d.draggable = false);
+            
+            this.recordAnswer(q, placement, ok);
+            this.feedback(ok, q.pmax, q, `Xếp đúng ${correctCount}/${q.drag_items.length}`);
+        };
+    }
+
+    // ===== RECORD ANSWER WITH IDS =====
+    recordAnswer(q, userAnswer, isCorrect) {
+        this.answers.push({
+            question_id: q.qid,
+            question_number: q.qn,
+            question_type: q.qtype,
+            user_answer: userAnswer,
+            user_answer_ids: this.extractIds(userAnswer, q.qtype),
+            correct_answer: q.sol_array || q.sol_json,
+            correct_answer_ids: this.extractCorrectIds(q),
+            is_correct: isCorrect,
+            points_earned: isCorrect ? q.pmax : 0,
+            max_points: q.pmax
+        });
+    }
+
+    // ===== EXTRACT USER ANSWER IDS =====
+    extractIds(answer, qtype) {
+        if (!answer) return null;
+        
+        // Already IDs (string or array of strings)
+        if (typeof answer === 'string') return answer;
+        if (Array.isArray(answer) && answer.every(a => typeof a === 'string')) {
+            return answer;
+        }
+        
+        // Array of pairs (image_pair)
+        if (Array.isArray(answer) && answer.length > 0 && Array.isArray(answer[0])) {
+            return answer; // Already [[id1, id2], ...]
+        }
+        
+        // Object (hotspot, drag_drop)
+        if (typeof answer === 'object') {
+            if (answer.clicked_id) return answer.clicked_id;
+            if (answer.x_y_id) return answer.x_y_id;
+            // Drag drop placement: { img_009_1: "safe", img_009_2: "danger" }
+            return answer;
+        }
+        
+        return answer;
+    }
+
+    // ===== EXTRACT CORRECT ANSWER IDS =====
+    extractCorrectIds(q) {
+        const sol = q.sol_array || q.sol_json;
+        
+        if (!sol) return null;
+        
+        // String ID
+        if (typeof sol === 'string') return sol;
+        
+        // Array of IDs
+        if (Array.isArray(sol)) return sol;
+        
+        // Hotspot object
+        if (sol.x_y_id) return sol.x_y_id;
+        
+        return sol;
+    }
+
+    // ===== FEEDBACK WITH DETAILED TRACKING =====
+    feedback(ok, pts, q, msg = '') {
+        const endTime = new Date();
+        const playTime = endTime - this.currentQuestionStartTime;
+        const timeRemaining = (q.tmax || 0) - playTime;
+
+        if (ok) {
+            this.score += pts;
+            this.streak++;
+            const bonusPts = this.streak >= 3 ? Math.floor(pts * 0.1) : 0;
+            this.cumulativeScore = this.score + bonusPts;
+        } else {
+            this.streak = 0;
+        }
+
+        this.totalPoints += pts;
+        
+        const fb = document.createElement('div');
+        fb.className = `feedback-message ${ok ? 'correct' : 'incorrect'}`;
+        fb.innerHTML = `
+            <div class="feedback-icon">${ok ? '✓' : '✗'}</div>
+            <div class="feedback-content">
+                <div class="feedback-title">${ok ? 'Chính xác!' : 'Chưa đúng!'}</div>
+                ${msg ? `<div class="feedback-detail">${msg}</div>` : ''}
+                <div class="feedback-explanation">${q.expl || ''}</div>
+                <div class="feedback-points">+${ok ? pts : 0} điểm</div>
+            </div>
+        `;
+        this.container.querySelector('.question-container').appendChild(fb);
+
+        // Get last answer for this question
+        const lastAnswer = this.answers[this.answers.length - 1];
+
+        this.quizResults.push({
+            qn: q.qn,
+            lq: q.lq || false,
+            qid: q.qid,
+            qtype: q.qtype,
+            ts_start: this.currentQuestionStartTime.toISOString(),
+            ts_end: endTime.toISOString(),
+            pt: playTime,
+            ps: pts,
+            ans: lastAnswer ? lastAnswer.user_answer_ids : null,
+            ans_raw: lastAnswer ? lastAnswer.user_answer : null,
+            cor: ok,
+            skip: false,
+            trem: Math.max(0, timeRemaining),
+            hint: false,
+            pen: 0,
+            cum: this.cumulativeScore,
+            streak: this.streak,
+            sol: lastAnswer ? lastAnswer.correct_answer_ids : (q.sol_array || q.sol_json),
+            sol_raw: q.sol_array || q.sol_json,
+            show_sol: q.display_correct_answer === 'y'
+            // Note: expl field removed from output (only used for display)
+        });
+
+        setTimeout(() => {
+            this.currentQuestionIndex++;
+            this.render();
+        }, 2500);
+    }
+
+    // ===== RENDER RESULTS =====
+    renderResults() {
+        const totalTime = new Date() - this.quizStartTime;
+        const percent = Math.round((this.score / this.totalPoints) * 100);
+        const passThreshold = this.gameData.main_pass_threshold_percent || 70;
+        const passed = percent >= passThreshold;
+        
+        // Generate detailed output with IDs
+        this.generateDetailedOutput();
+
+        const resultHtml = `
+            <div class="quiz-container results-container">
+                <div class="results-header">
+                    <h1 class="results-title">${passed ? '🎉 Xuất sắc!' : '💪 Cố gắng thêm!'}</h1>
+                    <div class="results-score-circle">
+                        <div class="score-circle ${passed ? 'pass' : 'fail'}">
+                            <span class="score-percent">${percent}%</span>
+                            <span class="score-label">${this.score}/${this.totalPoints} điểm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">Tổng câu hỏi:</span>
+                        <span class="summary-value">${this.questions.length}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Trả lời đúng:</span>
+                        <span class="summary-value correct">${this.quizResults.filter(r => r.correct).length}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Trả lời sai:</span>
+                        <span class="summary-value incorrect">${this.quizResults.filter(r => !r.correct).length}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Thời gian:</span>
+                        <span class="summary-value">${Math.floor(totalTime / 60000)}:${String(Math.floor((totalTime % 60000) / 1000)).padStart(2, '0')}</span>
+                    </div>
+                </div>
+
+                <div class="results-details">
+                    <h3 class="details-title">Chi tiết từng câu:</h3>
+                    ${this.quizResults.map((r, i) => {
+                        const ans = this.answers[i];
+                        return `
+                            <div class="result-item ${r.correct ? 'correct' : 'incorrect'}">
+                                <div class="result-item-header">
+                                    <span class="result-item-number">Câu ${r.qn}</span>
+                                    <span class="result-item-type">${this.getTypeLabel(r.qtype)}</span>
+                                    <span class="result-item-status">${r.correct ? '✓' : '✗'}</span>
+                                </div>
+                                <div class="result-item-body">
+                                    <div class="result-item-points">${r.points}/${r.max_points} điểm</div>
+                                    ${ans ? `
+                                        <div class="result-item-answer">
+                                            <strong>Bạn chọn:</strong> ${this.formatAnswer(ans.user_answer, r.qtype)}
+                                        </div>
+                                        ${!r.correct ? `
+                                            <div class="result-item-correct">
+                                                <strong>Đáp án đúng:</strong> ${this.formatAnswer(ans.correct_answer, r.qtype)}
+                                            </div>
+                                        ` : ''}
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <div class="results-actions">
+                    <button class="action-button primary" onclick="location.reload()">Chơi lại</button>
+                    <button class="action-button secondary" onclick="QuizUtils.downloadResults()">Tải kết quả</button>
+                    <button class="action-button secondary" onclick="QuizUtils.downloadJSON()">Tải JSON</button>
+                    <button class="action-button secondary" onclick="QuizUtils.copyJSON()">Copy JSON</button>
+                </div>
+            </div>
+        `;
+
+        this.container.innerHTML = resultHtml;
+
+        // Store results for utility functions
+        window.currentQuizResults = {
+            gameData: this.gameData,
+            results: this.quizResults,
+            answers: this.answers,
+            score: this.score,
+            totalPoints: this.totalPoints,
+            percent: percent,
+            totalTime: totalTime
+        };
+    }
+
+    // ===== GENERATE DETAILED OUTPUT WITH IDS =====
+    generateDetailedOutput() {
+        const totalTime = new Date() - this.quizStartTime;
+        const correctCount = this.quizResults.filter(r => r.cor).length;
+        const wrongCount = this.quizResults.filter(r => !r.cor && !r.skip).length;
+        const skippedCount = this.quizResults.filter(r => r.skip).length;
+        const percent = Math.round((this.score / this.totalPoints) * 100);
+        const passThreshold = this.gameData.main_pass_threshold_percent || 70;
+
+        const detailedOutput = {
+            main_game_id: this.gameData.main_game_id,
+            main_title: this.gameData.main_title,
+            main_game_version: this.gameData.main_game_version,
+            main_author: this.gameData.main_author,
+            main_language: this.gameData.main_language,
+            main_total_questions: this.gameData.main_total_questions,
+            main_total_max_points: this.gameData.main_total_max_points,
+            player_info: {
+                uid: `user_${Math.random().toString(36).substr(2, 9)}`,
+                sid: `session_${Date.now()}`,
+                att: 1,
+                ua: navigator.userAgent,
+                ip: 'hidden'
+            },
+            quiz_results: this.quizResults,
+            summary: {
+                total_score: this.score,
+                max_score: this.totalPoints,
+                correct_count: correctCount,
+                wrong_count: wrongCount,
+                skipped_count: skippedCount,
+                avg_time_per_question_ms: Math.round(totalTime / this.questions.length),
+                total_time_ms: totalTime,
+                completion_rate_percent: 100,
+                pass_status: percent >= passThreshold ? 'passed' : 'failed',
+                percentage: percent
+            }
+        };
+
+        // Store for download/export
+        window.detailedQuizOutput = detailedOutput;
+        
+        // Log to console
+        console.log('📊 Detailed Quiz Results with IDs:', detailedOutput);
+        console.log('📋 Copy this output:', JSON.stringify(detailedOutput, null, 2));
+    }
+
+    // ===== FORMAT ANSWER FOR DISPLAY =====
+    formatAnswer(answer, qtype) {
+        if (Array.isArray(answer)) {
+            if (answer.length === 0) return '<em>Không có</em>';
+            if (qtype === 'image_pair') {
+                return answer.map(pair => `[${pair[0]} ↔ ${pair[1]}]`).join(', ');
+            }
+            return answer.join(', ');
+        }
+        if (typeof answer === 'object') {
+            if (answer.x !== undefined && answer.y !== undefined) {
+                return `x: ${answer.x}, y: ${answer.y}`;
+            }
+            return JSON.stringify(answer);
+        }
+        return String(answer);
+    }
+}
+
+// ===== UTILITY FUNCTIONS =====
+window.QuizUtils = {
+    downloadResults() {
+        const r = window.currentQuizResults;
+        if (!r) return;
+        
+        const text = `
+${r.gameData.main_title}
+${'='.repeat(50)}
+
+Điểm số: ${r.score}/${r.totalPoints} (${r.percent}%)
+Thời gian: ${Math.floor(r.totalTime / 60000)}:${String(Math.floor((r.totalTime % 60000) / 1000)).padStart(2, '0')}
+
+Chi tiết:
+${r.results.map((res, i) => {
+    const ans = r.answers[i];
+    return `
+Câu ${res.qn} (${res.qid}): ${res.correct ? '✓' Đúng' : '✗ Sai'} - ${res.points}/${res.max_points} điểm
+  Bạn chọn: ${this._formatAnswerText(ans.user_answer, res.qtype)}
+  ${!res.correct ? `Đáp án đúng: ${this._formatAnswerText(ans.correct_answer, res.qtype)}` : ''}
+`;
+}).join('\n')}
+        `.trim();
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `quiz-results-${Date.now()}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    },
+
+    copyResults() {
+        const r = window.currentQuizResults;
+        if (!r) return;
+        
+        const text = `${r.gameData.main_title}\nĐiểm: ${r.score}/${r.totalPoints} (${r.percent}%)`;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Đã copy kết quả!');
+        });
+    },
+
+    _formatAnswerText(answer, qtype) {
+        if (Array.isArray(answer)) {
+            if (answer.length === 0) return 'Không có';
+            if (qtype === 'image_pair') {
+                return answer.map(pair => `[${pair[0]} ↔ ${pair[1]}]`).join(', ');
+            }
+            return answer.join(', ');
+        }
+        if (typeof answer === 'object') {
+            if (answer.x !== undefined && answer.y !== undefined) {
+                return `x: ${answer.x}, y: ${answer.y}`;
+            }
+            return JSON.stringify(answer);
+        }
+        return String(answer);
+    }
+};
+
+console.log('✅ Quiz Engine with ID system loaded');
+
+// ===== DATA =====
+/**
+ * LOCAL DATA INPUT - WITH ID SYSTEM
+ * Chứa dữ liệu quiz với hệ thống ID
+ * File này được load trước local-quiz-complete.js
+ */
+
+// Khai báo biến global chứa quiz data
+window.quizData = {
+    "main_game_id": "complete_quiz_2025",
+    "main_title": "Quiz Hoàn Chỉnh - 12 Câu Hỏi Đa Dạng",
+    "main_description": "Bộ câu hỏi bao gồm tất cả các dạng: MCQ, Multi, Image, Hotspot, Order, Pair, Drag-Drop",
+    "main_project_id": "proj_hazard_2025",
+    "main_game_version": "1.0.0",
+    "main_author": "Quiz Team",
+    "main_age_array": [8, 9, 10, 11],
+    "main_grade": "Primary",
+    "main_total_questions": 12,
+    "main_total_max_points": 200,
+    "main_max_time_per_game_ms": 300000,
+    "main_language": "vi",
+    "main_theme": "safety_traffic",
+    "main_difficulty_level": "mixed",
+    "main_show_correct_answer_after_each_quiz": true,
+    "main_shuffle_questions_order": false,
+    "main_default_hint_allow": true,
+    "main_default_hint_penalty_percent": 20,
+    "main_feedback_mode": "detailed_explanation",
+    "main_pass_threshold_percent": 70,
+    "main_status": "published",
+    "EachQuiz": [
+        {
+            "qn": 1,
+            "qid": "traffic_001",
+            "qtype": "hotspot",
+            "qtxt": "Hãy bấm vào vị trí có vạch kẻ dành cho người đi bộ",
+            "pmax": 10,
+            "tmax": 30000,
+            "diff": "easy",
+            "fq": true,
+            "lq": false,
+            "opt_array": null,
+            "sol_json": { "x_y_id": "hotspot_001", "x": 400, "y": 300, "radius": 80 },
+            "expl": "Vạch kẻ trắng ngang đường là nơi an toàn để học sinh sang đường.",
+            "tag_array": ["crosswalk", "pedestrian"],
+            "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463771/68633251_tr3nqn.jpg"],
+            "image_total_number": 1,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_only",
+            "media_placement": "background",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Tìm dấu hiệu an toàn nhất để qua đường.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 2,
+            "qid": "traffic_002",
+            "qtype": "multi",
+            "qtxt": "Trong các lựa chọn sau, đâu là phương tiện giao thông an toàn, hợp pháp cho học sinh tiểu học?",
+            "pmax": 15,
+            "tmax": 40000,
+            "diff": "medium",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "text_id": "opt_002_1", "text": "Xe đạp" },
+                { "text_id": "opt_002_2", "text": "Xe máy" },
+                { "text_id": "opt_002_3", "text": "Ô tô đi cùng bố mẹ" },
+                { "text_id": "opt_002_4", "text": "Xe buýt trường học" },
+                { "text_id": "opt_002_5", "text": "Xe tải" }
+            ],
+            "sol_array": ["opt_002_1", "opt_002_3", "opt_002_4"],
+            "expl": "Học sinh tiểu học chỉ nên đi bộ, đi xe đạp hoặc được đưa đón bằng xe buýt/ô tô cùng người lớn.",
+            "tag_array": ["vehicle", "safe"],
+            "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463465/important_road_safety_rules_to_teach_your_children_illustration.jpg_vk7gty.webp"],
+            "image_total_number": 1,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "text_only",
+            "media_placement": "above",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Luật giao thông quy định độ tuổi và giấy phép lái xe cho từng loại phương tiện.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "hide",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 3,
+            "qid": "traffic_003",
+            "qtype": "mcq",
+            "qtxt": "Đèn tín hiệu giao thông màu đỏ nghĩa là gì?",
+            "pmax": 10,
+            "tmax": 20000,
+            "diff": "easy",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "text_id": "opt_003_1", "text": "Dừng lại" },
+                { "text_id": "opt_003_2", "text": "Đi chậm" },
+                { "text_id": "opt_003_3", "text": "Được đi tiếp" },
+                { "text_id": "opt_003_4", "text": "Rẽ phải" }
+            ],
+            "sol_array": "opt_003_1",
+            "expl": "Đèn đỏ nghĩa là mọi phương tiện và người đi bộ phải dừng lại.",
+            "tag_array": ["traffic_light"],
+            "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1758463334/Teach-Road-Safety-to-Kids-1_kibxvw.png"],
+            "image_total_number": 1,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "text_only",
+            "media_placement": "above",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": false,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Đây là kiến thức cơ bản nhất về luật giao thông.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "hide",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 4,
+            "qid": "traffic_004",
+            "qtype": "order",
+            "qtxt": "Sắp xếp đúng thứ tự các bước khi qua đường tại ngã tư có đèn tín hiệu",
+            "pmax": 20,
+            "tmax": 50000,
+            "diff": "hard",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "text_id": "opt_004_1", "text": "Nhìn trái – nhìn phải" },
+                { "text_id": "opt_004_2", "text": "Chờ đèn xanh cho người đi bộ" },
+                { "text_id": "opt_004_3", "text": "Đi nhanh qua vạch kẻ" },
+                { "text_id": "opt_004_4", "text": "Không dừng giữa đường" }
+            ],
+            "sol_array": ["opt_004_2", "opt_004_1", "opt_004_3", "opt_004_4"],
+            "expl": "Trẻ em cần tuân thủ đủ 4 bước: chờ tín hiệu, quan sát an toàn, và đi qua dứt khoát.",
+            "tag_array": ["order", "crossing"],
+            "image_json": ["https://res.cloudinary.com/dcuqbylaa/image/upload/v1759660871/88745398_road-safety_qjetaw.jpg"],
+            "image_total_number": 1,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "text_only",
+            "media_placement": "above",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Điều đầu tiên luôn là phải tuân theo tín hiệu, sau đó mới đến quan sát.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "hide",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 5,
+            "qid": "traffic_005",
+            "qtype": "image_pair",
+            "qtxt": "Ghép cặp hành động an toàn và nguy hiểm tương ứng",
+            "pmax": 25,
+            "tmax": 60000,
+            "diff": "hard",
+            "fq": false,
+            "lq": false,
+            "opt_array": null,
+            "sol_array": [["img_005_1", "img_005_4"], ["img_005_2", "img_005_5"], ["img_005_3", "img_005_6"]],
+            "expl": "Luôn ghép hành động đúng với hành động sai tương ứng.",
+            "tag_array": ["image_pair", "safe_vs_danger"],
+            "image_json": [
+                { "image_id": "img_005_1", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662280/89039832_children_tw6zrn.jpg" },
+                { "image_id": "img_005_2", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759661153/87498090_a-car-bumping-the-traffic-cones_pk60x0.jpg" },
+                { "image_id": "img_005_3", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662493/88589066_children_1_j24kzx.jpg" },
+                { "image_id": "img_005_4", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662282/89505552_children_snzywa.jpg" },
+                { "image_id": "img_005_5", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662851/36960374_children_xterrv.jpg" },
+                { "image_id": "img_005_6", "image": "https://res.cloudinary.com/dcuqbylaa/image/upload/v1759662490/87614454_children_rkfqo3.jpg" }
+            ],
+            "image_total_number": 6,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_only",
+            "media_placement": "side_by_side",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Ghép hình ảnh 1 với 4, 2 với 5, 3 với 6.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "hide",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 6,
+            "qid": "traffic_006",
+            "qtype": "image_mcq",
+            "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi đi xe đạp trên đường?",
+            "pmax": 15,
+            "tmax": 30000,
+            "diff": "medium",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "image_id": "img_006_1", "text": "Mũ bảo hiểm xe đạp", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
+                { "image_id": "img_006_2", "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
+                { "image_id": "img_006_3", "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
+                { "image_id": "img_006_4", "text": "Không cần đội gì", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+            ],
+            "sol_array": "img_006_1",
+            "expl": "Mũ bảo hiểm xe đạp là thiết bị bảo hộ quan trọng giúp bảo vệ đầu khi té ngã.",
+            "tag_array": ["helmet", "bicycle", "safety"],
+            "image_json": null,
+            "image_total_number": 0,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Tìm thiết bị được thiết kế chuyên dụng cho xe đạp.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 7,
+            "qid": "traffic_007",
+            "qtype": "image_mcq",
+            "qtxt": "Chọn biển báo CẤM ĐI NGƯỢC CHIỀU",
+            "pmax": 10,
+            "tmax": 25000,
+            "diff": "easy",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "image_id": "img_007_1", "text": "Biển cấm đi ngược chiều", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=400&h=300&fit=crop" },
+                { "image_id": "img_007_2", "text": "Biển dừng lại", "image": "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop" },
+                { "image_id": "img_007_3", "text": "Biển ưu tiên", "image": "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?w=400&h=300&fit=crop" },
+                { "image_id": "img_007_4", "text": "Biển chỉ đường", "image": "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&h=300&fit=crop" }
+            ],
+            "sol_array": "img_007_1",
+            "expl": "Biển cấm đi ngược chiều có hình tròn đỏ với vạch trắng ngang.",
+            "tag_array": ["traffic_sign", "prohibition"],
+            "image_json": null,
+            "image_total_number": 0,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 15,
+            "hint_content_text": "Biển cấm có hình tròn với viền đỏ.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 8,
+            "qid": "traffic_008",
+            "qtype": "image_multi",
+            "qtxt": "Chọn TẤT CẢ các biển báo NGUY HIỂM",
+            "pmax": 15,
+            "tmax": 35000,
+            "diff": "medium",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "image_id": "img_008_1", "text": "Cẩn thận công trình", "image": "https://images.unsplash.com/photo-1544919982-b61976f0ba43?w=300&h=200&fit=crop" },
+                { "image_id": "img_008_2", "text": "Nguy hiểm điện cao thế", "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop" },
+                { "image_id": "img_008_3", "text": "Chỉ dẫn hướng đi", "image": "https://images.unsplash.com/photo-1542831371-d531d36971e6?w=300&h=200&fit=crop" },
+                { "image_id": "img_008_4", "text": "Ngã tư nguy hiểm", "image": "https://images.unsplash.com/photo-1449247666642-264389f5f5b1?w=300&h=200&fit=crop" }
+            ],
+            "sol_array": ["img_008_1", "img_008_2", "img_008_4"],
+            "expl": "Biển nguy hiểm thường có màu vàng hình tam giác để cảnh báo.",
+            "tag_array": ["warning_sign", "danger"],
+            "image_json": null,
+            "image_total_number": 0,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Biển nguy hiểm có hình tam giác màu vàng với viền đỏ.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 9,
+            "qid": "safety_009",
+            "qtype": "drag_drop",
+            "qtxt": "Kéo thả các hình ảnh vào cột AN TOÀN hoặc NGUY CƠ",
+            "pmax": 20,
+            "tmax": 45000,
+            "diff": "medium",
+            "fq": false,
+            "lq": false,
+            "opt_array": null,
+            "drag_items": [
+                { "image_id": "img_009_1", "label": "Mặc đồ bảo hộ", "image": "https://images.unsplash.com/photo-1572107248692-1d32d1f5fc3a?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                { "image_id": "img_009_2", "label": "Hút thuốc", "image": "https://images.unsplash.com/photo-1605671919743-c3cd293be5e7?w=200&h=150&fit=crop", "correct_zone": "danger" },
+                { "image_id": "img_009_3", "label": "Đeo kính bảo hộ", "image": "https://images.unsplash.com/photo-1574258495973-f010dfbb5371?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                { "image_id": "img_009_4", "label": "Chạy trong nhà máy", "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=200&h=150&fit=crop", "correct_zone": "danger" },
+                { "image_id": "img_009_5", "label": "Rửa tay đúng cách", "image": "https://images.unsplash.com/photo-1584555613497-9ecf9dd06f68?w=200&h=150&fit=crop", "correct_zone": "safe" },
+                { "image_id": "img_009_6", "label": "Dùng điện thoại khi vận hành", "image": "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=200&h=150&fit=crop", "correct_zone": "danger" }
+            ],
+            "sol_array": null,
+            "expl": "Phân biệt rõ hành động an toàn và nguy hiểm tại nơi làm việc.",
+            "tag_array": ["drag_drop", "workplace_safety"],
+            "image_json": null,
+            "image_total_number": 6,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Quan sát kỹ từng hành động và đánh giá mức độ an toàn.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 10,
+            "qid": "safety_010",
+            "qtype": "multi_hotspot",
+            "qtxt": "Click vào TẤT CẢ các điểm NGUY HIỂM trên hình ảnh công trường",
+            "pmax": 20,
+            "tmax": 60000,
+            "diff": "hard",
+            "fq": false,
+            "lq": false,
+            "opt_array": null,
+            "hotspot_array": [
+                { "x_y_id": "spot_010_1", "x": 25, "y": 30 },
+                { "x_y_id": "spot_010_2", "x": 50, "y": 40 },
+                { "x_y_id": "spot_010_3", "x": 75, "y": 35 },
+                { "x_y_id": "spot_010_4", "x": 30, "y": 70 },
+                { "x_y_id": "spot_010_5", "x": 65, "y": 75 }
+            ],
+            "sol_array": ["spot_010_1", "spot_010_3", "spot_010_5"],
+            "expl": "Cần nhận biết được các điểm nguy hiểm để tránh tai nạn lao động.",
+            "tag_array": ["multi_hotspot", "workplace_hazard"],
+            "image_json": ["https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=600&fit=crop"],
+            "image_total_number": 1,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_only",
+            "media_placement": "background",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Tìm các vị trí không có biện pháp bảo vệ hoặc có nguy cơ rơi, va chạm.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 11,
+            "qid": "safety_011",
+            "qtype": "image_mcq",
+            "qtxt": "Thiết bị bảo hộ nào là BẮT BUỘC khi làm việc ở công trường xây dựng?",
+            "pmax": 10,
+            "tmax": 25000,
+            "diff": "easy",
+            "fq": false,
+            "lq": false,
+            "opt_array": [
+                { "image_id": "img_011_1", "text": "Mũ bảo hiểm", "image": "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400&h=300&fit=crop" },
+                { "image_id": "img_011_2", "text": "Nón lá", "image": "https://images.unsplash.com/photo-1578922746064-031a8c0cb677?w=400&h=300&fit=crop" },
+                { "image_id": "img_011_3", "text": "Mũ thời trang", "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=300&fit=crop" },
+                { "image_id": "img_011_4", "text": "Không cần đội gì", "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop" }
+            ],
+            "sol_array": "img_011_1",
+            "expl": "Mũ bảo hiểm là thiết bị bảo hộ bắt buộc tại mọi công trường xây dựng theo quy định an toàn lao động.",
+            "tag_array": ["helmet", "construction", "ppe"],
+            "image_json": null,
+            "image_total_number": 0,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 15,
+            "hint_content_text": "Tìm thiết bị được thiết kế để bảo vệ đầu khỏi va đập.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": false,
+            "display": "show",
+            "display_correct_answer": "y"
+        },
+        {
+            "qn": 12,
+            "qid": "safety_012",
+            "qtype": "image_multi",
+            "qtxt": "Chọn TẤT CẢ các thiết bị bảo hộ cá nhân cần thiết khi làm việc với hóa chất",
+            "pmax": 15,
+            "tmax": 40000,
+            "diff": "medium",
+            "fq": false,
+            "lq": true,
+            "opt_array": [
+                { "image_id": "img_012_1", "text": "Găng tay chống hóa chất", "image": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=400&h=300&fit=crop" },
+                { "image_id": "img_012_2", "text": "Kính bảo hộ", "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?w=400&h=300&fit=crop" },
+                { "image_id": "img_012_3", "text": "Quần áo thời trang", "image": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=300&fit=crop" },
+                { "image_id": "img_012_4", "text": "Khẩu trang phòng độc", "image": "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&h=300&fit=crop" }
+            ],
+            "sol_array": ["img_012_1", "img_012_2", "img_012_4"],
+            "expl": "Cần đầy đủ găng tay chống hóa chất, kính bảo hộ và khẩu trang phòng độc khi làm việc với hóa chất.",
+            "tag_array": ["ppe", "chemical_safety", "multi_choice"],
+            "image_json": null,
+            "image_total_number": 0,
+            "audio_json": null,
+            "video_json": null,
+            "opt_fmt": "image_text",
+            "media_placement": "inline",
+            "expl_fmt": "plain",
+            "author_id": "admin_001",
+            "project_id": "proj_hazard_2025",
+            "age": "8-11",
+            "grade": "primary",
+            "lang": "vi",
+            "status": "active",
+            "version": "1.0",
+            "is_private": false,
+            "penalty_points": 0,
+            "min_points": 0,
+            "speed_bonus_eligible": true,
+            "hint_allow": true,
+            "hint_penalty_percent": 20,
+            "hint_content_text": "Hóa chất có thể gây hại qua da, mắt và đường hô hấp.",
+            "hint_content_media": null,
+            "created_at": "2025-01-10T10:00:00Z",
+            "updated_at": "2025-01-10T10:00:00Z",
+            "shuf": true,
+            "display": "show",
+            "display_correct_answer": "y"
+        }
+    ]
+};
+
+console.log('✅ Quiz data with ID system loaded:', window.quizData.main_title);
+console.log('📊 Total questions:', window.quizData.main_total_questions);
+
+// ===== INIT =====
+/**
+ * LOCAL QUIZ JAVASCRIPT
+ * File khởi tạo cho từng quiz cụ thể
+ * Nhúng sau global-quiz.js và local_datainput.js
+ */
+
+// Lấy dữ liệu Quiz từ file local_datainput.js
+// Biến window.quizData đã được define trong local_datainput.js
+function getQuizData() {
+    // Kiểm tra xem data đã được load chưa
+    if (typeof window.quizData !== 'undefined' && window.quizData !== null) {
+        console.log('✅ Quiz data found:', window.quizData.main_title);
+        return window.quizData;
+    }
+    
+    // Fallback: nếu chưa có, log error với thông tin debug
+    console.error('❌ Quiz data chưa được load!');
+    console.error('   Kiểm tra:');
+    console.error('   1. File local_datainput.js đã được nhúng chưa?');
+    console.error('   2. Nhúng đúng thứ tự: global-quiz.js → local_datainput.js → local-quiz-complete.js');
+    console.error('   3. Đường dẫn file có đúng không?');
+    console.error('   Debug: window.quizData =', window.quizData);
+    return null;
+}
+
+// Khởi chạy quiz khi DOM đã sẵn sàng
+function initQuiz() {
+    // Kiểm tra nếu QuizEngine đã được load
+    if (typeof QuizEngine === 'undefined') {
+        console.error('❌ QuizEngine chưa được load. Hãy chắc chắn rằng global-quiz.js đã được nhúng trước file này.');
+        return;
+    }
+
+    // Lấy dữ liệu quiz từ local_datainput.js
+    const quizData = getQuizData();
+    
+    if (!quizData) {
+        console.error('❌ Không thể load quiz data. Kiểm tra lại local_datainput.js');
+        return;
+    }
+
+    // Khởi tạo quiz engine với dữ liệu
+    console.log('🚀 Khởi chạy quiz:', quizData.main_title);
+    const quiz = new QuizEngine(quizData);
+    
+    // Khởi chạy quiz trong container có id="quiz-container"
+    quiz.init('quiz-container');
+}
+
+// Tự động khởi chạy khi DOM sẵn sàng
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQuiz);
+} else {
+    // Delay một chút để đảm bảo tất cả scripts đã load
+    setTimeout(initQuiz, 100);
+}
+    </script>
+</body>
+</html>

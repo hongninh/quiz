@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Simple Debug - Check Network</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .debug-box h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-box">
+        <h2>🔍 Simple Network Debug</h2>
+        <p>Kiểm tra xem browser có thể load file từ CDN không.</p>
+        
+        <button onclick="testCDN()">🌐 Test CDN</button>
+        <button onclick="checkConsole()">📊 Check Console</button>
+        <button onclick="testLocal()">💻 Test Local</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="debug-box">
+        <h3>📋 Instructions:</h3>
+        <ol>
+            <li><strong>Click "Test CDN"</strong> để test kết nối CDN</li>
+            <li><strong>Click "Check Console"</strong> và nhấn F12 để xem chi tiết</li>
+            <li><strong>Nếu CDN fail</strong> → Dùng file <code>STANDALONE-QUIZ.html</code></li>
+        </ol>
+        
+        <div class="status info">
+            <strong>📥 File STANDALONE-QUIZ.html:</strong><br>
+            File này chứa TẤT CẢ code trong 1 file HTML duy nhất.<br>
+            Không cần internet, không cần load external files.<br>
+            <strong>100% chắc chắn hoạt động!</strong>
+        </div>
+    </div>
+
+    <script>
+        function testCDN() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="status info">⏳ Testing CDN...</div>';
+            
+            // Test load script từ CDN
+            const script = document.createElement('script');
+            const testURL = 'https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/global-quiz-with-ids.js';
+            
+            script.onload = function() {
+                let html = '<div class="status ok">✅ CDN: Accessible!</div>';
+                html += '<div class="status ok">✅ QuizEngine loaded: ' + (typeof QuizEngine !== 'undefined' ? 'Yes' : 'No') + '</div>';
+                html += '<div class="status info">🌐 CDN URL:<br>' + testURL + '</div>';
+                html += '<div class="status ok">✅ GIẢI PHÁP: File ONLINE-TEST-CDN.html nên hoạt động.</div>';
+                html += '<div class="status warning">⚠️ Nếu vẫn lỗi, kiểm tra firewall/antivirus có chặn không.</div>';
+                resultsDiv.innerHTML = html;
+            };
+            
+            script.onerror = function() {
+                let html = '<div class="status error">❌ CDN: Cannot load!</div>';
+                html += '<div class="status error">❌ Lý do có thể:</div>';
+                html += '<div class="status warning">1. Firewall/Antivirus chặn</div>';
+                html += '<div class="status warning">2. Không có internet</div>';
+                html += '<div class="status warning">3. CDN bị chặn ở quốc gia bạn</div>';
+                html += '<div class="status warning">4. Branch name quá dài (CDN issue)</div>';
+                html += '<div class="status ok">✅ GIẢI PHÁP: Dùng file <strong>STANDALONE-QUIZ.html</strong></div>';
+                html += '<div class="status info">File STANDALONE không cần load external files → Chắc chắn hoạt động!</div>';
+                resultsDiv.innerHTML = html;
+            };
+            
+            script.src = testURL;
+            document.head.appendChild(script);
+        }
+
+        function checkConsole() {
+            console.clear();
+            console.log('========================================');
+            console.log('🔍 NETWORK DEBUG INFO');
+            console.log('========================================');
+            console.log('User Agent:', navigator.userAgent);
+            console.log('Online:', navigator.onLine);
+            console.log('Language:', navigator.language);
+            console.log('Location:', window.location.href);
+            console.log('========================================');
+            console.log('Testing CDN availability...');
+            
+            // Test fetch
+            fetch('https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/global-quiz-with-ids.js')
+                .then(response => {
+                    console.log('✅ CDN Response:', response.status, response.statusText);
+                    console.log('✅ CDN is accessible!');
+                    console.log('If ONLINE-TEST-CDN.html fails, check browser console for errors.');
+                })
+                .catch(error => {
+                    console.error('❌ CDN Error:', error);
+                    console.error('❌ CDN is blocked or unreachable!');
+                    console.log('✅ SOLUTION: Use STANDALONE-QUIZ.html instead.');
+                });
+            
+            alert('Check Console (F12) để xem kết quả chi tiết!');
+        }
+
+        function testLocal() {
+            const resultsDiv = document.getElementById('results');
+            let html = '<div class="status info">💻 Testing Local Environment...</div>';
+            html += '<div class="status info">Browser: ' + navigator.userAgent.split(' ').pop() + '</div>';
+            html += '<div class="status info">Online: ' + (navigator.onLine ? '✅ Yes' : '❌ No') + '</div>';
+            html += '<div class="status info">Protocol: ' + window.location.protocol + '</div>';
+            html += '<div class="status info">Location: ' + window.location.href + '</div>';
+            
+            if (window.location.protocol === 'file:') {
+                html += '<div class="status warning">⚠️ Protocol: file:// (Local file)</div>';
+                html += '<div class="status warning">Some browsers block loading JS from local files.</div>';
+                html += '<div class="status ok">✅ BEST SOLUTION: Use <strong>STANDALONE-QUIZ.html</strong></div>';
+                html += '<div class="status info">This file has all code embedded → No external files needed!</div>';
+            } else {
+                html += '<div class="status ok">✅ Protocol: ' + window.location.protocol + ' (OK)</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // Auto check on load
+        window.addEventListener('load', () => {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="status info">Ready to test. Click buttons above.</div>';
+        });
+    </script>
+</body>
+</html>
