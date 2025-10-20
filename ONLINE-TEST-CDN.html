@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Quiz Test - CDN Version (Online)</title>
+    
+    <!-- Load CSS từ CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/global-quiz.css">
+    
+    <style>
+        /* Debug panel */
+        .debug-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            max-width: 350px;
+            z-index: 9999;
+            font-size: 12px;
+        }
+        .debug-info h3 {
+            margin: 0 0 10px 0;
+            color: #4CAF50;
+            font-size: 14px;
+        }
+        .debug-info .status {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .debug-info .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .debug-info .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        .debug-info button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .debug-info button:hover {
+            background: #45a049;
+        }
+        .notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .notice h2 {
+            margin-top: 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <!-- Notice về CDN -->
+    <div class="notice">
+        <h2>🌐 CDN Version - Load Từ Internet</h2>
+        <p><strong>✅ Ưu điểm:</strong></p>
+        <ul>
+            <li>Không cần download files</li>
+            <li>Không lo CORS errors</li>
+            <li>Luôn là version mới nhất</li>
+            <li>Mở trực tiếp trong browser</li>
+        </ul>
+        <p><strong>⚠️ Lưu ý:</strong> Cần kết nối internet để load files từ CDN.</p>
+    </div>
+
+    <!-- Debug Info Panel -->
+    <div class="debug-info" id="debug-info">
+        <h3>🌐 CDN Debug Info</h3>
+        <div id="debug-status">
+            <div class="status info">⏳ Loading files from CDN...</div>
+        </div>
+        <button onclick="checkSetup()">🔄 Check Setup</button>
+        <button onclick="viewOutput()">📊 View Output</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quiz-container"></div>
+
+    <!-- Load JavaScript files từ CDN -->
+    <script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/global-quiz-with-ids.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/local_datainput_with_ids.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436/local-quiz-complete.js"></script>
+
+    <script>
+        // Check setup khi load
+        function checkSetup() {
+            const statusDiv = document.getElementById('debug-status');
+            let html = '';
+
+            // Check 1: Engine loaded
+            if (typeof QuizEngine !== 'undefined') {
+                html += '<div class="status ok">✅ Engine: Loaded from CDN</div>';
+            } else {
+                html += '<div class="status error">❌ Engine: Failed to load</div>';
+            }
+
+            // Check 2: Data loaded
+            if (typeof window.quizData !== 'undefined') {
+                html += '<div class="status ok">✅ Data: Loaded from CDN</div>';
+                html += `<div class="status ok">📦 Game ID: ${window.quizData.main_game_id}</div>`;
+                html += `<div class="status ok">📊 Questions: ${window.quizData.main_total_questions}</div>`;
+                
+                // Check 3: Data có IDs không
+                const firstQ = window.quizData.EachQuiz?.[0];
+                if (firstQ && firstQ.opt_array && firstQ.opt_array.length > 0) {
+                    const firstOpt = firstQ.opt_array[0];
+                    
+                    if (typeof firstOpt === 'object' && (firstOpt.text_id || firstOpt.image_id)) {
+                        html += '<div class="status ok">✅ IDs: Present!</div>';
+                        html += `<div class="status ok">🔑 Sample: ${firstOpt.text_id || firstOpt.image_id}</div>`;
+                    }
+                }
+            } else {
+                html += '<div class="status error">❌ Data: Failed to load</div>';
+            }
+
+            // Check internet
+            html += '<div class="status info">🌐 Source: jsdelivr CDN</div>';
+            html += '<div class="status info">📍 Location: ' + window.location.href + '</div>';
+
+            statusDiv.innerHTML = html;
+        }
+
+        function viewOutput() {
+            if (window.detailedQuizOutput) {
+                console.clear();
+                console.log('📊 DETAILED OUTPUT WITH IDs:');
+                console.log('================================');
+                console.log(window.detailedQuizOutput);
+                console.log('================================');
+                console.log('📋 Copy with: QuizUtils.copyJSON()');
+                alert('✅ Check Console (F12) để xem output!');
+            } else {
+                alert('⚠️ Chưa có output. Hãy chơi quiz trước!');
+            }
+        }
+
+        // Auto check on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(checkSetup, 1000); // Wait for CDN files
+            
+            // Log instruction
+            console.log('=====================================');
+            console.log('🌐 QUIZ TEST - CDN VERSION');
+            console.log('=====================================');
+            console.log('Files loaded from: jsdelivr CDN');
+            console.log('Repository: github.com/hongninh/quiz');
+            console.log('=====================================');
+            console.log('1. Check debug panel (top-right)');
+            console.log('2. Play quiz');
+            console.log('3. After finish, run: QuizUtils.copyJSON()');
+            console.log('4. Or click "View Output" button');
+            console.log('=====================================');
+            
+            // Monitor quiz completion
+            if (typeof QuizEngine !== 'undefined') {
+                const originalRenderResults = QuizEngine.prototype.renderResults;
+                QuizEngine.prototype.renderResults = function() {
+                    originalRenderResults.call(this);
+                    
+                    // Show completion message
+                    setTimeout(() => {
+                        console.log('🎉 QUIZ COMPLETED!');
+                        console.log('📊 Output available at: window.detailedQuizOutput');
+                        
+                        if (window.detailedQuizOutput) {
+                            const firstResult = window.detailedQuizOutput.quiz_results[0];
+                            
+                            console.log('\n🔍 CHECKING OUTPUT FORMAT:');
+                            console.log('ans field:', firstResult.ans);
+                            console.log('sol field:', firstResult.sol);
+                            
+                            if (firstResult.ans && (typeof firstResult.ans === 'string' || Array.isArray(firstResult.ans))) {
+                                console.log('✅ Output has IDs! Perfect!');
+                            }
+                            
+                            console.log('\n📋 To copy: QuizUtils.copyJSON()');
+                            console.log('📥 To download: QuizUtils.downloadJSON()');
+                        }
+                    }, 500);
+                };
+            }
+        });
+    </script>
+</body>
+</html>

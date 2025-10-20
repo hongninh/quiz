@@ -1,0 +1,51 @@
+/**
+ * LOCAL QUIZ CSS
+ * CSS đặc thù cho từng quiz cụ thể
+ * Nhúng sau global-quiz.css để override/customize
+ */
+
+/* ========== CUSTOM THEME CHO QUIZ NÀY ========== */
+/* Bạn có thể thay đổi màu sắc, gradient, font size tùy theo yêu cầu */
+
+/* Ví dụ: Thay đổi màu gradient background cho quiz này */
+/*
+body {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+*/
+
+/* Ví dụ: Thay đổi màu chủ đạo của buttons và badges */
+/*
+.question-type-badge {
+    background: #ff6b6b;
+}
+
+.answer-letter {
+    background: #4ecdc4;
+}
+
+.submit-button, .next-button, .retry-button {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+*/
+
+/* ========== CUSTOM ANIMATIONS ========== */
+/* Thêm hiệu ứng riêng cho quiz này nếu cần */
+
+/* ========== BRANDING ========== */
+/* Logo hoặc watermark cho procfu.com */
+/*
+.quiz-container::after {
+    content: 'Powered by Procfu.com';
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+*/
+
+/* ========== RESPONSIVE OVERRIDES ========== */
+/* Điều chỉnh cho mobile nếu cần */

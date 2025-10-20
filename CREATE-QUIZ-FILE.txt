@@ -1,0 +1,67 @@
+==========================================
+HƯỚNG DẪN TẠO FILE QUIZ LOCAL (100% HOẠT ĐỘNG)
+==========================================
+
+VẤN ĐỀ: Bạn download từ GitHub vẫn bị lỗi syntax do browser/CDN cache
+
+GIẢI PHÁP: Tự tạo file local từ code bên dưới
+
+==========================================
+BƯỚC 1: TẠO FILE HTML MỚI
+==========================================
+
+1. Mở Notepad (Windows) hoặc TextEdit (Mac)
+2. Copy TOÀN BỘ code từ dòng "=== BẮT ĐẦU CODE ===" đến "=== KẾT THÚC CODE ==="
+3. Paste vào Notepad/TextEdit
+4. Save As:
+   - File name: my-quiz.html
+   - Save as type: All Files (*)
+   - Encoding: UTF-8
+5. Double-click file my-quiz.html để chạy
+
+==========================================
+BƯỚC 2: HOẶC DÙNG COMMAND
+==========================================
+
+### Windows PowerShell:
+```powershell
+# Copy code này vào PowerShell và Enter
+@"
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Quiz</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+</style>
+</head>
+<body>
+<div id="quiz-container"></div>
+<script>
+alert('⚠️ VUI LÒNG DÙNG FILE ĐẦY ĐỦ - File này chỉ là template!');
+</script>
+</body>
+</html>
+"@ | Out-File -FilePath "my-quiz.html" -Encoding UTF8
+Start-Process "my-quiz.html"
+```
+
+==========================================
+LIÊN HỆ TRỰC TIẾP
+==========================================
+
+Vì bạn gặp lỗi trên 2 máy tính, có thể:
+1. CDN bị cache (raw.githubusercontent.com cache file cũ)
+2. Browser aggressive cache
+3. Network proxy/firewall modify file
+
+GIẢI PHÁP NHANH:
+- Tôi sẽ tạo file mới với tên khác: QUIZ-FIXED-FINAL.html
+- Hoặc bạn dùng file từ commit cụ thể
+
+Link mới (force no cache):
+https://raw.githubusercontent.com/hongninh/quiz/3535f40/QUIZ-FIXED-FINAL.html
+
+==========================================

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Inline Data (Always Works)</title>
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="global-quiz.css">
+    <link rel="stylesheet" href="local-quiz-complete.css">
+</head>
+<body>
+    <!-- Quiz Container -->
+    <div id="quiz-container"></div>
+    
+    <!-- ============================================ -->
+    <!-- INLINE DATA - Copy từ local_datainput.js    -->
+    <!-- Cách này LUÔN CHẠY, không cần file riêng    -->
+    <!-- ============================================ -->
+    <script>
+    window.quizData = {
+        "main_game_id": "inline_quiz_001",
+        "main_title": "Quiz Test - Inline Data",
+        "main_description": "Quiz với data inline - luôn chạy được",
+        "main_project_id": "test_project",
+        "main_game_version": "1.0.0",
+        "main_author": "Quiz Team",
+        "main_age_array": [8, 9, 10, 11],
+        "main_grade": "Primary",
+        "main_total_questions": 3,
+        "main_total_max_points": 30,
+        "main_max_time_per_game_ms": 180000,
+        "main_language": "vi",
+        "main_theme": "test",
+        "main_difficulty_level": "easy",
+        "main_show_correct_answer_after_each_quiz": true,
+        "main_shuffle_questions_order": false,
+        "main_default_hint_allow": true,
+        "main_default_hint_penalty_percent": 20,
+        "main_feedback_mode": "detailed_explanation",
+        "main_pass_threshold_percent": 70,
+        "main_status": "published",
+        "EachQuiz": [
+            {
+                "qn": 1,
+                "qid": "test_001",
+                "qtype": "mcq",
+                "qtxt": "1 + 1 = ?",
+                "pmax": 10,
+                "tmax": 30000,
+                "diff": "easy",
+                "fq": true,
+                "lq": false,
+                "opt_array": ["1", "2", "3", "4"],
+                "sol_array": "2",
+                "expl": "1 cộng 1 bằng 2",
+                "tag_array": ["math", "basic"],
+                "image_json": null,
+                "image_total_number": 0,
+                "audio_json": null,
+                "video_json": null,
+                "opt_fmt": "text_only",
+                "media_placement": "above",
+                "expl_fmt": "plain",
+                "author_id": "admin",
+                "project_id": "test",
+                "age": "8-11",
+                "grade": "primary",
+                "lang": "vi",
+                "status": "active",
+                "version": "1.0",
+                "is_private": false,
+                "penalty_points": 0,
+                "min_points": 0,
+                "speed_bonus_eligible": true,
+                "hint_allow": true,
+                "hint_penalty_percent": 20,
+                "hint_content_text": "Phép cộng đơn giản",
+                "hint_content_media": null,
+                "created_at": "2025-01-10T10:00:00Z",
+                "updated_at": "2025-01-10T10:00:00Z",
+                "shuf": false,
+                "display": "show",
+                "display_correct_answer": "y"
+            },
+            {
+                "qn": 2,
+                "qid": "test_002",
+                "qtype": "mcq",
+                "qtxt": "2 + 2 = ?",
+                "pmax": 10,
+                "tmax": 30000,
+                "diff": "easy",
+                "fq": false,
+                "lq": false,
+                "opt_array": ["2", "3", "4", "5"],
+                "sol_array": "4",
+                "expl": "2 cộng 2 bằng 4",
+                "tag_array": ["math", "basic"],
+                "image_json": null,
+                "image_total_number": 0,
+                "audio_json": null,
+                "video_json": null,
+                "opt_fmt": "text_only",
+                "media_placement": "above",
+                "expl_fmt": "plain",
+                "author_id": "admin",
+                "project_id": "test",
+                "age": "8-11",
+                "grade": "primary",
+                "lang": "vi",
+                "status": "active",
+                "version": "1.0",
+                "is_private": false,
+                "penalty_points": 0,
+                "min_points": 0,
+                "speed_bonus_eligible": true,
+                "hint_allow": true,
+                "hint_penalty_percent": 20,
+                "hint_content_text": "Phép cộng đơn giản",
+                "hint_content_media": null,
+                "created_at": "2025-01-10T10:00:00Z",
+                "updated_at": "2025-01-10T10:00:00Z",
+                "shuf": false,
+                "display": "show",
+                "display_correct_answer": "y"
+            },
+            {
+                "qn": 3,
+                "qid": "test_003",
+                "qtype": "mcq",
+                "qtxt": "3 + 3 = ?",
+                "pmax": 10,
+                "tmax": 30000,
+                "diff": "easy",
+                "fq": false,
+                "lq": true,
+                "opt_array": ["4", "5", "6", "7"],
+                "sol_array": "6",
+                "expl": "3 cộng 3 bằng 6",
+                "tag_array": ["math", "basic"],
+                "image_json": null,
+                "image_total_number": 0,
+                "audio_json": null,
+                "video_json": null,
+                "opt_fmt": "text_only",
+                "media_placement": "above",
+                "expl_fmt": "plain",
+                "author_id": "admin",
+                "project_id": "test",
+                "age": "8-11",
+                "grade": "primary",
+                "lang": "vi",
+                "status": "active",
+                "version": "1.0",
+                "is_private": false,
+                "penalty_points": 0,
+                "min_points": 0,
+                "speed_bonus_eligible": true,
+                "hint_allow": true,
+                "hint_penalty_percent": 20,
+                "hint_content_text": "Phép cộng đơn giản",
+                "hint_content_media": null,
+                "created_at": "2025-01-10T10:00:00Z",
+                "updated_at": "2025-01-10T10:00:00Z",
+                "shuf": false,
+                "display": "show",
+                "display_correct_answer": "y"
+            }
+        ]
+    };
+    
+    // Log để debug
+    console.log('✅ Inline data loaded:', window.quizData.main_title);
+    console.log('📊 Total questions:', window.quizData.EachQuiz.length);
+    </script>
+    
+    <!-- ============================================ -->
+    <!-- LOAD SCRIPTS - KHÔNG cần local_datainput.js -->
+    <!-- ============================================ -->
+    <script src="global-quiz.js"></script>
+    <script src="local-quiz-complete.js"></script>
+    
+    <!-- DEBUG INFO -->
+    <script>
+    console.log('=== SYSTEM STATUS ===');
+    console.log('✅ QuizEngine:', typeof QuizEngine !== 'undefined' ? 'Loaded' : '❌ Missing');
+    console.log('✅ Quiz Data:', window.quizData ? 'Loaded' : '❌ Missing');
+    console.log('✅ Container:', document.getElementById('quiz-container') ? 'Ready' : '❌ Missing');
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Fix - Decode & Parse Quiz Data</title>
+</head>
+<body>
+    <h1>🔧 Emergency Fix</h1>
+    <div id="status">Running diagnostics...</div>
+    <pre id="output"></pre>
+    
+    <script>
+    // === EMERGENCY FIX SCRIPT ===
+    // Copy entire my_variables.questions_and_answers_input_text_format value here
+    
+    function emergencyFix() {
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        
+        if (typeof my_variables === 'undefined' || !my_variables.questions_and_answers_input_text_format) {
+            status.innerHTML = '❌ No data found. Make sure my_variables is loaded.';
+            return;
+        }
+        
+        let raw = my_variables.questions_and_answers_input_text_format;
+        output.innerHTML += `📊 Data type: ${typeof raw}\n`;
+        output.innerHTML += `📏 Data length: ${typeof raw === 'string' ? raw.length : 'N/A'}\n\n`;
+        
+        // If object, use directly
+        if (typeof raw === 'object' && raw !== null) {
+            window.quizData = raw;
+            status.innerHTML = '✅ Data is object, using directly';
+            output.innerHTML += '✅ Success! Quiz data loaded.\n';
+            return;
+        }
+        
+        // If string, decode and parse
+        if (typeof raw === 'string') {
+            output.innerHTML += '⚙️ Processing string...\n';
+            
+            // Step 1: Decode HTML entities
+            const textarea = document.createElement('textarea');
+            textarea.innerHTML = raw;
+            const decoded = textarea.value;
+            output.innerHTML += `✅ Decoded: ${decoded.length} chars\n`;
+            
+            // Step 2: Check balance
+            const openBraces = (decoded.match(/\{/g) || []).length;
+            const closeBraces = (decoded.match(/\}/g) || []).length;
+            const openBrackets = (decoded.match(/\[/g) || []).length;
+            const closeBrackets = (decoded.match(/\]/g) || []).length;
+            
+            output.innerHTML += `🔍 Braces: { ${openBraces} vs } ${closeBraces} (diff: ${openBraces - closeBraces})\n`;
+            output.innerHTML += `🔍 Brackets: [ ${openBrackets} vs ] ${closeBrackets} (diff: ${openBrackets - closeBrackets})\n\n`;
+            
+            if (openBraces !== closeBraces || openBrackets !== closeBrackets) {
+                status.innerHTML = '❌ JSON IS TRUNCATED! Backend is cutting data.';
+                output.innerHTML += '❌ ERROR: JSON is incomplete (unbalanced brackets)\n';
+                output.innerHTML += '\n📋 SOLUTION:\n';
+                output.innerHTML += '1. Backend: Increase output buffer size\n';
+                output.innerHTML += '2. Use API endpoint instead of inline JSON\n';
+                output.innerHTML += '3. Reduce number of questions per load\n';
+                return;
+            }
+            
+            // Step 3: Try parse
+            try {
+                window.quizData = JSON.parse(decoded);
+                output.innerHTML += '✅ Parsed successfully!\n';
+                
+                // Step 4: Unwrap if needed
+                if (window.quizData.EachQuiz?.main_game_id && window.quizData.EachQuiz?.EachQuiz) {
+                    window.quizData = window.quizData.EachQuiz;
+                    output.innerHTML += '✅ Unwrapped nested structure\n';
+                }
+                
+                output.innerHTML += `\n📊 Quiz: ${window.quizData.main_title}\n`;
+                output.innerHTML += `📝 Questions: ${window.quizData.EachQuiz?.length || 0}\n`;
+                
+                status.innerHTML = '✅ SUCCESS! Quiz data ready.';
+                
+                // Auto-init quiz if container exists
+                if (document.getElementById('quiz-container') && typeof QuizEngine !== 'undefined') {
+                    const quiz = new QuizEngine(window.quizData);
+                    quiz.init('quiz-container');
+                    status.innerHTML = '✅ Quiz started!';
+                }
+                
+            } catch (e) {
+                status.innerHTML = '❌ PARSE ERROR';
+                output.innerHTML += `\n❌ Parse failed: ${e.message}\n`;
+                
+                // Extract position
+                const match = e.message.match(/position (\d+)/);
+                if (match) {
+                    const pos = parseInt(match[1]);
+                    output.innerHTML += `\n🔍 Error at position ${pos}:\n`;
+                    output.innerHTML += `Before: ${decoded.substring(Math.max(0, pos - 50), pos)}\n`;
+                    output.innerHTML += `At: [${decoded.charAt(pos)}] (code: ${decoded.charCodeAt(pos)})\n`;
+                    output.innerHTML += `After: ${decoded.substring(pos, Math.min(decoded.length, pos + 50))}\n`;
+                }
+            }
+        }
+    }
+    
+    // Run on load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', emergencyFix);
+    } else {
+        emergencyFix();
+    }
+    </script>
+</body>
+</html>

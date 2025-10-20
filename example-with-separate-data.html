@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Hoàn Chỉnh - 12 Câu Hỏi</title>
+    
+    <!-- ========== GLOBAL CSS ========== -->
+    <link rel="stylesheet" href="global-quiz.css">
+    
+    <!-- ========== LOCAL CSS ========== -->
+    <link rel="stylesheet" href="local-quiz-complete.css">
+</head>
+<body>
+    <!-- ========== QUIZ CONTAINER ========== -->
+    <div id="quiz-container"></div>
+    
+    <!-- ========== JAVASCRIPT - THỨ TỰ QUAN TRỌNG ========== -->
+    
+    <!-- 1. Global JS Engine (core quiz engine) -->
+    <script src="global-quiz.js"></script>
+    
+    <!-- 2. Local Data Input (dữ liệu quiz - có thể thay bằng backend data) -->
+    <script src="local_datainput.js"></script>
+    
+    <!-- 3. Local JS Init (khởi tạo quiz) -->
+    <script src="local-quiz-complete.js"></script>
+    
+    <!-- ========== DEBUG ========== -->
+    <script>
+        console.log('📦 Kiểm tra các component đã load:');
+        console.log('  ✅ QuizEngine:', typeof QuizEngine !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('  ✅ Quiz Data:', typeof window.quizData !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('  ✅ Container:', document.getElementById('quiz-container') ? 'OK' : '❌ MISSING');
+        
+        if (typeof window.quizData !== 'undefined') {
+            console.log('📊 Quiz Info:');
+            console.log('  - Title:', window.quizData.main_title);
+            console.log('  - Questions:', window.quizData.main_total_questions);
+            console.log('  - Max Points:', window.quizData.main_total_max_points);
+        }
+    </script>
+</body>
+</html>

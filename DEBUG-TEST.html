@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Debug Test - Check Files</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .debug-box h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .instructions {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #2196F3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-box">
+        <h2>🔍 Debug Quiz Files</h2>
+        <p>File này sẽ check xem tất cả files cần thiết có load được không.</p>
+        
+        <button onclick="runCheck()">🔄 Run Check</button>
+        <button onclick="openConsole()">📊 Open Console (F12)</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="debug-box instructions">
+        <h3>📋 Hướng dẫn kiểm tra:</h3>
+        <ol>
+            <li><strong>Click "Run Check"</strong> để kiểm tra files</li>
+            <li><strong>Nhấn F12</strong> để mở Console và xem chi tiết lỗi</li>
+            <li><strong>Check folder structure:</strong> Tất cả files phải ở cùng folder</li>
+        </ol>
+        
+        <h4>✅ Cấu trúc folder đúng:</h4>
+        <div class="code">
+quiz-folder/
+├── TEST-WITH-IDS-CORRECT.html
+├── DEBUG-TEST.html (file này)
+├── global-quiz.css
+├── global-quiz-with-ids.js        ← Quan trọng!
+├── local_datainput_with_ids.js    ← Quan trọng!
+└── local-quiz-complete.js         ← Quan trọng!
+        </div>
+    </div>
+
+    <!-- Load files để test -->
+    <script src="global-quiz-with-ids.js" onerror="logError('global-quiz-with-ids.js')"></script>
+    <script src="local_datainput_with_ids.js" onerror="logError('local_datainput_with_ids.js')"></script>
+    <script src="local-quiz-complete.js" onerror="logError('local-quiz-complete.js')"></script>
+
+    <script>
+        const errors = [];
+        
+        function logError(file) {
+            errors.push(file);
+            console.error(`❌ Failed to load: ${file}`);
+        }
+
+        function openConsole() {
+            alert('Nhấn F12 (Windows) hoặc Cmd+Opt+I (Mac) để mở Console và xem chi tiết lỗi.');
+        }
+
+        function runCheck() {
+            const resultsDiv = document.getElementById('results');
+            let html = '<h3>🔍 Check Results:</h3>';
+            
+            // Check 1: QuizEngine
+            console.log('Checking QuizEngine...', typeof QuizEngine);
+            if (typeof QuizEngine !== 'undefined') {
+                html += '<div class="status ok">✅ global-quiz-with-ids.js: Loaded</div>';
+            } else {
+                html += '<div class="status error">❌ global-quiz-with-ids.js: NOT LOADED</div>';
+                html += '<div class="status warning">⚠️ File không tồn tại hoặc không cùng folder với HTML</div>';
+            }
+            
+            // Check 2: Quiz Data
+            console.log('Checking quizData...', typeof window.quizData);
+            if (typeof window.quizData !== 'undefined') {
+                html += '<div class="status ok">✅ local_datainput_with_ids.js: Loaded</div>';
+                html += `<div class="status ok">📦 Game ID: ${window.quizData.main_game_id || 'N/A'}</div>`;
+                html += `<div class="status ok">📊 Total Questions: ${window.quizData.main_total_questions || 'N/A'}</div>`;
+                
+                // Check IDs
+                const firstQ = window.quizData.EachQuiz?.[0];
+                if (firstQ?.opt_array?.[0]) {
+                    const firstOpt = firstQ.opt_array[0];
+                    if (firstOpt.text_id || firstOpt.image_id) {
+                        html += '<div class="status ok">✅ IDs: Present!</div>';
+                        html += `<div class="status ok">🔑 Sample: ${firstOpt.text_id || firstOpt.image_id}</div>`;
+                    } else {
+                        html += '<div class="status error">❌ IDs: MISSING (wrong data file)</div>';
+                    }
+                }
+            } else {
+                html += '<div class="status error">❌ local_datainput_with_ids.js: NOT LOADED</div>';
+            }
+            
+            // Check 3: File load errors
+            if (errors.length > 0) {
+                html += '<div class="status error">❌ Failed to load:</div>';
+                errors.forEach(err => {
+                    html += `<div class="status error">  • ${err}</div>`;
+                });
+            }
+            
+            // Console check
+            html += '<h4>📊 Check Console (F12) cho chi tiết:</h4>';
+            html += '<div class="code">';
+            html += 'typeof QuizEngine: ' + typeof QuizEngine + '<br>';
+            html += 'typeof window.quizData: ' + typeof window.quizData + '<br>';
+            html += 'window.location: ' + window.location.href + '<br>';
+            html += '</div>';
+            
+            // Solutions
+            if (typeof QuizEngine === 'undefined' || typeof window.quizData === 'undefined') {
+                html += '<div class="status error" style="margin-top: 20px;">';
+                html += '<h4>🔧 GIẢI PHÁP:</h4>';
+                html += '<ol>';
+                html += '<li><strong>Check folder:</strong> Tất cả files (.html, .js, .css) phải ở CÙNG folder</li>';
+                html += '<li><strong>Mở Console (F12):</strong> Xem lỗi chi tiết (màu đỏ)</li>';
+                html += '<li><strong>Browser:</strong> Thử browser khác (Chrome/Firefox)</li>';
+                html += '<li><strong>Download lại:</strong> File có thể bị lỗi khi tải</li>';
+                html += '<li><strong>Dùng file STANDALONE:</strong> Xem file STANDALONE-QUIZ.html (không cần file riêng)</li>';
+                html += '</ol>';
+                html += '</div>';
+            } else {
+                html += '<div class="status ok" style="margin-top: 20px;">';
+                html += '<h4>✅ TẤT CẢ FILES LOADED THÀNH CÔNG!</h4>';
+                html += '<p>Bạn có thể mở file <strong>TEST-WITH-IDS-CORRECT.html</strong> để chơi quiz.</p>';
+                html += '</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+            
+            // Console logs
+            console.log('========================================');
+            console.log('DEBUG RESULTS:');
+            console.log('========================================');
+            console.log('QuizEngine:', typeof QuizEngine);
+            console.log('window.quizData:', typeof window.quizData);
+            console.log('Errors:', errors);
+            console.log('Location:', window.location.href);
+            console.log('========================================');
+        }
+        
+        // Auto run on load
+        window.addEventListener('load', () => {
+            setTimeout(runCheck, 500);
+        });
+    </script>
+</body>
+</html>
