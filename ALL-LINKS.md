@@ -340,5 +340,5 @@ console.log('First option:', window.quizData.EachQuiz[0].opt_array[0]);
 
 **Repository:** https://github.com/hongninh/quiz  
 **Branch:** cursor/bc-abd464d3-8b48-4f0e-8587-740d52d1cbb5-6436  
-**Last Commit:** eca6b24  
+**Last Commit:** e5643d6 (Fixed TEST-WITH-IDS-CORRECT.html)  
 **Updated:** 2025-10-19
