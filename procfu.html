@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game - 2 Câu Hỏi</title>
+    
+    <!-- CSS from GitHub -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.css">
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>🎯 Quiz Game</h1>
+        
+        <!-- Question Section -->
+        <div id="question-section">
+            <div class="question-section">
+                <p class="question-text">
+                    <span class="question-number">Câu <span id="question-number">1</span>/<span id="total-questions">2</span></span>
+                    <br><br>
+                    <span id="question-text"></span>
+                </p>
+                
+                <div id="answers-container" class="answers">
+                    <!-- Answers will be inserted here by JavaScript -->
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="next-btn" class="btn btn-primary" disabled>
+                    Tiếp theo →
+                </button>
+            </div>
+        </div>
+        
+        <!-- Result Section -->
+        <div id="result-section" class="result-section hidden">
+            <h2>🎊 Kết Quả</h2>
+            <div class="result-score">
+                <span id="score">0/2</span>
+            </div>
+            <div class="result-message" id="result-message"></div>
+            <div class="result-details">
+                <p><strong>Điểm số:</strong> <span id="percentage">0%</span></p>
+            </div>
+            <div class="controls">
+                <button id="restart-btn" class="btn btn-secondary">
+                    🔄 Làm lại
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript from GitHub -->
+    <script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.js"></script>
+</body>
+</html>
