@@ -5,9 +5,10 @@ Quiz game đơn giản với CSS và JavaScript được đóng gói trên GitHu
 ## 📁 Cấu trúc Files
 
 ```
-quiz.css        - File CSS (hosted trên GitHub)
-quiz.js         - File JavaScript (hosted trên GitHub)
-procfu.html     - File HTML cho Procfu.com (chỉ gọi các file từ GitHub)
+CDN Quiz/
+  ├── quiz.css        - File CSS (hosted trên GitHub)
+  ├── quiz.js         - File JavaScript (hosted trên GitHub)
+  └── procfu.html     - File HTML cho Procfu.com (chỉ gọi các file từ GitHub)
 ```
 
 ## 🚀 Hướng dẫn sử dụng
@@ -15,8 +16,8 @@ procfu.html     - File HTML cho Procfu.com (chỉ gọi các file từ GitHub)
 ### Bước 1: Push code lên GitHub
 
 ```bash
-git add quiz.css quiz.js
-git commit -m "Add quiz game files"
+git add "CDN Quiz/"
+git commit -m "Add quiz game files in CDN Quiz folder"
 git push origin main
 ```
 
@@ -26,15 +27,15 @@ Copy nội dung file `procfu.html` và paste vào Procfu.com. File này sẽ t�
 
 ```html
 <!-- CSS from GitHub -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/CDN%20Quiz/quiz.css">
 
 <!-- JavaScript from GitHub -->
-<script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/CDN%20Quiz/quiz.js"></script>
 ```
 
 ### Bước 3: Test thử
 
-1. Mở file `procfu.html` trong trình duyệt để test
+1. Mở file `CDN Quiz/procfu.html` trong trình duyệt để test
 2. Hoặc deploy trực tiếp trên Procfu.com
 
 ## ✨ Tính năng
@@ -50,7 +51,7 @@ Copy nội dung file `procfu.html` và paste vào Procfu.com. File này sẽ t�
 
 ### Thay đổi câu hỏi
 
-Chỉnh sửa file `quiz.js`, phần `quizData`:
+Chỉnh sửa file `CDN Quiz/quiz.js`, phần `quizData`:
 
 ```javascript
 const quizData = {
@@ -83,7 +84,7 @@ Thêm object mới vào mảng `questions`:
 
 ### Thay đổi màu sắc
 
-Chỉnh sửa file `quiz.css`:
+Chỉnh sửa file `CDN Quiz/quiz.css`:
 
 ```css
 /* Đổi màu gradient background */
@@ -99,8 +100,8 @@ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
 File CSS và JS được serve qua jsDelivr CDN:
 
-- **CSS:** `https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.css`
-- **JS:** `https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.js`
+- **CSS:** `https://cdn.jsdelivr.net/gh/hongninh/quiz@main/CDN%20Quiz/quiz.css`
+- **JS:** `https://cdn.jsdelivr.net/gh/hongninh/quiz@main/CDN%20Quiz/quiz.js`
 
 ### Lưu ý về Cache
 
@@ -109,11 +110,11 @@ jsDelivr có cache, nếu bạn update code:
 1. **Option 1:** Đợi vài phút để cache tự xóa
 2. **Option 2:** Thêm version vào URL:
    ```html
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/quiz.css?v=2">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@main/CDN%20Quiz/quiz.css?v=2">
    ```
 3. **Option 3:** Dùng commit hash cụ thể:
    ```html
-   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@abc1234/quiz.css">
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hongninh/quiz@abc1234/CDN%20Quiz/quiz.css">
    ```
 
 ## 🎯 Ưu điểm của cách làm này
@@ -130,7 +131,7 @@ jsDelivr có cache, nếu bạn update code:
 # Mở file procfu.html bằng trình duyệt
 # Hoặc dùng live server
 python3 -m http.server 8000
-# Truy cập: http://localhost:8000/procfu.html
+# Truy cập: http://localhost:8000/CDN%20Quiz/procfu.html
 ```
 
 ## 🐛 Troubleshooting
