@@ -1,0 +1,14 @@
+/* Minimal styles for 2-question quiz */
+.pfqz-container{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;max-width:520px;margin:16px auto;padding:16px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.pfqz-title{font-weight:700;font-size:18px;margin:0 0 12px}
+.pfqz-q{margin:12px 0;padding:12px;border-radius:10px;background:#f9fafb;border:1px dashed #e5e7eb}
+.pfqz-q h4{margin:0 0 8px;font-size:16px}
+.pfqz-opts{display:grid;gap:8px}
+.pfqz-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;cursor:pointer}
+.pfqz-opt input{accent-color:#0ea5e9}
+.pfqz-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.pfqz-btn{appearance:none;border:1px solid #0ea5e9;background:#0ea5e9;color:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+.pfqz-btn.secondary{background:#fff;color:#0ea5e9}
+.pfqz-score{margin-top:12px;font-weight:700}
+.pfqz-correct{border-color:#22c55e;background:#f0fdf4}
+.pfqz-wrong{border-color:#ef4444;background:#fef2f2}
