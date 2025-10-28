@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Kiểm Tra Kiến Thức</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #quiz-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .quiz-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quiz-progress {
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .answer-option:hover:not(:disabled) {
+            background: #f0f0f0;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .answer-option:disabled {
+            cursor: not-allowed;
+        }
+
+        .answer-letter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-text {
+            flex: 1;
+            color: #333;
+        }
+
+        .answer-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: bounceIn 0.5s ease;
+        }
+
+        .answer-option.correct .answer-letter {
+            background: #28a745;
+        }
+
+        .answer-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        .answer-option.incorrect .answer-letter {
+            background: #dc3545;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback-message {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .feedback-correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .feedback-icon {
+            font-size: 24px;
+        }
+
+        .next-button, .retry-button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .next-button:hover, .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .results-container {
+            text-align: center;
+        }
+
+        .results-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .results-score {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-circle-bg {
+            fill: none;
+            stroke: #e0e0e0;
+            stroke-width: 8;
+        }
+
+        .score-circle-fill {
+            fill: none;
+            stroke-width: 8;
+            transition: stroke-dasharray 1s ease;
+        }
+
+        .score-circle.passed .score-circle-fill {
+            stroke: #28a745;
+        }
+
+        .score-circle.failed .score-circle-fill {
+            stroke: #dc3545;
+        }
+
+        .score-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .score-percentage {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .score-fraction {
+            font-size: 18px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .results-message {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .message-passed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .message-failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .results-details {
+            text-align: left;
+            margin-top: 30px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .results-details h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .result-correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .result-incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .result-question {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .result-icon {
+            font-size: 20px;
+        }
+
+        .result-answer {
+            font-size: 14px;
+            color: #666;
+            margin-left: 30px;
+        }
+
+        .result-answer strong {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+            }
+
+            .question-title {
+                font-size: 20px;
+            }
+
+            .answer-option {
+                padding: 15px;
+                font-size: 14px;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-percentage {
+                font-size: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container"></div>
+
+    <script>
+        // Quiz Engine
+        class QuizEngine {
+            constructor(config) {
+                this.config = config;
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.answers = [];
+                this.container = null;
+            }
+
+            init(containerId) {
+                this.container = document.getElementById(containerId);
+                if (!this.container) {
+                    console.error('Quiz container not found:', containerId);
+                    return;
+                }
+                this.render();
+            }
+
+            render() {
+                if (this.currentQuestionIndex < this.config.questions.length) {
+                    this.renderQuestion();
+                } else {
+                    this.renderResults();
+                }
+            }
+
+            renderQuestion() {
+                const question = this.config.questions[this.currentQuestionIndex];
+                const totalQuestions = this.config.questions.length;
+                const questionNumber = this.currentQuestionIndex + 1;
+
+                const html = `
+                    <div class="quiz-container">
+                        <div class="quiz-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${(questionNumber / totalQuestions) * 100}%"></div>
+                            </div>
+                            <div class="progress-text">Câu ${questionNumber} / ${totalQuestions}</div>
+                        </div>
+
+                        <div class="question-container">
+                            <h2 class="question-title">${question.question}</h2>
+                            
+                            <div class="answers-container">
+                                ${question.answers.map((answer, index) => `
+                                    <button class="answer-option" data-index="${index}">
+                                        <span class="answer-letter">${String.fromCharCode(65 + index)}</span>
+                                        <span class="answer-text">${answer}</span>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+                this.attachAnswerListeners();
+            }
+
+            attachAnswerListeners() {
+                const buttons = this.container.querySelectorAll('.answer-option');
+                buttons.forEach((button, index) => {
+                    button.addEventListener('click', () => this.selectAnswer(index));
+                });
+            }
+
+            selectAnswer(answerIndex) {
+                const question = this.config.questions[this.currentQuestionIndex];
+                const isCorrect = answerIndex === question.correctAnswer;
+                
+                this.answers.push({
+                    questionIndex: this.currentQuestionIndex,
+                    answerIndex: answerIndex,
+                    isCorrect: isCorrect
+                });
+
+                if (isCorrect) {
+                    this.score++;
+                }
+
+                this.showFeedback(answerIndex, isCorrect);
+            }
+
+            showFeedback(selectedIndex, isCorrect) {
+                const buttons = this.container.querySelectorAll('.answer-option');
+                const question = this.config.questions[this.currentQuestionIndex];
+                
+                buttons.forEach(btn => btn.disabled = true);
+
+                buttons[selectedIndex].classList.add(isCorrect ? 'correct' : 'incorrect');
+                
+                if (!isCorrect) {
+                    buttons[question.correctAnswer].classList.add('correct');
+                }
+
+                const feedbackHtml = `
+                    <div class="feedback-message ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
+                        <span class="feedback-icon">${isCorrect ? '✓' : '✗'}</span>
+                        <span class="feedback-text">${isCorrect ? this.config.l10n.correctText : this.config.l10n.incorrectText}</span>
+                    </div>
+                `;
+
+                const questionContainer = this.container.querySelector('.question-container');
+                questionContainer.insertAdjacentHTML('beforeend', feedbackHtml);
+
+                const nextButton = document.createElement('button');
+                nextButton.className = 'next-button';
+                nextButton.textContent = this.currentQuestionIndex < this.config.questions.length - 1 
+                    ? this.config.l10n.nextButtonLabel 
+                    : this.config.l10n.finishButtonLabel;
+                nextButton.addEventListener('click', () => this.nextQuestion());
+                questionContainer.appendChild(nextButton);
+            }
+
+            nextQuestion() {
+                this.currentQuestionIndex++;
+                this.render();
+            }
+
+            renderResults() {
+                const totalQuestions = this.config.questions.length;
+                const percentage = Math.round((this.score / totalQuestions) * 100);
+                const passed = percentage >= this.config.passPercentage;
+
+                const html = `
+                    <div class="quiz-container results-container">
+                        <div class="results-header">
+                            <h2>${this.config.l10n.resultsTitle}</h2>
+                        </div>
+
+                        <div class="results-score">
+                            <div class="score-circle ${passed ? 'passed' : 'failed'}">
+                                <svg viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" class="score-circle-bg"></circle>
+                                    <circle cx="50" cy="50" r="45" class="score-circle-fill" 
+                                        style="stroke-dasharray: ${percentage * 2.827}, 282.7"></circle>
+                                </svg>
+                                <div class="score-text">
+                                    <div class="score-percentage">${percentage}%</div>
+                                    <div class="score-fraction">${this.score} / ${totalQuestions}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="results-message ${passed ? 'message-passed' : 'message-failed'}">
+                            ${passed ? this.config.l10n.passedMessage : this.config.l10n.failedMessage}
+                        </div>
+
+                        <div class="results-details">
+                            <h3>${this.config.l10n.reviewTitle}</h3>
+                            ${this.config.questions.map((question, index) => `
+                                <div class="result-item ${this.answers[index].isCorrect ? 'result-correct' : 'result-incorrect'}">
+                                    <div class="result-question">
+                                        <span class="result-icon">${this.answers[index].isCorrect ? '✓' : '✗'}</span>
+                                        <span>Câu ${index + 1}: ${question.question}</span>
+                                    </div>
+                                    <div class="result-answer">
+                                        ${!this.answers[index].isCorrect ? `
+                                            <div>Bạn chọn: <strong>${question.answers[this.answers[index].answerIndex]}</strong></div>
+                                            <div>Đáp án đúng: <strong>${question.answers[question.correctAnswer]}</strong></div>
+                                        ` : `
+                                            <div>Bạn đã chọn đúng: <strong>${question.answers[question.correctAnswer]}</strong></div>
+                                        `}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="results-actions">
+                            <button class="retry-button" onclick="location.reload()">
+                                ${this.config.l10n.retryButtonLabel}
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.container.innerHTML = html;
+            }
+        }
+
+        // Quiz Configuration
+        const quizConfig = {
+            questions: [
+                {
+                    question: "Chọn tình huống nguy cơ khi làm việc với máy móc?",
+                    answers: [
+                        "Đeo đầy đủ thiết bị bảo hộ lao động",
+                        "Vận hành máy khi chưa được huấn luyện",
+                        "Kiểm tra máy móc trước khi sử dụng",
+                        "Báo cáo khi phát hiện máy móc hỏng hóc"
+                    ],
+                    correctAnswer: 1
+                },
+                {
+                    question: "Hành động nào thể hiện an toàn lao động?",
+                    answers: [
+                        "Làm việc không cần nghỉ ngơi để hoàn thành sớm",
+                        "Tự ý sửa chữa thiết bị điện khi hỏng",
+                        "Tuân thủ quy trình an toàn lao động",
+                        "Bỏ qua các biển báo nguy hiểm"
+                    ],
+                    correctAnswer: 2
+                },
+                {
+                    question: "Khi xảy ra cháy nổ, bạn cần làm gì đầu tiên?",
+                    answers: [
+                        "Chạy về nhà lấy đồ đạc",
+                        "Kêu cứu và báo động khẩn cấp",
+                        "Chụp ảnh đăng lên mạng xã hội",
+                        "Đứng xem và quay video"
+                    ],
+                    correctAnswer: 1
+                },
+                {
+                    question: "Thiết bị bảo hộ nào BẮT BUỘC khi làm việc ở công trường xây dựng?",
+                    answers: [
+                        "Mũ bảo hiểm",
+                        "Tai nghe bluetooth",
+                        "Đồng hồ thông minh",
+                        "Kính thời trang"
+                    ],
+                    correctAnswer: 0
+                },
+                {
+                    question: "Biển báo nào chỉ thị nguy hiểm điện áp cao?",
+                    answers: [
+                        "Biển hình tròn màu xanh",
+                        "Biển hình tam giác màu vàng với hình tia chớp",
+                        "Biển hình vuông màu đỏ",
+                        "Biển hình chữ nhật màu trắng"
+                    ],
+                    correctAnswer: 1
+                }
+            ],
+            passPercentage: 60,
+            showScore: false,
+            l10n: {
+                nextButtonLabel: "Câu tiếp theo",
+                finishButtonLabel: "Hoàn thành",
+                retryButtonLabel: "Làm lại",
+                correctText: "Chính xác!",
+                incorrectText: "Chưa chính xác!",
+                resultsTitle: "Kết quả Quiz",
+                reviewTitle: "Xem lại các câu hỏi",
+                passedMessage: "🎉 Chúc mừng! Bạn đã vượt qua bài kiểm tra!",
+                failedMessage: "😔 Bạn chưa đạt yêu cầu. Hãy thử lại nhé!"
+            }
+        };
+
+        // Initialize quiz
+        document.addEventListener('DOMContentLoaded', function() {
+            const quiz = new QuizEngine(quizConfig);
+            quiz.init('quiz-container');
+        });
+    </script>
+</body>
+</html>
