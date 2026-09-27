@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Quiz + Userback</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+        .answer-btn { display: block; width: 100%; margin: 8px 0; padding: 12px; text-align: left; cursor: pointer; }
+        .answer-btn.selected { background: #dbeafe; border-color: #2563eb; }
+        #report-btn { position: fixed; right: 16px; bottom: 16px; padding: 10px 14px; background: #dc2626; color: #fff; border: 0; border-radius: 8px; cursor: pointer; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Quiz demo</h1>
+    <div id="question-section">
+        <p>Câu <span id="question-number">1</span>/<span id="total-questions">2</span></p>
+        <p id="question-text"></p>
+        <div id="answers-container"></div>
+        <button id="next-btn" disabled>Tiếp theo →</button>
+    </div>
+    <div id="result-section" class="hidden">
+        <h2>Kết quả: <span id="score"></span></h2>
+    </div>
+
+    <!-- Nút báo lỗi tiếng Việt (ẩn launcher mặc định của Userback) -->
+    <button id="report-btn" onclick="QuizFeedback.open('bug', 'screenshot')">🐞 Báo lỗi / Góp ý</button>
+
+    <script>
+        // Quiz tối giản chỉ để thử tích hợp - dùng cùng id với "CDN Quiz/procfu.html"
+        window.quizData = { main_game_id: 'demo-001', main_title: 'Quiz demo Userback' };
+        const questions = [
+            { q: 'JavaScript là gì?', a: ['Ngôn ngữ lập trình', 'Một loại cà phê'], correct: 0 },
+            { q: 'HTML là viết tắt của gì?', a: ['Hyper Text Markup Language', 'Home Tool Markup Language'], correct: 0 }
+        ];
+        let current = 0, score = 0, selected = null;
+
+        function render() {
+            const item = questions[current];
+            document.getElementById('question-number').textContent = current + 1;
+            document.getElementById('total-questions').textContent = questions.length;
+            document.getElementById('question-text').textContent = item.q;
+            const box = document.getElementById('answers-container');
+            box.innerHTML = '';
+            item.a.forEach((text, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.textContent = text;
+                btn.onclick = () => {
+                    selected = i;
+                    box.querySelectorAll('.answer-btn').forEach((b, j) => b.classList.toggle('selected', j === i));
+                    document.getElementById('next-btn').disabled = false;
+                };
+                box.appendChild(btn);
+            });
+            selected = null;
+            document.getElementById('next-btn').disabled = true;
+        }
+
+        document.getElementById('next-btn').onclick = () => {
+            if (selected === questions[current].correct) score++;
+            current++;
+            if (current < questions.length) return render();
+            document.getElementById('question-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('hidden');
+            document.getElementById('score').textContent = score + '/' + questions.length;
+        };
+        render();
+    </script>
+
+    <!-- ===== Tích hợp Userback: chỉ cần 2 thẻ script này ===== -->
+    <script>
+        window.QUIZ_FEEDBACK = {
+            accessToken: 'USERBACK_ACCESS_TOKEN', // thay bằng token thật
+            hideLauncher: true
+        };
+    </script>
+    <script src="userback-feedback.js"></script>
+</body>
+</html>
