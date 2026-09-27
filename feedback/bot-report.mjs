@@ -11,7 +11,7 @@
 //   NOCOBASE_COLLECTION=quiz_feedbacks              (mặc định)
 //
 // Selector quiz (đổi nếu giao diện quiz khác):
-//   ANSWER_SELECTOR=.answer-btn  NEXT_SELECTOR=#next-btn  RESULT_SELECTOR=#result-section
+//   ANSWER_SELECTOR=[data-quiz-answer]  NEXT_SELECTOR=[data-quiz-next]  RESULT_SELECTOR=[data-quiz-result]
 //
 // Kết quả cục bộ: feedback-reports/<thời-gian>-<tester>/report.json, report.md, step-*.png
 
@@ -26,9 +26,9 @@ if (!url) {
 }
 
 const env = process.env;
-const ANSWER_SELECTOR = env.ANSWER_SELECTOR || '.answer-btn';
-const NEXT_SELECTOR = env.NEXT_SELECTOR || '#next-btn';
-const RESULT_SELECTOR = env.RESULT_SELECTOR || '#result-section';
+const ANSWER_SELECTOR = env.ANSWER_SELECTOR || '[data-quiz-answer]';
+const NEXT_SELECTOR = env.NEXT_SELECTOR || '[data-quiz-next]';
+const RESULT_SELECTOR = env.RESULT_SELECTOR || '[data-quiz-result]';
 const MAX_STEPS = 50;
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');

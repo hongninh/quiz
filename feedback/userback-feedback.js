@@ -8,6 +8,7 @@
 //       testerId: 'bot-01',                     // tuỳ chọn - hoặc truyền qua URL ?tester=bot-01
 //       testerName: 'Bot kiểm thử 01',          // tuỳ chọn
 //       testerEmail: 'bot01@example.com',       // tuỳ chọn
+//       gameId: 'quiz-123',                     // tuỳ chọn - nếu không có data-quiz-game-id trên trang
 //       hideLauncher: false,                    // true = ẩn nút mặc định, tự gọi QuizFeedback.open()
 //       onlyForTesters: false,                  // true = chỉ tải widget khi có tester id (học viên thật không thấy)
 //       getContext: function () { return {}; }  // tuỳ chọn - thêm dữ liệu riêng của quiz
@@ -58,21 +59,21 @@
     }
 
     // ===== Ngữ cảnh quiz tại thời điểm gửi phản hồi =====
-    function textOf(id) {
-        const el = document.getElementById(id);
-        return el ? el.textContent.trim() : null;
+    // Quiz đánh dấu bằng thuộc tính data-quiz-* (xem docs/PHAN-HOI-USERBACK.md)
+    function readQuiz(attr) {
+        const el = document.querySelector('[' + attr + ']');
+        if (!el) return null;
+        return el.getAttribute(attr) || el.textContent.trim() || null;
     }
 
     function getQuizContext() {
-        const data = window.quizData || {};
         const context = {
             page_url: window.location.href,
             page_title: document.title,
-            game_id: data.main_game_id || null,
-            game_title: data.main_title || null,
-            question_number: textOf('question-number'),
-            total_questions: textOf('total-questions'),
-            question_text: textOf('question-text'),
+            game_id: config.gameId || readQuiz('data-quiz-game-id'),
+            question_number: readQuiz('data-quiz-question-number'),
+            total_questions: readQuiz('data-quiz-total'),
+            question_text: readQuiz('data-quiz-question-text'),
             viewport: window.innerWidth + 'x' + window.innerHeight,
             user_agent: navigator.userAgent,
             tester_id: getTesterId(),

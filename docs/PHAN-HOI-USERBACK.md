@@ -106,7 +106,23 @@ Bot gửi thẳng vào NocoBase thì **miễn phí, giữ đúng chỗ như trư
 | `feedback/demo.html` | Trang quiz mẫu có nút “🐞 Báo lỗi / Góp ý” |
 | `feedback/bot-report.mjs` | Bot tự chơi → ảnh + báo cáo → gửi vào NocoBase |
 
-### 2.4 Cài đặt cho bot
+### 2.4 Quy ước đánh dấu quiz (`data-quiz-*`)
+
+Widget và bot không phụ thuộc vào cấu trúc quiz cụ thể; chỉ cần quiz gắn các thuộc tính sau:
+
+| Thuộc tính | Gắn vào | Dùng cho |
+|---|---|---|
+| `data-quiz-game-id="<id>"` | Khung bao quiz | `game_id` trong phản hồi (hoặc truyền `gameId` trong cấu hình) |
+| `data-quiz-question-number` | Chỗ hiện số câu hiện tại | `question_number` |
+| `data-quiz-total` | Chỗ hiện tổng số câu | `total_questions` |
+| `data-quiz-question-text` | Nội dung câu hỏi | `question_text` |
+| `data-quiz-answer` | Mỗi nút đáp án | Bot chọn đáp án |
+| `data-quiz-next` | Nút “Tiếp theo” | Bot sang câu |
+| `data-quiz-result` | Màn hình kết quả (ẩn khi đang làm) | Bot biết đã chơi xong |
+
+Ví dụ đầy đủ: `feedback/demo.html`. Quiz đã có selector khác thì đặt `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR` khi chạy bot.
+
+### 2.5 Cài đặt cho bot
 
 1. Tạo bảng `quiz_feedbacks` như trên.
 2. Tạo **role** riêng cho bot, chỉ cho phép: *tạo* bản ghi `quiz_feedbacks` và *tải tệp lên*.
@@ -122,10 +138,10 @@ node feedback/bot-report.mjs "https://<link-quiz>" bot-01
 
 - Không đặt `NOCOBASE_URL` → bot chỉ lưu báo cáo tại `feedback-reports/…`.
 - Exit code: `0` chơi hết không lỗi · `2` có lỗi · `3` gửi NocoBase thất bại (báo cáo vẫn lưu cục bộ).
-- Quiz có giao diện khác → đổi `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR`.
+- Quiz chưa dùng quy ước `data-quiz-*` → đặt `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR`.
 - API key **chỉ đặt ở máy chạy bot**, không bao giờ đưa vào trang quiz.
 
-### 2.5 Cài đặt cho tester người (Userback)
+### 2.6 Cài đặt cho tester người (Userback)
 
 1. Tạo tài khoản Userback → tạo **Project**.
 2. Thêm **domain của NocoBase** (và domain trang quiz nếu quiz chạy ở nơi khác) vào project.
@@ -163,7 +179,7 @@ Dữ liệu tự đính kèm mỗi phản hồi (mục *Custom data* trong Userb
 }
 ```
 
-### 2.6 Đưa phản hồi Userback về NocoBase (tuỳ chọn)
+### 2.7 Đưa phản hồi Userback về NocoBase (tuỳ chọn)
 
 | Cách | Cần | Ghi chú |
 |---|---|---|
