@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Quiz + Userback</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+        .answer { display: block; width: 100%; margin: 8px 0; padding: 12px; text-align: left; cursor: pointer; }
+        .answer.selected { background: #dbeafe; border-color: #2563eb; }
+        #report-btn { position: fixed; right: 16px; bottom: 16px; padding: 10px 14px; background: #dc2626; color: #fff; border: 0; border-radius: 8px; cursor: pointer; }
+        [hidden] { display: none; }
+    </style>
+</head>
+<body>
+    <!-- Quiz mẫu dùng quy ước data-quiz-* để widget và bot đọc được ngữ cảnh -->
+    <main data-quiz-game-id="demo-001">
+        <h1>🎯 Quiz demo</h1>
+        <section id="question-box">
+            <p>Câu <span data-quiz-question-number></span>/<span data-quiz-total></span></p>
+            <p data-quiz-question-text></p>
+            <div id="answers"></div>
+            <button data-quiz-next disabled>Tiếp theo →</button>
+        </section>
+        <section data-quiz-result hidden>
+            <h2>Kết quả: <span id="score"></span></h2>
+        </section>
+    </main>
+
+    <!-- Nút báo lỗi tiếng Việt (ẩn launcher mặc định của Userback) -->
+    <button id="report-btn" onclick="QuizFeedback.open('bug', 'screenshot')">🐞 Báo lỗi / Góp ý</button>
+
+    <script>
+        const questions = [
+            { q: 'JavaScript là gì?', a: ['Ngôn ngữ lập trình', 'Một loại cà phê'], correct: 0 },
+            { q: 'HTML là viết tắt của gì?', a: ['Hyper Text Markup Language', 'Home Tool Markup Language'], correct: 0 }
+        ];
+        const $ = (selector) => document.querySelector(selector);
+        const nextBtn = $('[data-quiz-next]');
+        let current = 0, score = 0, selected = null;
+
+        function render() {
+            const item = questions[current];
+            $('[data-quiz-question-number]').textContent = current + 1;
+            $('[data-quiz-total]').textContent = questions.length;
+            $('[data-quiz-question-text]').textContent = item.q;
+            const box = $('#answers');
+            box.innerHTML = '';
+            item.a.forEach((text, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer';
+                btn.setAttribute('data-quiz-answer', i);
+                btn.textContent = text;
+                btn.onclick = () => {
+                    selected = i;
+                    box.querySelectorAll('.answer').forEach((b, j) => b.classList.toggle('selected', j === i));
+                    nextBtn.disabled = false;
+                };
+                box.appendChild(btn);
+            });
+            selected = null;
+            nextBtn.disabled = true;
+        }
+
+        nextBtn.onclick = () => {
+            if (selected === questions[current].correct) score++;
+            current++;
+            if (current < questions.length) return render();
+            $('#question-box').hidden = true;
+            $('[data-quiz-result]').hidden = false;
+            $('#score').textContent = score + '/' + questions.length;
+        };
+        render();
+    </script>
+
+    <!-- ===== Tích hợp Userback: chỉ cần 2 thẻ script này ===== -->
+    <script>
+        window.QUIZ_FEEDBACK = {
+            accessToken: 'USERBACK_ACCESS_TOKEN', // thay bằng token thật
+            hideLauncher: true
+        };
+    </script>
+    <script src="userback-feedback.js"></script>
+</body>
+</html>
