@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo - Quiz + Userback</title>
+    <title>Demo - Quiz + nút góp ý</title>
     <style>
         body { font-family: sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
         .answer { display: block; width: 100%; margin: 8px 0; padding: 12px; text-align: left; cursor: pointer; }
         .answer.selected { background: #dbeafe; border-color: #2563eb; }
-        #report-btn { position: fixed; right: 16px; bottom: 16px; padding: 10px 14px; background: #dc2626; color: #fff; border: 0; border-radius: 8px; cursor: pointer; }
+        #feedback-btn { position: fixed; right: 16px; bottom: 16px; padding: 10px 14px; background: #2563eb; color: #fff; border: 0; border-radius: 8px; cursor: pointer; }
+        #feedback-panel { position: fixed; right: 16px; bottom: 64px; width: 300px; padding: 12px; background: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+        #feedback-panel textarea { width: 100%; height: 100px; box-sizing: border-box; }
         [hidden] { display: none; }
     </style>
 </head>
 <body>
-    <!-- Quiz mẫu dùng quy ước data-quiz-* để widget và bot đọc được ngữ cảnh -->
+    <!-- Quiz mẫu dùng quy ước data-quiz-* để bot đọc được ngữ cảnh -->
     <main data-quiz-game-id="demo-001">
         <h1>🎯 Quiz demo</h1>
         <section id="question-box">
@@ -27,8 +29,16 @@
         </section>
     </main>
 
-    <!-- Nút báo lỗi tiếng Việt (ẩn launcher mặc định của Userback) -->
-    <button id="report-btn" onclick="QuizFeedback.open('bug', 'screenshot')">🐞 Báo lỗi / Góp ý</button>
+    <!-- Mô phỏng tool góp ý nội bộ: nút góc phải-dưới → form mô tả + ảnh → Gửi -->
+    <button id="feedback-btn" onclick="document.getElementById('feedback-panel').hidden = false">💬 Góp ý</button>
+    <div id="feedback-panel" role="dialog" aria-label="Form góp ý" hidden>
+        <form id="feedback-form">
+            <textarea name="content" placeholder="Mô tả vấn đề..." required></textarea>
+            <p><input type="file" name="screenshot" accept="image/*"></p>
+            <button type="submit">Gửi</button>
+        </form>
+        <p id="feedback-done" hidden>Cảm ơn bạn đã góp ý!</p>
+    </div>
 
     <script>
         const questions = [
@@ -73,13 +83,19 @@
         render();
     </script>
 
-    <!-- ===== Tích hợp Userback: chỉ cần 2 thẻ script này ===== -->
     <script>
-        window.QUIZ_FEEDBACK = {
-            accessToken: 'USERBACK_ACCESS_TOKEN', // thay bằng token thật
-            hideLauncher: true
+        // Tool thật sẽ gửi lên server; bản mô phỏng chỉ giữ lại để kiểm tra
+        window.submittedFeedbacks = [];
+        document.getElementById('feedback-form').onsubmit = (event) => {
+            event.preventDefault();
+            const form = event.target;
+            window.submittedFeedbacks.push({
+                content: form.content.value,
+                screenshot: form.screenshot.files[0] ? form.screenshot.files[0].name : null
+            });
+            form.hidden = true;
+            document.getElementById('feedback-done').hidden = false;
         };
     </script>
-    <script src="userback-feedback.js"></script>
 </body>
 </html>
