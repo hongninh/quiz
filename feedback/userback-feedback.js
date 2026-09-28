@@ -59,7 +59,7 @@
     }
 
     // ===== Ngữ cảnh quiz tại thời điểm gửi phản hồi =====
-    // Quiz đánh dấu bằng thuộc tính data-quiz-* (xem docs/PHAN-HOI-USERBACK.md)
+    // Quiz đánh dấu bằng thuộc tính data-quiz-* (xem docs/PHAN-HOI-KIEM-THU.md)
     function readQuiz(attr) {
         const el = document.querySelector('[' + attr + ']');
         if (!el) return null;

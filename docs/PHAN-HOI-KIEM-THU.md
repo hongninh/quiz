@@ -1,7 +1,7 @@
-# 🐞 Phản hồi kiểm thử quiz: NocoBase + Userback
+# 🐞 Phản hồi kiểm thử quiz (NocoBase)
 
-Tài liệu ghi lại **cách phản hồi trước đây trong NocoBase**, **giải pháp khi thêm Userback**
-(chụp màn hình + mô tả), và **ưu / nhược điểm**.
+Tài liệu ghi lại **cách phản hồi trước đây trong NocoBase**, **2 bot kiểm thử** (gửi trực tiếp và
+gửi qua nút góp ý) và **phương án Userback** (đang tạm dừng vì đã có tool góp ý nội bộ).
 
 > Tên bảng / trường bên dưới là đề xuất. Nếu NocoBase của bạn đã có bảng với tên khác,
 > chỉ cần đổi `NOCOBASE_COLLECTION` và tên trường cho khớp.
@@ -44,32 +44,31 @@ Người phụ trách xem bảng phản hồi, lọc, đổi trạng thái
 
 ---
 
-## 2. Giải pháp: NocoBase vẫn là trung tâm, thêm Userback cho người
+## 2. Hai bot kiểm thử
 
 ### 2.1 Kiến trúc
 
 ```
-TESTER NGƯỜI
-  Quiz (trong iframe block của NocoBase hoặc trang công khai)
-  + widget Userback (feedback/userback-feedback.js)
-    │  chụp màn hình, khoanh vùng, quay video, gõ mô tả
-    │  tự gắn: game_id, câu số mấy, nội dung câu, lỗi JS gần nhất, mã tester, trình duyệt
-    ▼
-  Userback dashboard
-    │  (tuỳ chọn) webhook ──► NocoBase Workflow (trigger Webhook) ──► tạo bản ghi quiz_feedbacks
-    ▼
-  NocoBase: quiz_feedbacks  ◄───────────────────────────────┐
-                                                             │ API key
-BOT TRONG DANH SÁCH KIỂM THỬ                                 │
-  feedback/bot-report.mjs                                    │
-    │  tự chơi quiz, chụp từng bước, ghi lỗi console         │
-    ├─► POST /api/attachments:create   (tải ảnh)             │
-    └─► POST /api/quiz_feedbacks:create (bản ghi + ảnh) ─────┘
+Bot trong danh sách kiểm thử: tự chơi quiz, chụp từng bước, ghi lỗi console
+  │
+  ├─► Bot 1 – bot-direct
+  │     POST /api/attachments:create     (tải ảnh)
+  │     POST /api/quiz_feedbacks:create  (bản ghi + ảnh)  ──► NocoBase: quiz_feedbacks
+  │
+  └─► Bot 2 – bot-button
+        bấm nút "Góp ý" góc phải → điền mô tả → đính ảnh → Gửi
+        (đi đúng đường của người dùng thật)                ──► tool góp ý nội bộ
 ```
 
-**Vì sao bot không dùng Userback:** widget Userback là giao diện cho người bấm tay. Bot gửi vào Userback
-chỉ được qua REST API của Userback, mà REST API / webhook chỉ có ở gói cao nhất (Business Plus).
-Bot gửi thẳng vào NocoBase thì **miễn phí, giữ đúng chỗ như trước**, nay có thêm ảnh chụp.
+| | Bot 1 – `bot-direct` | Bot 2 – `bot-button` |
+|---|---|---|
+| Gửi phản hồi bằng | API NocoBase (API key) | Nút “Góp ý” góc phải trên giao diện |
+| Kiểm thử được | Quiz | Quiz **và** tool góp ý nội bộ (nút có hiện không, form có gửi được không) |
+| Dữ liệu gửi | Đầy đủ: mô tả, lỗi, ngữ cảnh từng bước, **mọi** ảnh chụp | Những gì form góp ý cho phép: mô tả ngắn + 1 ảnh |
+| Cần | API key có quyền tạo bản ghi + tải tệp | Phiên đăng nhập (nếu tool yêu cầu), selector nếu tool khác mặc định |
+| Khi hỏng | Lỗi API → exit 3, báo cáo vẫn lưu cục bộ | Không thấy nút / không gửi được → exit 4, có ảnh chụp chỗ hỏng |
+
+Cả 2 bot đều lưu báo cáo cục bộ tại `feedback-reports/<thời-gian>-<bot>-<tester>/` (`report.md`, `report.json`, `step-*.png`).
 
 ### 2.2 Bảng dữ liệu đề xuất trong NocoBase
 
@@ -82,37 +81,38 @@ Bot gửi thẳng vào NocoBase thì **miễn phí, giữ đúng chỗ như trư
 | `kind` | Single select | `bot` / `người` |
 | `active` | Checkbox | |
 
-**`quiz_feedbacks` – phản hồi**
+**`quiz_feedbacks` – phản hồi** (bot-direct ghi vào đây; bot-button đi qua tool nội bộ)
 
 | Trường | Kiểu | Ghi chú |
 |---|---|---|
 | `title` | Single line text | |
-| `source` | Single select | `bot` / `userback` / `form` |
+| `source` | Single select | `bot-direct` / `form` / … |
 | `status` | Single select | `new` / `in_progress` / `done` / `ok` (bot chơi không lỗi) |
 | `tester_code` | Single line text | Nối với `testers.code` (hoặc đổi thành quan hệ Many-to-one) |
 | `game_id` | Single line text | |
 | `question_number` | Single line text | |
-| `description` | Markdown | Bot ghi báo cáo từng bước |
+| `description` | Markdown | Báo cáo từng bước |
 | `errors` | JSON | Lỗi console / JS |
 | `context` | JSON | Ngữ cảnh từng bước |
 | `screenshots` | Attachment | Ảnh chụp |
-| `userback_url` | URL | Link phản hồi bên Userback (nếu đồng bộ) |
 
 ### 2.3 Các file
 
 | File | Vai trò |
 |---|---|
-| `feedback/userback-feedback.js` | Tải widget Userback, gắn ngữ cảnh quiz, ghi 20 lỗi JS gần nhất, nhận diện tester |
-| `feedback/demo.html` | Trang quiz mẫu có nút “🐞 Báo lỗi / Góp ý” |
-| `feedback/bot-report.mjs` | Bot tự chơi → ảnh + báo cáo → gửi vào NocoBase |
+| `feedback/bots/lib.mjs` | Phần chung: mở quiz, tự chơi, chụp ảnh, ghi lỗi, đọc ngữ cảnh, lưu báo cáo |
+| `feedback/bots/bot-direct.mjs` | Bot 1 – gửi thẳng vào NocoBase |
+| `feedback/bots/bot-button.mjs` | Bot 2 – gửi qua nút góp ý góc phải |
+| `feedback/demo.html` | Quiz mẫu + mô phỏng nút “💬 Góp ý” góc phải để thử 2 bot |
+| `feedback/userback-feedback.js` | Widget Userback (tạm dừng, xem mục 3) |
 
 ### 2.4 Quy ước đánh dấu quiz (`data-quiz-*`)
 
-Widget và bot không phụ thuộc vào cấu trúc quiz cụ thể; chỉ cần quiz gắn các thuộc tính sau:
+Bot không phụ thuộc vào cấu trúc quiz cụ thể; chỉ cần quiz gắn các thuộc tính sau:
 
 | Thuộc tính | Gắn vào | Dùng cho |
 |---|---|---|
-| `data-quiz-game-id="<id>"` | Khung bao quiz | `game_id` trong phản hồi (hoặc truyền `gameId` trong cấu hình) |
+| `data-quiz-game-id="<id>"` | Khung bao quiz | `game_id` trong phản hồi |
 | `data-quiz-question-number` | Chỗ hiện số câu hiện tại | `question_number` |
 | `data-quiz-total` | Chỗ hiện tổng số câu | `total_questions` |
 | `data-quiz-question-text` | Nội dung câu hỏi | `question_text` |
@@ -120,28 +120,77 @@ Widget và bot không phụ thuộc vào cấu trúc quiz cụ thể; chỉ cầ
 | `data-quiz-next` | Nút “Tiếp theo” | Bot sang câu |
 | `data-quiz-result` | Màn hình kết quả (ẩn khi đang làm) | Bot biết đã chơi xong |
 
-Ví dụ đầy đủ: `feedback/demo.html`. Quiz đã có selector khác thì đặt `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR` khi chạy bot.
+Quiz đã có selector khác thì đặt `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR` khi chạy bot.
 
-### 2.5 Cài đặt cho bot
+### 2.5 Chuẩn bị chung
+
+```bash
+npm i -D playwright
+```
+
+Quiz cần đăng nhập NocoBase → lưu phiên đăng nhập của tài khoản bot một lần, rồi truyền `STORAGE_STATE`:
+
+```bash
+npx playwright codegen --save-storage=auth.json "https://nocobase.cua-ban.vn"   # đăng nhập bằng tài khoản bot rồi đóng cửa sổ
+STORAGE_STATE=auth.json node feedback/bots/bot-button.mjs "<link-quiz>" bot-02
+```
+
+`auth.json` chứa phiên đăng nhập – **không commit** lên repo.
+
+### 2.6 Bot 1 – `bot-direct`
 
 1. Tạo bảng `quiz_feedbacks` như trên.
 2. Tạo **role** riêng cho bot, chỉ cho phép: *tạo* bản ghi `quiz_feedbacks` và *tải tệp lên*.
 3. **Settings → API keys** → tạo key gắn role đó (đặt thời hạn).
-4. Chạy bot:
+4. Chạy:
 
 ```bash
-npm i -D playwright
 NOCOBASE_URL=https://nocobase.cua-ban.vn/api \
 NOCOBASE_API_KEY=xxxxx \
-node feedback/bot-report.mjs "https://<link-quiz>" bot-01
+node feedback/bots/bot-direct.mjs "<link-quiz>" bot-01
 ```
 
-- Không đặt `NOCOBASE_URL` → bot chỉ lưu báo cáo tại `feedback-reports/…`.
-- Exit code: `0` chơi hết không lỗi · `2` có lỗi · `3` gửi NocoBase thất bại (báo cáo vẫn lưu cục bộ).
-- Quiz chưa dùng quy ước `data-quiz-*` → đặt `ANSWER_SELECTOR`, `NEXT_SELECTOR`, `RESULT_SELECTOR`.
+- Không đặt `NOCOBASE_URL` → chỉ lưu báo cáo cục bộ.
+- Exit code: `0` chơi hết không lỗi · `2` quiz có lỗi · `3` gửi NocoBase thất bại.
 - API key **chỉ đặt ở máy chạy bot**, không bao giờ đưa vào trang quiz.
 
-### 2.6 Cài đặt cho tester người (Userback)
+### 2.7 Bot 2 – `bot-button`
+
+```bash
+node feedback/bots/bot-button.mjs "<link-quiz>" bot-02
+```
+
+Các bước bot làm sau khi chơi xong:
+
+1. Chụp màn hình hiện tại.
+2. Tìm nút góp ý: phần tử có chữ / `aria-label` / `title` khớp `góp ý|feedback|phản hồi|báo lỗi`, chọn cái **nằm góc phải-dưới nhất**.
+3. Bấm nút → chờ ô mô tả (`textarea` hoặc vùng soạn thảo) hiện ra → điền: mã bot, kết quả, game, câu, danh sách lỗi.
+4. Đính ảnh: nếu tool có nút “chụp màn hình” (khai báo `FEEDBACK_SCREENSHOT_SELECTOR`) thì bấm nút đó; không thì đưa ảnh vào ô chọn tệp `input[type=file]`; không có cả hai thì bỏ qua ảnh.
+5. Bấm nút có chữ `Gửi|Submit|Send` → chờ chữ `Cảm ơn|thành công|đã gửi|thank`.
+
+Tool nội bộ khác mặc định → khai báo selector:
+
+| Biến | Dùng khi |
+|---|---|
+| `FEEDBACK_BUTTON_SELECTOR` / `FEEDBACK_BUTTON_TEXT` | Nút góp ý có chữ khác hoặc bot chọn nhầm nút |
+| `FEEDBACK_TEXT_SELECTOR` | Ô mô tả không phải `textarea` |
+| `FEEDBACK_FILE_SELECTOR` | Có nhiều ô chọn tệp trên trang |
+| `FEEDBACK_SCREENSHOT_SELECTOR` | Tool có nút tự chụp màn hình |
+| `FEEDBACK_SUBMIT_SELECTOR` | Nút gửi có chữ khác |
+| `FEEDBACK_SUCCESS_TEXT` | Thông báo thành công có chữ khác |
+
+- Exit code: `0` không lỗi · `2` quiz có lỗi (đã gửi góp ý) · `4` không gửi được qua nút góp ý.
+- Nếu nút góp ý nằm trong iframe khác domain với quiz, bot chưa hỗ trợ – cần báo lại để bổ sung.
+
+---
+
+## 3. Userback (tạm dừng)
+
+Hiện đã có tool góp ý nội bộ nên **tạm không dùng Userback**. Phần dưới giữ lại để tham khảo nếu cần
+thêm công cụ khoanh vùng / quay video cho tester người sau này. `feedback/userback-feedback.js` vẫn còn,
+chỉ chạy khi được nhúng vào trang.
+
+### 3.1 Cài đặt (khi dùng lại)
 
 1. Tạo tài khoản Userback → tạo **Project**.
 2. Thêm **domain của NocoBase** (và domain trang quiz nếu quiz chạy ở nơi khác) vào project.
@@ -179,19 +228,17 @@ Dữ liệu tự đính kèm mỗi phản hồi (mục *Custom data* trong Userb
 }
 ```
 
-### 2.7 Đưa phản hồi Userback về NocoBase (tuỳ chọn)
+### 3.2 Đưa phản hồi Userback về NocoBase (tuỳ chọn)
 
 | Cách | Cần | Ghi chú |
 |---|---|---|
 | Userback webhook → NocoBase Workflow trigger **Webhook** → node *Create record* `quiz_feedbacks` (`source = userback`) | Userback **Business Plus** + plugin **Workflow: Webhook** của NocoBase (bản thương mại) | Tự động hoàn toàn, tốn phí cả hai phía |
-| Người phụ trách tạo bản ghi và dán `userback_url` | Không | Miễn phí, làm tay |
+| Người phụ trách tạo bản ghi và dán link Userback (thêm trường `userback_url` kiểu URL) | Không | Miễn phí, làm tay |
 | Không đồng bộ: người xem ở Userback, bot xem ở NocoBase | Không | Đơn giản nhất nhưng phản hồi nằm 2 nơi |
 
----
+### 3.3 Ưu / nhược điểm
 
-## 3. Ưu / nhược điểm khi dùng Userback
-
-### ✅ Ưu điểm
+#### ✅ Ưu điểm
 
 | Ưu điểm | Chi tiết |
 |---|---|
@@ -201,12 +248,12 @@ Dữ liệu tự đính kèm mỗi phản hồi (mục *Custom data* trong Userb
 | **Gói Free** | Theo thông tin công khai: không giới hạn số phản hồi và số người dùng |
 | **Dashboard riêng cho phản hồi** | Có trạng thái, gán người xử lý, bình luận |
 
-### ❌ Nhược điểm
+#### ❌ Nhược điểm
 
 | Nhược điểm | Chi tiết / cách giảm |
 |---|---|
 | **Phản hồi nằm 2 nơi** | Người → Userback, bot → NocoBase. Đồng bộ tự động cần Userback Business Plus + plugin Webhook NocoBase |
-| **Bot không dùng được widget** | Bot gửi thẳng NocoBase bằng `bot-report.mjs` |
+| **Bot không dùng được widget** | Bot dùng `bot-direct` / `bot-button` |
 | **REST API / webhook Userback đắt** | Chỉ gói Business Plus (~159–199 USD/tháng theo nguồn công khai 2026 — kiểm tra lại giá) |
 | **Dữ liệu ra ngoài** | Ảnh chụp, mô tả lưu trên server Userback, không nằm trong NocoBase của bạn |
 | **Ảnh chụp phía trình duyệt không hoàn hảo** | Ảnh, canvas, video không cho phép tải chéo (CORS) có thể bị trắng. Widget trong iframe chỉ chụp phần quiz, không chụp giao diện NocoBase bên ngoài |
@@ -214,12 +261,12 @@ Dữ liệu tự đính kèm mỗi phản hồi (mục *Custom data* trong Userb
 | **Quyền riêng tư** | Dùng `onlyForTesters: true` để học viên thật không thấy nút |
 | **Thêm script bên thứ ba** | Có thể bị trình chặn quảng cáo chặn; cache jsDelivr `@main` chậm cập nhật → dùng `@<commit>` |
 
-### 📊 So sánh
+#### 📊 So sánh
 
-| Tiêu chí | NocoBase thuần (trước đây) | NocoBase + Userback (đề xuất) | Tự làm nút chụp trong NocoBase |
+| Tiêu chí | NocoBase thuần (trước đây) | NocoBase + Userback (tạm dừng) | Tự làm nút chụp trong NocoBase |
 |---|---|---|---|
 | Ảnh chụp cho người | ❌ phải tự chụp | ✅ có khoanh vùng, video | ✅ chụp được, không khoanh vùng/video |
-| Ảnh chụp cho bot | ❌ | ✅ qua `bot-report.mjs` | ✅ qua `bot-report.mjs` |
+| Ảnh chụp cho bot | ❌ | ✅ qua 2 bot | ✅ qua 2 bot |
 | Ngữ cảnh tự động | ❌ | ✅ | ✅ (tự code) |
 | Dữ liệu ở một nơi | ✅ | ⚠️ 2 nơi (trừ khi trả phí đồng bộ) | ✅ |
 | Dữ liệu trên server mình | ✅ | ❌ phần của người | ✅ |
@@ -228,11 +275,13 @@ Dữ liệu tự đính kèm mỗi phản hồi (mục *Custom data* trong Userb
 
 ---
 
+---
+
 ## 4. Khuyến nghị
 
-1. **Bot** → dùng ngay `feedback/bot-report.mjs` gửi vào NocoBase (miễn phí, có ảnh chụp, đúng bảng như trước).
-2. **Người** → thử Userback gói Free trong iframe block với `onlyForTesters: true`.
-3. Sau 2–4 tuần dùng thử:
-   - Phản hồi của người ít, chấp nhận nằm ở Userback → giữ nguyên, dán `userback_url` khi cần.
-   - Cần mọi thứ trong NocoBase → cân nhắc trả phí đồng bộ, **hoặc** tự làm nút chụp màn hình trong NocoBase
-     (tải ảnh qua `attachments:create`, giống cách bot đang làm) và bỏ Userback.
+1. Chạy **cả 2 bot** định kỳ:
+   - `bot-direct` → báo cáo đầy đủ về quiz (mọi ảnh, mọi lỗi) vào `quiz_feedbacks`.
+   - `bot-button` → kiểm tra tool góp ý nội bộ vẫn hoạt động: nút còn hiện, form gửi được, ảnh đính được.
+     Exit code `4` nghĩa là **người dùng thật cũng không góp ý được** – cần xử lý ngay.
+2. Đặt mã tester khác nhau cho 2 bot (vd `bot-01` cho direct, `bot-02` cho nút) để lọc trong NocoBase.
+3. Userback: giữ tạm dừng; chỉ xem lại nếu tester người cần khoanh vùng / quay video mà tool nội bộ chưa có.
