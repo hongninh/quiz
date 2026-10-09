@@ -1,0 +1,803 @@
+{
+ "deployment_code": "LT100010",
+ "attempt": {
+  "attempt_code": "LBmv1lzyhkfqj79",
+  "deployment_code_ref": "LT100010",
+  "ma_chien_dich_ref": null,
+  "campaign_code_snapshot": null,
+  "campaign_name_snapshot": null,
+  "audience_type": "tai_xe",
+  "attempt_number": 1,
+  "content_version": 4,
+  "attempt_status": "da_nop",
+  "player_full_name": "TEST TAI",
+  "province": "Hà Nội",
+  "province_ref_id": 384382319919104,
+  "phone_number": null,
+  "phone_owner": "cua_ban_than",
+  "player_uid": "Umv1lzyhk8m1cx",
+  "session_id": "Smv1lzyhknb4cr",
+  "user_agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Mobile/15E148 Safari/604.1",
+  "device_type": "dien_thoai",
+  "started_at": "2026-10-09T23:41:18.296Z",
+  "max_score": 300,
+  "exam_set_code_snapshot": "BD100013",
+  "exam_set_title_snapshot": "Đề kiểm tra ATGT – GPLX – Đề số 1/6",
+  "loai_nguoi_choi": "nguoi_that",
+  "xa_phuong_ma": null,
+  "nguon_dia_ban": null,
+  "nhom_theo_link": null,
+  "nhom_nguoi_lam": "tai_xe",
+  "school_name": null,
+  "class_name": null,
+  "khoa_nganh": null,
+  "organization_name": null,
+  "no_organization": false,
+  "noi_lam_viec_loai": null,
+  "hang_van_chuyen": null,
+  "tuyen_hay_di": null,
+  "loai_xe": null,
+  "submitted_at": "2026-10-09T23:41:59.435Z",
+  "total_time_ms": 41139,
+  "average_time_per_question_ms": 1371,
+  "total_score": 70,
+  "percentage": 23,
+  "pass_status": "chua_dat",
+  "correct_count": 7,
+  "wrong_count": 23,
+  "skipped_count": 0,
+  "completion_rate_percent": 100
+ },
+ "answers": [
+  {
+   "question_order_in_set": 1,
+   "question_id": "100056",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:18.292Z",
+   "answered_at": "2026-10-09T23:41:19.089Z",
+   "time_spent_ms": 797,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 0,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 2,
+   "question_id": "100067",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:19.637Z",
+   "answered_at": "2026-10-09T23:41:20.420Z",
+   "time_spent_ms": 783,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 0,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 3,
+   "question_id": "100077",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:20.951Z",
+   "answered_at": "2026-10-09T23:41:21.737Z",
+   "time_spent_ms": 786,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 0,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 4,
+   "question_id": "100086",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:22.286Z",
+   "answered_at": "2026-10-09T23:41:23.052Z",
+   "time_spent_ms": 766,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 10,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 5,
+   "question_id": "100087",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:23.586Z",
+   "answered_at": "2026-10-09T23:41:24.377Z",
+   "time_spent_ms": 791,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 10,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 6,
+   "question_id": "100116",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:24.919Z",
+   "answered_at": "2026-10-09T23:41:25.685Z",
+   "time_spent_ms": 766,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 10,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 7,
+   "question_id": "100118",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:26.218Z",
+   "answered_at": "2026-10-09T23:41:26.985Z",
+   "time_spent_ms": 767,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 20,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 8,
+   "question_id": "100123",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:27.518Z",
+   "answered_at": "2026-10-09T23:41:28.302Z",
+   "time_spent_ms": 784,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 20,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 9,
+   "question_id": "100139",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:28.852Z",
+   "answered_at": "2026-10-09T23:41:29.618Z",
+   "time_spent_ms": 766,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 30,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 10,
+   "question_id": "100171",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:30.152Z",
+   "answered_at": "2026-10-09T23:41:30.919Z",
+   "time_spent_ms": 767,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 30,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 11,
+   "question_id": "100331",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:31.471Z",
+   "answered_at": "2026-10-09T23:41:32.235Z",
+   "time_spent_ms": 764,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 40,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 12,
+   "question_id": "100184",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:32.769Z",
+   "answered_at": "2026-10-09T23:41:33.551Z",
+   "time_spent_ms": 782,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 2,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 13,
+   "question_id": "100273",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:34.086Z",
+   "answered_at": "2026-10-09T23:41:34.868Z",
+   "time_spent_ms": 782,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 14,
+   "question_id": "100344",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:35.418Z",
+   "answered_at": "2026-10-09T23:41:36.203Z",
+   "time_spent_ms": 785,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 15,
+   "question_id": "100349",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:36.735Z",
+   "answered_at": "2026-10-09T23:41:37.502Z",
+   "time_spent_ms": 767,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 16,
+   "question_id": "100356",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:38.035Z",
+   "answered_at": "2026-10-09T23:41:38.819Z",
+   "time_spent_ms": 784,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 17,
+   "question_id": "100406",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:39.351Z",
+   "answered_at": "2026-10-09T23:41:40.120Z",
+   "time_spent_ms": 769,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 18,
+   "question_id": "100414",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:40.652Z",
+   "answered_at": "2026-10-09T23:41:41.436Z",
+   "time_spent_ms": 784,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 19,
+   "question_id": "100424",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:41.968Z",
+   "answered_at": "2026-10-09T23:41:42.736Z",
+   "time_spent_ms": 768,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 50,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 20,
+   "question_id": "100439",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:43.268Z",
+   "answered_at": "2026-10-09T23:41:44.034Z",
+   "time_spent_ms": 766,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 60,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 21,
+   "question_id": "100458",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:44.573Z",
+   "answered_at": "2026-10-09T23:41:45.336Z",
+   "time_spent_ms": 763,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 60,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 22,
+   "question_id": "100492",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:45.866Z",
+   "answered_at": "2026-10-09T23:41:46.652Z",
+   "time_spent_ms": 786,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "A"
+   ],
+   "is_correct": true,
+   "is_skipped": false,
+   "points_earned": 10,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 1,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 23,
+   "question_id": "100507",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:47.184Z",
+   "answered_at": "2026-10-09T23:41:47.951Z",
+   "time_spent_ms": 767,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "C"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 24,
+   "question_id": "100523",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:48.485Z",
+   "answered_at": "2026-10-09T23:41:49.269Z",
+   "time_spent_ms": 784,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 25,
+   "question_id": "100529",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:49.800Z",
+   "answered_at": "2026-10-09T23:41:50.568Z",
+   "time_spent_ms": 768,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 26,
+   "question_id": "100551",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:51.100Z",
+   "answered_at": "2026-10-09T23:41:51.885Z",
+   "time_spent_ms": 785,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "D"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 27,
+   "question_id": "100577",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:52.421Z",
+   "answered_at": "2026-10-09T23:41:53.200Z",
+   "time_spent_ms": 779,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 28,
+   "question_id": "100583",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:53.734Z",
+   "answered_at": "2026-10-09T23:41:54.518Z",
+   "time_spent_ms": 784,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 29,
+   "question_id": "100603",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:55.053Z",
+   "answered_at": "2026-10-09T23:41:55.816Z",
+   "time_spent_ms": 763,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  },
+  {
+   "question_order_in_set": 30,
+   "question_id": "100617",
+   "question_type_snapshot": "single_text_choice",
+   "is_last_question": false,
+   "started_at": "2026-10-09T23:41:56.369Z",
+   "answered_at": "2026-10-09T23:41:57.151Z",
+   "time_spent_ms": 782,
+   "answer_of_player": [
+    "A"
+   ],
+   "correct_answer_snapshot": [
+    "B"
+   ],
+   "is_correct": false,
+   "is_skipped": false,
+   "points_earned": 0,
+   "points_max": 10,
+   "speed_bonus_points": 0,
+   "penalty_points": 0,
+   "cumulative_points": 70,
+   "correct_streak": 0,
+   "hint_used": false,
+   "answer_shown": true
+  }
+ ]
+}
