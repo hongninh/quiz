@@ -93,6 +93,30 @@ location = /api/shdnFeedback:ma.js {
     proxy_hide_header Set-Cookie;
     add_header X-Cache $upstream_cache_status always;
 }
+
+# Vỏ trang làm bài /q/<mã> (0.7.7, 2026-10-10): plugin trả MỘT chuỗi HTML cố định cho mọi lượt (shdnQuiz:trang), nên cả hội trường
+# quét QR cùng lúc chỉ cần 1 lần gọi NocoBase / 10 giây. sub_filter (nút góp ý) là bộ lọc đầu ra nên vẫn chèn vào bản lấy từ cache.
+# Regex này đứng TRƯỚC regex /q/<mã> sẵn có (file include ở dòng đầu snippet) nên được chọn; mẫu giống hệt bản cũ.
+location ~ "^/q/([0-9a-zA-Z_-]+)/?$" {
+    rewrite "^/q/([0-9a-zA-Z_-]+)/?$" /api/shdnQuiz:trang?ma=$1 break;
+    proxy_pass http://127.0.0.1:13000;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header Accept-Encoding "";  # de sub_filter doc duoc HTML
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 60s;
+
+    proxy_cache quiz;
+    proxy_cache_key $scheme$host$request_uri;
+    proxy_cache_valid 200 10s;
+    proxy_cache_lock on;
+    proxy_cache_use_stale updating error timeout http_500 http_502 http_503 http_504;
+    proxy_ignore_headers Cache-Control Expires Set-Cookie;
+    proxy_hide_header Set-Cookie;
+    add_header X-Cache $upstream_cache_status always;
+}
 CAUHINH
 
 grep -q quiz-cache-locations /etc/nginx/snippets/shdn-ten-mien-nocobase.conf || sed -i '1i include snippets/quiz-cache-locations.conf;' /etc/nginx/snippets/shdn-ten-mien-nocobase.conf

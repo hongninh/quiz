@@ -1,5 +1,8 @@
 # Cache + gzip cho trang quiz (nginx)
 
+> Bản chính đã chuyển sang `hongninh/shdn-nocobase` → `plugins_nguon/_ha_tang/nginx_quiz_cache/` (có `cai_dat.sh` chạy thẳng trên VPS).
+> Bản ở đây giữ để tra; từ 2026-10-10 có thêm cache vỏ trang `/q/<mã>` 10 giây.
+
 NocoBase (`nocobase/nocobase:2.2.4`, Docker) chạy 1 tiến trình Node nên mỗi giây chỉ dựng được
 khoảng 16 gói đề. Các file ở đây để nginx giữ bản sao ngắn hạn của những thứ giống hệt nhau với
 mọi học sinh, gồm đề (`shdnQuiz:goi`, 30 giây), `app.js` (60 giây) và `ma.js` (60 giây). Kèm theo
